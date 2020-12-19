@@ -1,0 +1,20 @@
+@import './variables.scss';
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
+
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: $grey_dark;
+}
+
+*:focus {
+	outline: none;
+}
+
+* {
+	font-family: 'Montserrat';
+	color: white;
+	font-size: $s;
+}

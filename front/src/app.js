@@ -2,4 +2,9 @@
  Entrypoint of the web app.
 */
 
-console.log("App is running");
+import Router from './Router';
+import pageLayout from './views/PageLayout';
+
+window.router = new Router();
+new pageLayout().render();
+Backbone.history.start();

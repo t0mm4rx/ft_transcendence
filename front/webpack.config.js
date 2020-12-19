@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
 	entry: {
-		app: ["./src/app.js"]
+		app: ["./src/app.js", "./scss/main.scss"]
 	},
 	output: {
 		path: path.resolve(__dirname, "./dist/"),
@@ -16,10 +16,20 @@ module.exports = {
 		port: 8080
 	},
 	module: {
-		rules: [{
-			test: /\.js$/,
-			include: path.resolve(__dirname, './src'),
-			loader: "babel-loader"
-		}]
+		rules: [
+			{
+				test: /\.js$/,
+				include: path.resolve(__dirname, './src'),
+				loader: "babel-loader"
+			},
+			{
+				test: /\.(scss|css)$/,
+				include: path.resolve(__dirname, './scss'),
+				use: [{
+					loader: 'file-loader',
+					options: {outputPath: './', name: '[name].min.css'}
+				}, 'sass-loader'],
+			},
+		]
 	}
 };
