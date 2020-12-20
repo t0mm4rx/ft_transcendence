@@ -41,6 +41,17 @@ RUN rm -rf /var/cache/apk/*
 RUN gem install bundler
 RUN gem install rails -v 6.1.0
 
+# Create app folder
+RUN mkdir -p /usr/app; \
+	chmod 0700 /usr/app
+
+# Copy gemfile
+COPY ./app/Gemfile /usr/app
+COPY ./app/Gemfile.lock /usr/app
+
+RUN cd /usr/app; \
+	bundle install
+
 COPY ./conf/database.yml /tmp/database.yml
 #RUN chown -R bund:bund /tmp/database.yml
 

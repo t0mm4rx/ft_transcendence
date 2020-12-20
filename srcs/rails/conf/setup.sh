@@ -8,8 +8,8 @@ host="$1"
 shift
 
 # Crate app folder
-mkdir -p /usr/app
-chmod 0700 /usr/app
+#mkdir -p /usr/app
+#chmod 0700 /usr/app
 
 cd /usr/app
 
@@ -19,13 +19,11 @@ then
 	echo "ERROR : Please create app folder on host machine."
 	echo "Execute srcs/rails/dev/scatch.sh"
 	exit 2
-else
-	# Install gems
-	bundle install
 fi
-
-# Add database informations
-mv /tmp/database.yml /usr/app/config/databse.yml
+#else
+	# Install gems
+#	bundle install
+#fi
 
 # Remove a potentially pre-existing server.pid for Rails.
 rm -f /usr/app/tmp/pids/server.pid
