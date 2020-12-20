@@ -1,0 +1,113 @@
+FROM alpine:3.12
+
+# PostgresSQL install procedure
+# https://www.postgresql.org/docs/12/install-procedure.html
+
+ENV PGDATA /var/lib/postgresql/data
+
+# Download of postgresql-12.1
+
+# Download tar
+RUN wget -O postgresql.tar.bz2 https://ftp.postgresql.org/pub/source/v12.1/postgresql-12.1.tar.bz2
+
+# Create postgresql folder life
+RUN mkdir -p /usr/src/postgresql
+
+# Extract files
+RUN tar \
+	--extract \
+	--file postgresql.tar.bz2 \
+	--directory /usr/src/postgresql \
+	--strip-components 1
+
+# Remove tar
+RUN rm postgresql.tar.bz2
+
+# Install packages and deps
+RUN apk update \
+	&& apk add --upgrade \
+	busybox \
+	icu-libs \
+        icu-dev \
+	libcrypto1.1 \
+	libgcc \
+	libldap \
+	libpq \
+	libssl1.1 \
+	libstdc++ \
+	libxml2 \
+	libxml2-dev \
+	libxslt-dev \
+	libc-dev \
+	readline-dev \
+	llvm10-libs \
+	llvm10-dev \
+	e2fsprogs \
+	e2fsprogs-dev \
+	perl-utils \
+	perl-ipc-run \	
+	make \
+	bison \
+	flex \
+	musl \
+	openssl-dev \
+	tzdata \
+	linux-headers \
+	dpkg-dev \
+	dpkg \
+	zlib-dev \
+	gcc \
+	clang \
+	g++
+
+# Remove redundant duplication of apk
+RUN rm -rf /var/cache/apk/*
+
+# Cofigure postrgresql
+RUN cd /usr/src/postgresql; \
+	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+	./configure \
+		--build="$gnuArch" \
+		--enable-integer-datetimes \
+		--enable-thread-safety \
+		--enable-tap-tests \
+		--disable-rpath \
+		--with-uuid=e2fs \
+		--with-gnu-ld \
+		--with-system-tzdata=/usr/share/zoneinfo \
+		--with-includes=/usr/local/include \
+		--with-libraries=/usr/local/lib \
+		--with-openssl  \
+		--with-libxml \
+		--with-libxslt \
+		--with-icu \
+		--with-llvm
+
+# Install postgresql package
+RUN cd /usr/src/postgresql; \
+	make world ; \
+	make install-world ; \
+	make -C contrib install
+
+# Install postgresql contrib
+RUN cd /usr/src/postgresql/contrib ;\
+	make ;\
+	make install
+
+# Check for deps
+RUN cd /usr/src/postgresql/contrib ;\
+	runDeps="$( \
+	scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+		| tr ',' '\n' \
+		| sort -u \
+		| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+	)"; \
+	apk add --no-cache --virtual .postgresql-rundeps \
+		$runDeps
+
+# Create binaries tar containing postgresql stuff
+RUN cd /tmp; \
+	tar -czvf postgresql-binaries-12.1.tgz /usr/local/pgsql
+
+# Up docker time to do the copy
+CMD ["tail", "-f", "/dev/null"]

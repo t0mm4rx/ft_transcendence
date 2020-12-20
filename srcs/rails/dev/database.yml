@@ -1,0 +1,11 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: postgresql_db
+  username: railsapp
+  password: ecnednecsnart
+  pool: 5
+
+development:
+  <<: *default
+  database: ft_transcendence_db

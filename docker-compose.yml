@@ -1,0 +1,21 @@
+version: "3.3"
+services:
+    postgresql_db:
+        build: ./srcs/postgresql
+        volumes:
+            - postgresql_vol:/var/lib/postgresql:z
+        ports:
+            - "5432:5432"
+    rails_backend:
+        build: ./srcs/rails
+        entrypoint: ["/tmp/setup.sh", "postgresql_db"]
+        command: ["rails", "server", "-b", "0.0.0.0"]
+        volumes:
+            - ./srcs/rails/app:/usr/app
+        ports:
+            - "3000:3000"
+        depends_on:
+            - postgresql_db
+
+volumes:
+     postgresql_vol:
