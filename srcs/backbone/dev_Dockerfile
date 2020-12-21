@@ -1,0 +1,25 @@
+FROM alpine:3.12
+
+# Install packages & deps
+RUN apk update && apk --upgrade add \
+	bash \
+	npm 
+
+RUN rm -rf /var/cache/apk/*
+
+COPY ./conf/setup.sh /tmp/setup.sh
+RUN chmod +x /tmp/setup.sh
+
+RUN mkdir /var/front
+
+#COPY ./front /var
+
+#WORKDIR /var/front
+
+#RUN npm install
+
+EXPOSE 8080
+
+ENTRYPOINT ["/tmp/setup.sh"]
+
+CMD ["npm", "run", "serve"]

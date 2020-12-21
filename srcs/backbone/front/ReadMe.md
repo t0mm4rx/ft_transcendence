@@ -6,7 +6,7 @@
 - underscore for the templates
 - p5 for the game canvas
 - backbone for the front-end
-- SASS compiles everythink in ./scss/ in ./dist/
+- SASS compiles everything in ./scss/ in ./dist/
 
 ## Scripts
 - compile: compile the project for production
@@ -19,3 +19,6 @@
 - ./scss/: the SCSS sources for the website styling
 - ./src/: the JS sources of the website
 - ./templates/: the HTML parts of the website, injected by Backbone and underscore.js
+
+## Todo
+- [ ] Change icons

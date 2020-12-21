@@ -1,13 +1,17 @@
 version: "3.3"
 services:
     postgresql_db:
-        build: ./srcs/postgresql
+        build:
+            context: ./srcs/postgresql
+            dockerfile: Dockerfile
         volumes:
             - postgresql_vol:/var/lib/postgresql:z
         ports:
             - "5432:5432"
     rails_backend:
-        build: ./srcs/rails
+        build:
+            context: ./srcs/rails
+            dockerfile: Dockerfile
         entrypoint: ["/tmp/setup.sh", "postgresql_db"]
         command: ["rails", "server", "-b", "0.0.0.0"]
         volumes:
@@ -16,6 +20,14 @@ services:
             - "3000:3000"
         depends_on:
             - postgresql_db
+    dev_backbone_frontend:
+        build:
+            context: ./srcs/backbone/
+            dockerfile: dev_Dockerfile
+        volumes:
+            - ./srcs/backbone/front:/usr/front
+        ports:
+            - "8080:8080"
 
 volumes:
      postgresql_vol:
