@@ -1,4 +1,5 @@
 @import './variables.scss';
+@import './menu.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html, body {
@@ -17,4 +18,51 @@ html, body {
 	font-family: 'Montserrat';
 	color: white;
 	font-size: $s;
+}
+
+.panel {
+	border-radius: 10px;
+	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+	background-color: $grey;
+}
+
+.panel-blue {
+	background-color: $blue;
+}
+
+.button-icon {
+	position: relative;
+	cursor: pointer;
+}
+
+.button-icon span {
+	font-size: $m;
+}
+
+/*
+- Background waves -------------------------------------------------------------------------------------------------------------------
+*/
+
+#background-waves {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+#wave-1, #wave-2, #wave-3 {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+}
+
+#wave-1 {
+	width: 33%;
+}
+
+#wave-2 {
+	width: 100%;
+}
+
+#wave-3 {
+	width: 70%;
 }
