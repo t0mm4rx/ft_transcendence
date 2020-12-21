@@ -4,12 +4,16 @@ class UsersController < ApplicationController
   end
 
   def create
-   user = User.new(username:"matgj", login:"magrosje", avatar:"", guild_id:"1", wins:"10", losses:"0", online:"false", admin:"false")
-
+   user = User.new(user_params) #username: params[:title], login: params[:login], avatar: params[:avatar], guild_id: params[:guild_id], wins: params[:wins], losses: params[:losses], online: params[:online], params[:admin])
    if user.save
     render json: user, status: :created
-    else
+   else
     render json: user.errors, status: :unprocessable_entity
-    end
+   end
+  end
+
+  private
+  def user_params
+    params.require(:user).permit(:title, :login, :avatar, :guild_id, :wins, :losses, :online, :admin)
   end
 end
