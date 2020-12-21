@@ -13,7 +13,7 @@ RUN mkdir /usr/app
 
 WORKDIR /usr/app
 
-RUN /usr/bin/rails new .
+RUN /usr/bin/rails new . --api
 
 COPY ./database.yml /tmp/database.yml
 
