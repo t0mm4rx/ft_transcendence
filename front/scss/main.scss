@@ -1,5 +1,6 @@
 @import './variables.scss';
 @import './menu.scss';
+@import './notification-panel.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html, body {
@@ -41,6 +42,16 @@ a {
 
 .button-icon span {
 	font-size: $m;
+}
+
+.button-icon-accent {
+	background-color: $blue;
+	border-radius: 100%;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 /*
@@ -117,4 +128,21 @@ a {
 	flex-direction: row-reverse;
 	align-items: center;
 	font-size: $xs;
+}
+
+/*
+- Badge -------------------------------------------------------------------------------------
+*/
+.badge {
+	position: absolute;
+	top: 15px;
+	right: 0;
+	background-color: $red;
+	border-radius: 100%;
+	width: 20px;
+	height: 20px;
+	font-size: $xxs;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }

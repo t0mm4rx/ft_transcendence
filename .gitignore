@@ -1,1 +1,4 @@
 node_modules
+front/dist
+front/css
+.DS_Store
