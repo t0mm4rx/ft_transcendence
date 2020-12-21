@@ -11,7 +11,7 @@ class UsersController < ApplicationController
    if user.save
     render json: user, status: :created
    else
-    render json: user.errors, status: :unproccessable_entity
+    render json: user.errors, status: :unprocessable_entity
    end
   end
 
@@ -20,11 +20,11 @@ class UsersController < ApplicationController
 
     head :no_content
   end
-
   private
   def user_params
     params.require(:user).permit(:title, :login, :avatar, :guild_id, :wins, :losses, :online, :admin)
   end
+
 end
 end
 end
