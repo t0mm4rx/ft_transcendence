@@ -1,3 +1,5 @@
+module Api
+module V1
 class UsersController < ApplicationController
 
   def index
@@ -23,4 +25,6 @@ class UsersController < ApplicationController
   def user_params
     params.require(:user).permit(:title, :login, :avatar, :guild_id, :wins, :losses, :online, :admin)
   end
+end
+end
 end
