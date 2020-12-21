@@ -20,6 +20,10 @@ html, body {
 	font-size: $s;
 }
 
+a {
+	text-decoration: none;
+}
+
 .panel {
 	border-radius: 10px;
 	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
@@ -47,6 +51,7 @@ html, body {
 	position: absolute;
 	width: 100%;
 	height: 100%;
+	pointer-events: none;
 }
 
 #wave-1, #wave-2, #wave-3 {
@@ -65,4 +70,51 @@ html, body {
 
 #wave-3 {
 	width: 70%;
+}
+
+/*
+- Logo ----------------------------------------------------------------------------------------
+*/
+#logo {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 150px;
+	margin-top: 20px;
+}
+
+/*
+- Upper right menu ----------------------------------------------------------------------------
+*/
+#upper-right-menu {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	display: flex;
+	align-items: center;
+}
+
+#user-menu, #notifications-menu {
+	margin: 10px;
+}
+
+/*
+- Toasts -------------------------------------------------------------------------------------
+*/
+.toast-error {
+	background: none;
+	background-color: $red;
+	display: flex;
+	flex-direction: row-reverse;
+	align-items: center;
+	font-size: $xs;
+}
+
+.toast-success {
+	background: none;
+	background-color: $blue;
+	display: flex;
+	flex-direction: row-reverse;
+	align-items: center;
+	font-size: $xs;
 }

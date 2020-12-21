@@ -30,6 +30,24 @@ module.exports = {
 					options: {outputPath: './', name: '[name].min.css'}
 				}, 'sass-loader'],
 			},
+			{
+				test: /\.html$/i,
+				include: path.resolve(__dirname, './templates'),
+				loader: 'html-loader',
+			},
+			{
+				test: /\.(ico|gif|png|jpe?g|svg)$/,
+				// loaders: [
+				// 	{
+				// 		loader: 'file-loader',
+				// 		// options: {
+				// 		// 	name: '[path][name].[ext]',
+				// 		// 	context: './src'
+				// 		// }
+				// 	}
+				loader: 'file-loader'
+				// ]
+			},
 		]
 	}
 };
