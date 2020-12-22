@@ -1,34 +1,50 @@
+<!-- The global layout on every page (menu, top-right menu, logo, backgruond...) -->
+
+<!-- Menu-->
 <div>
 	<div class="panel panel-blue" id="menu">
-		<div class="button-icon">
+		<a class="button-icon" href="#home/">
 			<div class="menu-hover">
 				<span>Home</span>
 			</div>
 			<i class="fas fa-home"></i>
-		</div>
-		<div class="button-icon">
+		</a>
+		<a class="button-icon" href="#guilds/">
 			<div class="menu-hover">
 				<span>Guilds</span>
 			</div>
 			<i class="fas fa-users"></i>
-		</div>
-		<div class="button-icon">
+		</a>
+		<a class="button-icon" href="#game/">
 			<div class="menu-hover">
 				<span>Direct game</span>
 			</div>
 			<i class="fas fa-gamepad"></i>
-		</div>
-		<div class="button-icon">
+		</a>
+		<a class="button-icon" href="#tournaments/">
 			<div class="menu-hover">
 				<span>Tournament</span>
 			</div>
 			<i class="fas fa-list-ol"></i>
-		</div>
+		</a>
 	</div>
 </div>
 
+<!-- Logo -->
+<img src="../assets/logo.svg" alt="" id="logo">
+
+<!-- Upper-right menu, will be filled by Backbone views -->
+<div id="upper-right-menu">
+	<a href="#" id="user-menu"></a>
+	<div id="notifications-menu"></div>
+</div>
+
+<!-- Waves in background -->
 <div id="background-waves">
 	<img src="../assets/bg-3.svg" alt="" id="wave-3">
 	<img src="../assets/bg-2.svg" alt="" id="wave-2">
 	<img src="../assets/bg-1.svg" alt="" id="wave-1">
 </div>
+
+<!-- The page content -->
+<div id="page"></div>

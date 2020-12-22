@@ -9,6 +9,8 @@
 	flex-direction: column;
 	align-items: center;
 	padding: 10px 0px;
+	z-index: 10;
+	overflow: visible;
 }
 
 #menu svg {
@@ -48,4 +50,18 @@
 	font-weight: 600;
 	padding: 20px;
 	white-space: nowrap;
+}
+
+/* Top-right menu */
+#user-menu {
+	display: flex;
+	align-items: center;
+	img {
+		border-radius: 100%;
+		width: 60px;
+		margin-left: 15px;
+	}
+	span {
+		font-size: $xs;
+	}
 }
