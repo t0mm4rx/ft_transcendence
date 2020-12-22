@@ -168,6 +168,7 @@ GEM
 
 PLATFORMS
   ruby
+  x86_64-darwin-17
   x86_64-linux-musl
 
 DEPENDENCIES

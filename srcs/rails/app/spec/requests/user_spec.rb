@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "Users API", type: :request do
-	describe 'GET /books' do
+	describe 'GET /api/users' do
 		before do
 			FactoryBot.create(:user, username: "fredrikalindh", login: "frlindh")
 			FactoryBot.create(:user, username: "matgj", login: "magrosje")
@@ -9,13 +9,25 @@ describe "Users API", type: :request do
 
 		it 'returns all users' do
 			get '/api/users'
-			
-			expect(response).to have_http_status(:success)  
-			expect(JSON.parse(response.body).size).to eq(2)  
+
+			expect(response).to have_http_status(:success)
+			expect(JSON.parse(response.body).size).to eq(2)
+		end
+
+		it 'returns a subset of users based on limit' do
+			get '/api/users', params: { limit: 1 }
+			expect(response).to have_http_status(:success)
+			expect(JSON.parse(response.body).size).to eq(1)
+		end
+
+		it 'returns a subset of users based on limit and offset' do
+			get '/api/users', params: { offset: 1 }
+			expect(response).to have_http_status(:success)
+			expect(JSON.parse(response.body).size).to eq(1)
 		end
 	end
 
-	describe 'POST /books/1' do
+	describe 'POST /api/users' do
 		it 'create a new user' do
 			expect {
 			post '/api/users', params: { user: {username: "romain", login: "rchallie"} }
@@ -24,7 +36,7 @@ describe "Users API", type: :request do
 		end
 	end
 
-	describe 'DELETE /books/1' do
+	describe 'DELETE /api/users' do
 		let!(:user) { FactoryBot.create(:user, username: "fredrikalindh", login: "frlindh") }
 
 		it 'delete a user' do
