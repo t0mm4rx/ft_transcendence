@@ -158,7 +158,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sqlite3 (1.4.2)
     thor (1.0.1)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
@@ -169,7 +168,6 @@ GEM
 
 PLATFORMS
   ruby
-  x86_64-darwin-17
   x86_64-linux-musl
 
 DEPENDENCIES
@@ -180,9 +178,8 @@ DEPENDENCIES
   pg (~> 1.2.3)
   puma (~> 5.0)
   rails (~> 6.1.0)
-  rspec-rails
+  rspec-rails (~> 4.0.1)
   spring
-  sqlite3 (~> 1.4)
   tzinfo-data
 
 RUBY VERSION

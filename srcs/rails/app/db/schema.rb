@@ -10,22 +10,33 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_21_161440) do
+ActiveRecord::Schema.define(version: 2020_12_21_131214) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "relations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "other_id", null: false
+    t.integer "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["other_id"], name: "index_relations_on_other_id"
+    t.index ["user_id"], name: "index_relations_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "username"
     t.string "login"
-    t.string "avatar"
-    t.integer "guild_id"
+    t.string "avatar_url"
+    t.string "guild"
     t.integer "wins"
     t.integer "losses"
-    t.boolean "online"
     t.boolean "admin"
+    t.boolean "online"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "relations", "users"
 end

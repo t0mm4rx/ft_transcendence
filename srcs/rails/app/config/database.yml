@@ -1,16 +1,20 @@
 default: &default
   adapter: postgresql
   encoding: unicode
- # host: localhost
-  host: postgresql_db
+  host: localhost
+  #host: postgresql_db
   username: railsapp
   password: ecnednecsnart
   pool: 5
 
 development:
   <<: *default
-  database: ft_transcendence_db
+  database: "ft_transcendence_db"
 
 test:
   <<: *default
-  database: ft_transcendence_db
+  database: "ft_test_db"
+
+production:
+  <<: *default
+  database: "ft_transcendence_db"
