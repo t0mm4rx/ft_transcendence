@@ -1,0 +1,58 @@
+#home-section {
+	display: flex;
+	> .panel {
+		flex: 1;
+		margin: 10px;
+	}
+	h1 {
+		text-align: center;
+		position: relative;
+		
+	}
+	#blinking-live {
+		width: 15px;
+		height: 15px;
+		border-radius: 100%;
+		top: 50%;
+		left: 0;
+		margin: 10px;
+		background-color: $red;
+		animation: blinking-animation 1s linear 0s infinite alternate;
+	}
+	.game-item {
+		display: flex;
+		align-items: center;
+		padding: 20px;
+		font-size: $xxs;
+		background-color: $grey-dark;
+		span {
+			margin-left: 10px;
+			color: $grey-accent;
+			font-size: $xxs;
+		}
+		b {
+			font-size: $xxs;
+		}
+		.button-icon {
+			margin-left: auto;
+			svg {
+				font-size: $xs;
+			}
+		}
+	}
+}
+
+@keyframes blinking-animation {
+	from {
+		opacity: 1;
+	}
+	40% {
+		opacity: 1;
+	}
+	60% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 0;
+	}
+}

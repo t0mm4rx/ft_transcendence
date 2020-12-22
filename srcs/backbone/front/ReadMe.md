@@ -7,6 +7,7 @@
 - p5 for the game canvas
 - backbone for the front-end
 - SASS compiles everything in ./scss/ in ./dist/
+- Toastify.js for sending toasts
 
 ## Scripts
 - compile: compile the project for production
@@ -20,5 +21,12 @@
 - ./src/: the JS sources of the website
 - ./templates/: the HTML parts of the website, injected by Backbone and underscore.js
 
+## Styles
+All CSCC style are compiled in one. The built CSS is injected in index.html with a traditional link tag.
+
+If you want to add your style, create your .scss file in ./scss/, then import it in ./scss/main.scss.
+
 ## Todo
 - [ ] Change icons
+- [x] Rebuild the project when template changes
+- [x] Menu hover
