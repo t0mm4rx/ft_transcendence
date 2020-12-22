@@ -16,6 +16,17 @@ module Api
       end
     end
 
+    def show
+      user = User.find(params[:id])
+      render json: UserRepresenter.new(user).as_json
+    end
+
+    def update
+      user = User.find(params[:id])
+      user.update_attribute(:avatar_url, params[:user][:avatar_url])
+      render json: UserRepresenter.new(user).as_json
+    end
+
     def destroy
       User.find(params[:id]).destroy!
       head :no_content
@@ -26,7 +37,7 @@ module Api
     def limit
       [
         params.fetch(:limit, MAX_PAGINATION_LIMIT).to_i,
-        MAX_PAGINATION_LIMIT]
+      MAX_PAGINATION_LIMIT]
       .min
     end
 

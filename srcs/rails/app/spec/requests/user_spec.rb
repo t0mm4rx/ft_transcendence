@@ -14,14 +14,15 @@ describe "Users API", type: :request do
 			expect(JSON.parse(response.body).size).to eq(2)
 		end
 
-		it 'returns a subset of users based on limit' do
-			get '/api/users', params: { limit: 1 }
+		it 'returns one specific users' do
+			get '/api/users'
+
 			expect(response).to have_http_status(:success)
-			expect(JSON.parse(response.body).size).to eq(1)
+			expect(JSON.parse(response.body).size).to eq(2)
 		end
 
-		it 'returns a subset of users based on limit and offset' do
-			get '/api/users', params: { offset: 1 }
+		it 'returns a subset of users based on limit' do
+			get '/api/users', params: { limit: 1 }
 			expect(response).to have_http_status(:success)
 			expect(JSON.parse(response.body).size).to eq(1)
 		end
