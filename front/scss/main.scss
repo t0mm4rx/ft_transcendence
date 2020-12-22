@@ -1,6 +1,7 @@
 @import './variables.scss';
 @import './menu.scss';
 @import './notification-panel.scss';
+@import './home-page.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html, body {
@@ -29,15 +30,29 @@ a {
 	border-radius: 10px;
 	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 	background-color: $grey;
+	overflow: hidden;
 }
 
 .panel-blue {
 	background-color: $blue;
 }
 
+.panel-header {
+	display: flex;
+	padding: 20px;
+	justify-content: center;
+	align-items: center;
+	font-weight: 600;
+}
+
 .button-icon {
 	position: relative;
 	cursor: pointer;
+	transition: .3s ease all;
+}
+
+.button-icon:hover {
+	transform: scale(1.2);
 }
 
 .button-icon span {
@@ -92,6 +107,16 @@ a {
 	transform: translateX(-50%);
 	width: 150px;
 	margin-top: 20px;
+	animation: logo-anim 2s ease 0s infinite alternate;
+}
+
+@keyframes logo-anim {
+	from {
+		transform: translateX(-50%) translateY(20px);
+	}
+	to {
+		transform: translateX(-50%) translateY(0px);
+	}
 }
 
 /*
@@ -145,4 +170,15 @@ a {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+/*
+- Page ---------------------------------------------------------------------------------------
+*/
+#page {
+	position: absolute;
+	top: 10%;
+	left: 10%;
+	width: 80%;
+	height: 80%;
 }

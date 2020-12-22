@@ -1,4 +1,5 @@
-/* Notification panel view. */
+/* Notification panel view. The panel template is the one controlling the panel,
+the list is for refreshing only the part displaying the notifications and avoid a blinking panel. */
 import Backbone from 'backbone';
 import template_frame from '../../templates/notification-panel.html';
 import template_list from '../../templates/notification-list.html';

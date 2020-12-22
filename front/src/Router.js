@@ -1,34 +1,39 @@
 /* Here we define the routes and pages of our application. */
 
 import Backbone from 'backbone';
+import Guilds from './pages/Guilds';
+import Home from './pages/Home';
+import Game from './pages/Game';
+import Tournaments from './pages/Tournaments';
 
 export default Backbone.Router.extend({
 	routes: {
 		"": "home",
 		"home": "home",
 		"home/": "home",
-		"user": "user",
-		"user/": "user",
+		"user/:id": "user",
+		"user/:id/": "user",
 		"guilds": "guilds",
 		"guilds/": "guilds",
-		"direct-game": "direct-game",
-		"direct-game/": "direct-game",
+		"game": "game",
+		"game/": "game",
 		"tournaments": "tournaments",
 		"tournaments/": "tournaments",
 	},
 	home: function () {
-		console.log("Home view");
+		new Home().render();
 	},
-	user: function () {
+	user: function (id) {
+		console.log(id);
 		console.log("User view");
 	},
 	guilds: function () {
-		console.log("Guilds view");
+		new Guilds().render();
 	},
-	"direct-game": function () {
-		console.log("Direct game view");
+	game: function () {
+		new Game().render();
 	},
 	tournaments: function () {
-		console.log("Tournaments view");
+		new Tournaments().render();
 	},
 });
