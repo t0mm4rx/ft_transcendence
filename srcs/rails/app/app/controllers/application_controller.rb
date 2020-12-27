@@ -5,10 +5,9 @@ class ApplicationController < ActionController::API
 	private
   
 	def not_found(e)
-	 	render json: {errors: e}, status: :unprocessable_entity
-	 	# render json: { errors: e.record.errors }, status: :unprocessable_entity
-	end
-	def not_destroyed(e)
-	 	render json: { errors: e.record.errors }, status: :unprocessable_entity
-	end
+		render json: {errors: e}, status: :not_found
+    end
+    def not_destroyed(e)
+		render json: { errors: e.record.errors }, status: :unprocessable_entity
+    end
 end

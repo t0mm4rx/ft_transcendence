@@ -4,10 +4,6 @@ class UserRepresenter
 	end
 
 	def as_json
-		relations = user.relations
-		friends = relations.filter_map { |r| r.other if r.friends?}
-		relations = Relation.where(other: user.id)
-		friends += relations.filter_map { |r| r.user if r.friends?}
 		{
 			id: user.id,
 			username: user.username,
@@ -18,7 +14,6 @@ class UserRepresenter
 			losses: user.losses,
 			admin: user.admin,
 			online: user.online,
-			friends: friends
 		}
 	end
 
