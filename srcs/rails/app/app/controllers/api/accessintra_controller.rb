@@ -1,5 +1,7 @@
 module Api
 	class AccessintraController < ApplicationController
+	skip_before_action :authenticate_request
+
 		def index
 			#once the user authorize us to access his data via /logintra, 42 api redirect to /accessintra with the code needed to have a token in parameters
 			#we need to send a post request with our code to get a token access
