@@ -35,10 +35,8 @@ module App
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
-    config.autoload_paths << Rails.root.join('lib')
 
-    #As the action cable to be used by API and client is not on rails
-    config.action_cable.disable_request_forgery_protection = true
-    config.action_cable.url = "/cable"
+    #Set up for token authentification with Json Web Token
+    config.autoload_paths << Rails.root.join('lib')
   end
 end
