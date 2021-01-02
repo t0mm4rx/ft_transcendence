@@ -10,14 +10,27 @@ export default Backbone.View.extend({
 		this.renderGameList();
 	},
 	renderGameList: function () {
-		const list = $("#live-game-list");
-		list.html("");
+		const games = $("#live-game-list");
+		const friends = $("#live-friends-list");
+		games.html("");
+		friends.html("");
 		window.liveGames.forEach(game => {
-			list.append(
+			games.append(
 				`<div class="game-item">
 					<span><b>${game.attributes.player1}</b> vs. <b>${game.attributes.player2}</b></span>
 					<span>${game.attributes.type}</span>
 					<a class="button-icon button-icon-accent"><i class="fas fa-tv"></i></a>
+				</div>`
+			);
+		});
+		window.friends.forEach(friend => {
+			friends.append(
+				`<div class="friend-item">
+					<img src="${friend.attributes.avatar}" alt="${friend.attributes.login}'s profile picture"/>
+					<b class="friend-name">${friend.attributes.displayName}</b>
+					<span class="friend-status${friend.attributes.status.indexOf("online") >= 0 ? " friend-status-online" : ""}">${friend.attributes.status}</span>
+					<span class="button-icon"><i class="far fa-comment"></i></span>
+					${friend.attributes.status === "online" ? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}
 				</div>`
 			);
 		});

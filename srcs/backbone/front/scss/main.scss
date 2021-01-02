@@ -10,6 +10,7 @@ html, body {
 	margin: 0;
 	padding: 0;
 	background-color: $grey_dark;
+	font-size: 16px;
 }
 
 *:focus {
@@ -19,7 +20,6 @@ html, body {
 * {
 	font-family: 'Montserrat';
 	color: white;
-	font-size: $s;
 }
 
 a {
@@ -43,6 +43,7 @@ a {
 	justify-content: center;
 	align-items: center;
 	font-weight: 600;
+	font-size: $xl;
 }
 
 .button-icon {
@@ -55,8 +56,8 @@ a {
 	transform: scale(1.2);
 }
 
-.button-icon span {
-	font-size: $m;
+.button-icon span, .button-icon svg {
+	font-size: $xl;
 }
 
 .button-icon-accent {
@@ -128,6 +129,9 @@ a {
 	right: 20px;
 	display: flex;
 	align-items: center;
+	svg {
+		font-size: $xl;
+	}
 }
 
 #user-menu, #notifications-menu {
@@ -143,7 +147,7 @@ a {
 	display: flex;
 	flex-direction: row-reverse;
 	align-items: center;
-	font-size: $xs;
+	font-size: $m;
 }
 
 .toast-success {
@@ -152,7 +156,7 @@ a {
 	display: flex;
 	flex-direction: row-reverse;
 	align-items: center;
-	font-size: $xs;
+	font-size: $m;
 }
 
 /*
@@ -166,7 +170,7 @@ a {
 	border-radius: 100%;
 	width: 20px;
 	height: 20px;
-	font-size: $xxs;
+	font-size: $m;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -181,4 +185,5 @@ a {
 	left: 10%;
 	width: 80%;
 	height: 80%;
+	overflow-y: auto;
 }
