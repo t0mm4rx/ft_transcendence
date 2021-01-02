@@ -2,7 +2,7 @@
 	display: flex;
 	> .panel {
 		flex: 1;
-		margin: 10px;
+		margin: 20px;
 	}
 	h1 {
 		text-align: center;
@@ -23,21 +23,47 @@
 		display: flex;
 		align-items: center;
 		padding: 20px;
-		font-size: $xxs;
-		background-color: $grey-dark;
+		font-size: $m;
+		background-color: $grey_dark_light;
 		span {
 			margin-left: 10px;
 			color: $grey-accent;
-			font-size: $xxs;
+			font-size: $m;
 		}
 		b {
-			font-size: $xxs;
+			font-size: $m;
 		}
 		.button-icon {
 			margin-left: auto;
 			svg {
-				font-size: $xs;
+				font-size: $m;
 			}
+		}
+	}
+	.friend-item {
+		display: flex;
+		align-items: center;
+		background-color: $grey_dark_light;
+		font-size: $m;
+		img {
+			height: 70px;
+			width: auto;
+		}
+		span, b {
+			margin: 10px;
+		}
+		img, b  {
+			cursor: pointer;
+		}
+		.friend-status {
+			text-align: right;
+			flex: 1;
+		}
+		.friend-status-online {
+			color: $blue;
+		}
+		.button-icon svg {
+			font-size: $l;
 		}
 	}
 }
