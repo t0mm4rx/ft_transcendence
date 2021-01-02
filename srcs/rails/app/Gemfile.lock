@@ -95,6 +95,8 @@ GEM
     puma (5.1.1)
       nio4r (~> 2.0)
     rack (2.2.3)
+    rack-cors (1.1.1)
+      rack (>= 2.0.0)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (6.1.0)
@@ -145,14 +147,17 @@ GEM
     zeitwerk (2.4.2)
 
 PLATFORMS
+  ruby
   x86_64-linux-musl
 
 DEPENDENCIES
+  actioncable (~> 6.1.0)
   bootsnap (>= 1.4.4)
   byebug
   listen (~> 3.3)
   pg (~> 1.2.3)
   puma (~> 5.0)
+  rack-cors
   rails (~> 6.1.0)
   spring
   sqlite3 (~> 1.4)
@@ -162,4 +167,4 @@ RUBY VERSION
    ruby 2.7.1p83
 
 BUNDLED WITH
-   2.2.1
+   2.2.2
