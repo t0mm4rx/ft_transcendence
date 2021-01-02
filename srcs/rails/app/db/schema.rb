@@ -64,10 +64,18 @@ ActiveRecord::Schema.define(version: 2020_12_30_132150) do
     t.string "password_digest"
     t.string "token"
   end
+  
+    create_table "game_rooms", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "player"
+    t.string "opponent"
+  end
 
   add_foreign_key "channel_users", "channels"
   add_foreign_key "channel_users", "users"
   add_foreign_key "messages", "channels"
   add_foreign_key "messages", "users"
   add_foreign_key "relations", "users"
+
 end

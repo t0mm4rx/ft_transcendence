@@ -1,11 +1,11 @@
 Rails.application.routes.draw do
+
   namespace :api do
     root 'users#index'
     resources :channels do
       resources :channel_users
       resources :messages
     end
-   # mount ActionCable.server => '/cable'
     resources :users do
       resources :friends, controller: 'relations'
     end
@@ -13,4 +13,13 @@ Rails.application.routes.draw do
     resources :accessintra, only: :index
     post 'authenticate', to: 'authentication#authenticate'
   end
+
+  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  resources :game_rooms, only: [:index, :create, :show, :update]
+
+  get '/game/match_no_opponent', to: 'game_rooms#first_no_oppenent'
+  # get '/game/end_match/:id', to: 'game_rooms#end_game'
+
+  mount ActionCable.server => '/cable'
+
 end

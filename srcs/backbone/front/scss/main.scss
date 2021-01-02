@@ -1,5 +1,9 @@
 @import './variables.scss';
+@import './game.scss';
 @import './menu.scss';
+@import './notification-panel.scss';
+@import './test.scss';
+@import './home-page.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html, body {
@@ -8,6 +12,7 @@ html, body {
 	margin: 0;
 	padding: 0;
 	background-color: $grey_dark;
+	font-size: 16px;
 }
 
 *:focus {
@@ -17,26 +22,54 @@ html, body {
 * {
 	font-family: 'Montserrat';
 	color: white;
-	font-size: $s;
+}
+
+a {
+	text-decoration: none;
 }
 
 .panel {
 	border-radius: 10px;
 	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 	background-color: $grey;
+	overflow: hidden;
 }
 
 .panel-blue {
 	background-color: $blue;
 }
 
+.panel-header {
+	display: flex;
+	padding: 20px;
+	justify-content: center;
+	align-items: center;
+	font-weight: 600;
+	font-size: $xl;
+}
+
 .button-icon {
 	position: relative;
 	cursor: pointer;
+	transition: .3s ease all;
 }
 
-.button-icon span {
-	font-size: $m;
+.button-icon:hover {
+	transform: scale(1.2);
+}
+
+.button-icon span, .button-icon svg {
+	font-size: $xl;
+}
+
+.button-icon-accent {
+	background-color: $blue;
+	border-radius: 100%;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 /*
@@ -47,6 +80,7 @@ html, body {
 	position: absolute;
 	width: 100%;
 	height: 100%;
+	pointer-events: none;
 }
 
 #wave-1, #wave-2, #wave-3 {
@@ -65,4 +99,93 @@ html, body {
 
 #wave-3 {
 	width: 70%;
+}
+
+/*
+- Logo ----------------------------------------------------------------------------------------
+*/
+#logo {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 150px;
+	margin-top: 20px;
+	animation: logo-anim 2s ease 0s infinite alternate;
+}
+
+@keyframes logo-anim {
+	from {
+		transform: translateX(-50%) translateY(20px);
+	}
+	to {
+		transform: translateX(-50%) translateY(0px);
+	}
+}
+
+/*
+- Upper right menu ----------------------------------------------------------------------------
+*/
+#upper-right-menu {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	display: flex;
+	align-items: center;
+	svg {
+		font-size: $xl;
+	}
+}
+
+#user-menu, #notifications-menu {
+	margin: 10px;
+}
+
+/*
+- Toasts -------------------------------------------------------------------------------------
+*/
+.toast-error {
+	background: none;
+	background-color: $red;
+	display: flex;
+	flex-direction: row-reverse;
+	align-items: center;
+	font-size: $m;
+}
+
+.toast-success {
+	background: none;
+	background-color: $blue;
+	display: flex;
+	flex-direction: row-reverse;
+	align-items: center;
+	font-size: $m;
+}
+
+/*
+- Badge -------------------------------------------------------------------------------------
+*/
+.badge {
+	position: absolute;
+	top: 15px;
+	right: 0;
+	background-color: $red;
+	border-radius: 100%;
+	width: 20px;
+	height: 20px;
+	font-size: $m;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/*
+- Page ---------------------------------------------------------------------------------------
+*/
+#page {
+	position: absolute;
+	top: 10%;
+	left: 10%;
+	width: 80%;
+	height: 80%;
+	overflow-y: auto;
 }

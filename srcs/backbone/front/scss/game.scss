@@ -1,0 +1,40 @@
+#game-panel
+{
+    display: flex;
+    text-align: center;
+    margin: 10px;
+    width: 100%;
+    height: 100%;
+
+    .game-choose-panel
+    {
+        margin: 2%;
+        width: 46%;
+    }
+
+    .game-choose-img
+    {
+        background-color: black;
+        margin: 10px;
+        height: 35%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .game-choose-desc
+    {
+        display: flex;
+        margin: 10px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .game-choose-btn
+    {
+        border-radius: 10px;
+        border: none;
+        background-color: $blue;
+        padding: 10px 10px;
+    }
+}

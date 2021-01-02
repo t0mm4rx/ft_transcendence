@@ -1,0 +1,84 @@
+#home-section {
+	display: flex;
+	> .panel {
+		flex: 1;
+		margin: 20px;
+	}
+	h1 {
+		text-align: center;
+		position: relative;
+		
+	}
+	#blinking-live {
+		width: 15px;
+		height: 15px;
+		border-radius: 100%;
+		top: 50%;
+		left: 0;
+		margin: 10px;
+		background-color: $red;
+		animation: blinking-animation 1s linear 0s infinite alternate;
+	}
+	.game-item {
+		display: flex;
+		align-items: center;
+		padding: 20px;
+		font-size: $m;
+		background-color: $grey_dark_light;
+		span {
+			margin-left: 10px;
+			color: $grey-accent;
+			font-size: $m;
+		}
+		b {
+			font-size: $m;
+		}
+		.button-icon {
+			margin-left: auto;
+			svg {
+				font-size: $m;
+			}
+		}
+	}
+	.friend-item {
+		display: flex;
+		align-items: center;
+		background-color: $grey_dark_light;
+		font-size: $m;
+		img {
+			height: 70px;
+			width: auto;
+		}
+		span, b {
+			margin: 10px;
+		}
+		img, b  {
+			cursor: pointer;
+		}
+		.friend-status {
+			text-align: right;
+			flex: 1;
+		}
+		.friend-status-online {
+			color: $blue;
+		}
+		.button-icon svg {
+			font-size: $l;
+		}
+	}
+}
+
+@keyframes blinking-animation {
+	from {
+		opacity: 1;
+	}
+	40% {
+		opacity: 1;
+	}
+	60% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 0;
+	}
+}
