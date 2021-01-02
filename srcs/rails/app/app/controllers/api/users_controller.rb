@@ -2,18 +2,18 @@ module Api
   class UsersController < ApplicationController
     LIMIT_PAGINATION_MAX = 20
     skip_before_action :authenticate_request
+    
     def index
       # users = User.where(online: true).limit(limit).offset(params[:offset])
       # users = User.limit(limit).offset(params[:offset])
       users = User.order(online: :desc).limit(limit).offset(params[:offset])
-
-      render json: UsersRepresenter.new(users).as_json
+      render json: users
     end
 
     def create
       user = User.new(user_params)
       if user.save
-        render json: UserRepresenter.new(user).as_json, status: :created
+        render json: user, status: :created
       else
         render json: user.errors, status: :unprocessable_entity # 422
       end
@@ -24,7 +24,7 @@ module Api
       user ||= User.new(user_params)
       user.update(user_params)
       if user.save
-        render json: UserRepresenter.new(user).as_json
+        render json: user
       else
         render json: user.errors, status: :unprocessable_entity # 422
       end
@@ -38,7 +38,7 @@ module Api
     def show
       user = User.find(params[:id])
 
-      render json: UserRepresenter.new(user).as_json
+      render json: user
     end
 
     private

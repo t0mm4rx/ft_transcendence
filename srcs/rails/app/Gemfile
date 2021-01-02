@@ -25,6 +25,9 @@ gem 'actioncable', '~> 6.1.0'
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 
+# Rails hash to json
+gem 'active_model_serializers'
+
 #easier library to handle than the included one
 gem 'httparty'
 

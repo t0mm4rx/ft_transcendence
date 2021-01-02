@@ -6,6 +6,8 @@ class User < ApplicationRecord
 	has_many :channels, through: :channels_users
 	has_many :messages, dependent: :destroy
 
+	belongs_to :guild, optional: true
+
 	validates :username, presence: true, length: { minimum:2, maximum: 30}, uniqueness: { case_sensitive: false }
 	validates :login, presence: true, length: { minimum:2, maximum: 30 }, uniqueness: { case_sensitive: false }
 	# validates :avatar_url, # format: { with: ConstantData::VALID_EMAIL_REGEX }

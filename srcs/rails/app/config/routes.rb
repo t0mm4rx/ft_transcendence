@@ -7,7 +7,7 @@ Rails.application.routes.draw do
       resources :messages
     end
     resources :users do
-      resources :friends, controller: 'relations'
+      resources :friends, controller: 'relations', shallow: true
     end
     resources :logintra, only: :index
     resources :accessintra, only: :index
