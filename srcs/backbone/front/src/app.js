@@ -9,7 +9,6 @@ import UserMenu from './views/UserMenu';
 import {User, Friends} from './models/User';
 import NotificationsPanel from './views/NotificationsPanel';
 import {Notification, NotificationCollection} from './models/Notification';
-import {Game, GameCollection} from './models/Game';
 
 // We create the router, the part of the app which will change the page content according to the URL
 window.router = new Router();
@@ -56,23 +55,6 @@ window.friends.add(new User({
 window.notifications = new NotificationCollection();
 window.notifications.add(new Notification({title: "Romain vous a défier pour un match direct", id: Math.random()}));
 window.notifications.add(new Notification({title: "Manu veut être votre amis", id: Math.random()}));
-
-window.liveGames = new GameCollection();
-window.liveGames.add(new Game({
-	player1: "Jean",
-	player2: "Romain",
-	type: "War game"
-}));
-window.liveGames.add(new Game({
-	player1: "Fredrika",
-	player2: "Mathis",
-	type: "Direct game"
-}));
-window.liveGames.add(new Game({
-	player1: "Manu",
-	player2: "Donald",
-	type: "Ladder game"
-}));
 
 // Views on every pages
 new PageLayout().render();
