@@ -5,6 +5,7 @@ import Guilds from './pages/Guilds';
 import Home from './pages/Home';
 import Game from './pages/Game';
 import Tournaments from './pages/Tournaments';
+import Test from './pages/Test';
 
 export default Backbone.Router.extend({
 	routes: {
@@ -19,6 +20,8 @@ export default Backbone.Router.extend({
 		"game/": "game",
 		"tournaments": "tournaments",
 		"tournaments/": "tournaments",
+		"test": "test",
+		"test/": "test",
 	},
 	home: function () {
 		new Home().render();
@@ -35,5 +38,8 @@ export default Backbone.Router.extend({
 	},
 	tournaments: function () {
 		new Tournaments().render();
+	},
+	test: function () {
+		new Test().render();
 	},
 });

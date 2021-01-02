@@ -1,11 +1,11 @@
 /* The game model and collection. */
 import Backbone from 'backbone';
+import io from 'sockjs-client';
 
 const Game = Backbone.Model.extend({
 
     initialize: function(options) 
     {
-        console.log(options);
     }
 });
 

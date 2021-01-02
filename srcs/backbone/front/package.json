@@ -25,9 +25,15 @@
 	},
 	"dependencies": {
 		"backbone": "^1.4.0",
+		"buffer": "^6.0.3",
+		"express": "^4.17.1",
+		"fs": "0.0.1-security",
 		"jquery": "^3.5.1",
 		"p5": "^1.1.9",
 		"path": "^0.12.7",
+		"stream": "0.0.2",
+		"stream-browserify": "^3.0.0",
+		"stream-http": "^3.1.1",
 		"toastify-js": "^1.9.3",
 		"underscore": "^1.12.0"
 	}

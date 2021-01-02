@@ -63,4 +63,10 @@ Rails.application.configure do
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
+
+  # Allowed request origin for WebSocket
+  config.action_cable.allowed_request_origins = [
+     # Local address we use for our standalone client
+     'http://localhost:8080',
+  ]
 end

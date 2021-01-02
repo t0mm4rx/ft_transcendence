@@ -10,11 +10,15 @@ import {User, Friends} from './models/User';
 import NotificationsPanel from './views/NotificationsPanel';
 import {Notification, NotificationCollection} from './models/Notification';
 
+// Temp game server
+// import express from 'express';
+
 // We create the router, the part of the app which will change the page content according to the URL
 window.router = new Router();
 
 // We create our global models
 window.currentUser = new User({
+	id: 2564,
 	login: 'tmarx',
 	displayName: 'Air Marx',
 	avatar: 'https://cdn.intra.42.fr/users/large_tmarx.jpg'
