@@ -33,7 +33,7 @@
 	display: flex;
 	align-items: center;
 	border-radius: 0px 10px 10px 0px;
-	padding-left: 60px;
+	padding-left: 40px;
 	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 	opacity: 0;
 	transform: translateX(-50%) scaleX(0) translateX(50%);
@@ -46,7 +46,7 @@
 }
 
 .menu-hover span {
-	font-size: $xs !important;
+	font-size: $m !important;
 	font-weight: 600;
 	padding: 20px;
 	white-space: nowrap;
@@ -62,6 +62,6 @@
 		margin-left: 15px;
 	}
 	span {
-		font-size: $xs;
+		font-size: $m;
 	}
 }

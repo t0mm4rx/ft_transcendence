@@ -17,17 +17,18 @@
 		margin: 10px;
 		span {
 			flex: 1;
-			font-size: $xxs;
+			font-size: $m;
 			padding: 10px;
 		}
 		.notification-controls {
 			display: flex;
 			flex-direction: row;
+			align-items: center;
 			div {
 				margin: 5px;
 			}
 			svg {
-				font-size: $xxs !important;
+				font-size: $l;
 			}
 		}
 	}
