@@ -1,7 +1,7 @@
 module Api
   class UsersController < ApplicationController
     LIMIT_PAGINATION_MAX = 20
-
+    skip_before_action :authenticate_request
     def index
       # users = User.where(online: true).limit(limit).offset(params[:offset])
       # users = User.limit(limit).offset(params[:offset])
@@ -42,9 +42,10 @@ module Api
     end
 
     private
-    
+
     def user_params
-      params.require(:user).permit(:username, :login, :avatar_url)
+      #params.require(:user).permit(:username, :login, :avatar_url)
+      params.permit(:username, :login, :avatar_url, :password) #without require its allow to POST straight away some users, it's faster to test our API
     end
 
     def limit

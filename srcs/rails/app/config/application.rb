@@ -23,7 +23,6 @@ module App
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.1
-
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
@@ -36,5 +35,10 @@ module App
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+    config.autoload_paths << Rails.root.join('lib')
+
+    #As the action cable to be used by API and client is not on rails
+    config.action_cable.disable_request_forgery_protection = true
+    config.action_cable.url = "/cable"
   end
 end
