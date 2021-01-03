@@ -4,6 +4,7 @@
 @import './notification-panel.scss';
 @import './test.scss';
 @import './home-page.scss';
+@import './chat.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html, body {
@@ -70,6 +71,15 @@ a {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.button-icon-big {
+	width: 60px;
+	height: 60px;
+}
+
+.button-icon-big svg, .button-icon-big i {
+	font-size: $xl;
 }
 
 /*
@@ -172,7 +182,7 @@ a {
 	border-radius: 100%;
 	width: 20px;
 	height: 20px;
-	font-size: $m;
+	font-size: $m !important;
 	display: flex;
 	align-items: center;
 	justify-content: center;

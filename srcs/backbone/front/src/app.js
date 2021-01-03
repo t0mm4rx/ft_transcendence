@@ -10,6 +10,8 @@ import {User, Friends} from './models/User';
 import NotificationsPanel from './views/NotificationsPanel';
 import {Notification, NotificationCollection} from './models/Notification';
 import {Game, GameCollection} from './models/Game';
+import ChatPanel from './views/ChatPanel';
+import {Chat, Channel} from './models/Channels';
 
 // Temp game server
 // import express from 'express';
@@ -74,6 +76,35 @@ window.liveGames.add(new Game({
 	type: "Ladder game"
 }));
 
+window.chat = new Chat();
+window.chat.add(new Channel({
+	name: 'Magrosje',
+	avatar: "https://randomuser.me/api/portraits/men/11.jpg",
+	messages: [
+		{from: "magrosje", date: new Date().getTime() - 60, message: "Hello"},
+		{from: "tmarx", date: new Date().getTime() - 23, message: "Yo"},
+		{from: "tmarx", date: new Date().getTime() - 12, message: "Dis-moi quand tu veux jouer"},
+		{from: "magrosje", date: new Date().getTime() - 6, message: "Dans 5 minutes"},
+		{from: "magrosje", date: new Date().getTime() - 2, message: "*10"}
+	]
+}));
+window.chat.add(new Channel({
+	name: 'International killer team',
+	avatar: null,
+	messages: [
+		{from: "magrosje", date: new Date().getTime() - 60, message: "Hello to the team"},
+		{from: "frlindh", date: new Date().getTime() - 23, message: "🔥"},
+		{from: "rchallie", date: new Date().getTime() - 12, message: "Has the tournament started yet?"},
+		{from: "tmarx", date: new Date().getTime() - 2, message: "Nop"},
+		{from: "tmarx", date: new Date().getTime() - 2, message: "Test"},
+		{from: "frlindh", date: new Date().getTime() - 2, message: "To get the scroll"},
+		{from: "frlindh", date: new Date().getTime() - 2, message: "To get the scroll"},
+		{from: "frlindh", date: new Date().getTime() - 2, message: "To get the scroll"},
+		{from: "frlindh", date: new Date().getTime() - 2, message: "To get the scroll"},
+		{from: "frlindh", date: new Date().getTime() - 2, message: "To get the scroll"},
+	]
+}));
+
 window.notifications = new NotificationCollection();
 window.notifications.add(new Notification({title: "Romain vous a défier pour un match direct", id: Math.random()}));
 window.notifications.add(new Notification({title: "Manu veut être votre amis", id: Math.random()}));
@@ -82,5 +113,6 @@ window.notifications.add(new Notification({title: "Manu veut être votre amis", 
 new PageLayout().render();
 new UserMenu({model: window.currentUser}).render();
 new NotificationsPanel({model: window.notifications}).render();
+new ChatPanel({model: window.chat}).render();
 
 Backbone.history.start();
