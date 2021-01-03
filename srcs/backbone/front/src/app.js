@@ -9,6 +9,7 @@ import UserMenu from './views/UserMenu';
 import {User, Friends} from './models/User';
 import NotificationsPanel from './views/NotificationsPanel';
 import {Notification, NotificationCollection} from './models/Notification';
+import {Game, GameCollection} from './models/Game';
 
 // Temp game server
 // import express from 'express';
@@ -54,6 +55,23 @@ window.friends.add(new User({
 	displayName: 'Romain',
 	avatar: 'https://randomuser.me/api/portraits/men/11.jpg',
 	status: 'offline'
+}));
+
+window.liveGames = new GameCollection();
+window.liveGames.add(new Game({
+	player1: "Jean",
+	player2: "Romain",
+	type: "War game"
+}));
+window.liveGames.add(new Game({
+	player1: "Fredrika",
+	player2: "Mathis",
+	type: "Direct game"
+}));
+window.liveGames.add(new Game({
+	player1: "Manu",
+	player2: "Donald",
+	type: "Ladder game"
 }));
 
 window.notifications = new NotificationCollection();
