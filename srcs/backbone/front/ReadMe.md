@@ -26,8 +26,3 @@
 All CSCC style are compiled in one. The built CSS is injected in index.html with a traditional link tag.
 
 If you want to add your style, create your .scss file in ./scss/, then import it in ./scss/main.scss.
-
-## Todo
-- [ ] Change icons
-- [x] Rebuild the project when template changes
-- [x] Menu hover
