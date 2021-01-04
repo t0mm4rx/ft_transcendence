@@ -177,6 +177,11 @@ export default Backbone.View.extend({
             this.state = state_enum["END"];
     },
 
+    /**
+     * Three second at the begining of the game.
+     * In deep this function is used to sync the two player 
+     * first game frame with the left player.
+     */
     begin: function()
     {
         this.context.globalAlpha = 0.7;
@@ -194,8 +199,9 @@ export default Backbone.View.extend({
         var actual_date = new Date();
         var diff_time = Math.trunc((4000 - (actual_date - this.begin_date)) / 1000);
         
-        if (diff_time == 0)
-            this.state = state_enum["INGAME"];
+        if (diff_time == 0 && this.player_info.side == "left")
+            // this.state = state_enum["INGAME"];
+            this.ftsocket.sendMessage({ action: "to_broadcast", content: { state: state_enum["INGAME"] }});
         else
             this.drawText(diff_time, (this.canvas.width / 2) - (this.context.measureText(diff_time + "").width / 2), (this.canvas.height - (this.canvas.height / 4)), "WHITE");
     },
@@ -366,7 +372,9 @@ export default Backbone.View.extend({
 
             if (msg.message)
             {
-                if (msg.message.message == "update_ball" && self.player_info.side != "left")
+                if (msg.message.message == "update_state")
+                    self.state = msg.message.content.state;
+                else if (msg.message.message == "update_ball" && self.player_info.side != "left")
                     self.ball = msg.message.content;
                 else if (msg.message.message == "update_y"
                     && msg.message.content.player_id == self.opponent_info.id)

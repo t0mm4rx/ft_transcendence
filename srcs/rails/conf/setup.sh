@@ -39,6 +39,8 @@ echo "Database up detected !"
 # Execute rails initialization commands.
 bundle exec rake db:create db:migrate
 
+bin/rails db:migrate
+
 # Then exec the container's main process (what's set as CMD in the Dockerfile).
 # or override command in docker-compose.yml
 exec "$@"
