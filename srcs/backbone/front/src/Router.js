@@ -34,10 +34,11 @@ export default Backbone.Router.extend({
 	home: function () {
 		this.checkLogged();
 		this.showLayout();
-		console.log(window.chatPanelView);
 		new Home().render();
 	},
 	user: function (id) {
+		this.checkLogged();
+		this.showLayout();
 		console.log(id);
 		console.log("User view");
 	},
@@ -64,18 +65,21 @@ export default Backbone.Router.extend({
 	auth: function () {
 		if (!!Cookies.get('user')) {
 			window.location.hash = "/";
+		} else {
+			this.hideLayout();
+			new Auth().render();
 		}
-		$("#menu").hide();
-		new Auth().render();
 	},
+	/* Check if the user is logged, if not we redirect him to the auth page */
 	checkLogged: function () {
 		const user = Cookies.get('user');
 		if (!user) {
 			window.location.hash = "auth/";
 		}
 	},
-	/* Only if we are logged we show the chat panel, notification panel, and menus*/
+	/* Show chat panel, notification panel and other elements only visible when logged */
 	showLayout: function () {
+		console.log("Show");
 		$("#menu").show();
 		if (!window.userMenuView)
 		{
@@ -91,6 +95,24 @@ export default Backbone.Router.extend({
 		{
 			window.chatPanelView = new ChatPanel({model: window.chat});
 			window.chatPanelView.render();
+		}
+	},
+	hideLayout: function () {
+		$("#menu").hide();
+		if (window.userMenuView)
+		{
+			window.userMenuView.remove();
+			window.userMenuView = null;
+		}
+		if (window.notificationPanelView)
+		{
+			window.notificationPanelView.remove();
+			window.notificationPanelView = null;
+		}
+		if (window.chatPanelView)
+		{
+			window.chatPanelView.remove();
+			window.chatPanelView = null;
 		}
 	}
 });

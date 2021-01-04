@@ -238,4 +238,31 @@ a {
 	width: 80%;
 	height: 80%;
 	overflow-y: auto;
+	// display: flex;
+	// align-items: center;
+	// justify-content: center;
+}
+
+/*
+- Inputs ---------------------------------------------------------------------------------------
+*/
+.input-wrapper {
+	display: flex;
+	flex-direction: column;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+input[type="text"] {
+	padding: 10px;
+	background-color: $grey_dark_light;
+	border-radius: 10px;
+	border: none;
+}
+
+.checkbox-wrapper {
+	display: flex;
+	align-items: center;
+	margin-top: 10px;
+	margin-bottom: 10px;
 }
