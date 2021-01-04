@@ -109,10 +109,7 @@ window.notifications = new NotificationCollection();
 window.notifications.add(new Notification({title: "Romain vous a défier pour un match direct", id: Math.random()}));
 window.notifications.add(new Notification({title: "Manu veut être votre amis", id: Math.random()}));
 
-// Views on every pages
-new PageLayout().render();
-new UserMenu({model: window.currentUser}).render();
-new NotificationsPanel({model: window.notifications}).render();
-new ChatPanel({model: window.chat}).render();
+// Page layout
+window.layoutView = new PageLayout().render();
 
 Backbone.history.start();

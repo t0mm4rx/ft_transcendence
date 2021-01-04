@@ -5,6 +5,7 @@
 @import './test.scss';
 @import './home-page.scss';
 @import './chat.scss';
+@import './auth.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html, body {
@@ -29,6 +30,10 @@ a {
 	text-decoration: none;
 }
 
+/*
+- Panel -------------------------------------------------------------------------------------------------------------------
+*/
+
 .panel {
 	border-radius: 10px;
 	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
@@ -48,6 +53,10 @@ a {
 	font-weight: 600;
 	font-size: $xl;
 }
+
+/*
+- Buttons -------------------------------------------------------------------------------------------------------------------
+*/
 
 .button-icon {
 	position: relative;
@@ -80,6 +89,31 @@ a {
 
 .button-icon-big svg, .button-icon-big i {
 	font-size: $xl;
+}
+
+.button {
+	background-color: $blue;
+	padding: 10px;
+	border-radius: 10px;
+	border: none;
+	display: flex;
+	align-items: center;
+	font-weight: 800;
+	font-size: $m;
+	width: auto;
+	flex: 0;
+	cursor: pointer;
+	transition: .3s ease all;
+	img {
+		height: 40px;
+		width: auto;
+		margin-right: 10px;
+	}
+}
+
+.button:hover {
+	transform: scale(1.2);
+	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
 /*
@@ -121,6 +155,12 @@ a {
 	width: 150px;
 	margin-top: 20px;
 	animation: logo-anim 2s ease 0s infinite alternate;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none; 
 }
 
 @keyframes logo-anim {
@@ -198,4 +238,31 @@ a {
 	width: 80%;
 	height: 80%;
 	overflow-y: auto;
+	// display: flex;
+	// align-items: center;
+	// justify-content: center;
+}
+
+/*
+- Inputs ---------------------------------------------------------------------------------------
+*/
+.input-wrapper {
+	display: flex;
+	flex-direction: column;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+input[type="text"] {
+	padding: 10px;
+	background-color: $grey_dark_light;
+	border-radius: 10px;
+	border: none;
+}
+
+.checkbox-wrapper {
+	display: flex;
+	align-items: center;
+	margin-top: 10px;
+	margin-bottom: 10px;
 }

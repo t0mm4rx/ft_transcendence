@@ -6,6 +6,12 @@ import Home from './pages/Home';
 import Game from './pages/Game';
 import Tournaments from './pages/Tournaments';
 import Test from './pages/Test';
+import Auth from './pages/Auth';
+import NotificationsPanel from './views/NotificationsPanel';
+import ChatPanel from './views/ChatPanel';
+import UserMenu from './views/UserMenu';
+import Cookies from 'js-cookie';
+import $ from 'jquery';
 
 export default Backbone.Router.extend({
 	routes: {
@@ -22,24 +28,91 @@ export default Backbone.Router.extend({
 		"tournaments/": "tournaments",
 		"test": "test",
 		"test/": "test",
+		"auth": "auth",
+		"auth/": "auth"
 	},
 	home: function () {
+		this.checkLogged();
+		this.showLayout();
 		new Home().render();
 	},
 	user: function (id) {
+		this.checkLogged();
+		this.showLayout();
 		console.log(id);
 		console.log("User view");
 	},
 	guilds: function () {
+		this.checkLogged();
+		this.showLayout();
 		new Guilds().render();
 	},
 	game: function () {
+		this.checkLogged();
+		this.showLayout();
 		new Game().render();
 	},
 	tournaments: function () {
+		this.checkLogged();
+		this.showLayout();
 		new Tournaments().render();
 	},
 	test: function () {
+		this.checkLogged();
+		this.showLayout();
 		new Test().render();
 	},
+	auth: function () {
+		if (!!Cookies.get('user')) {
+			window.location.hash = "/";
+		} else {
+			this.hideLayout();
+			new Auth().render();
+		}
+	},
+	/* Check if the user is logged, if not we redirect him to the auth page */
+	checkLogged: function () {
+		const user = Cookies.get('user');
+		if (!user) {
+			window.location.hash = "auth/";
+		}
+	},
+	/* Show chat panel, notification panel and other elements only visible when logged */
+	showLayout: function () {
+		console.log("Show");
+		$("#menu").show();
+		if (!window.userMenuView)
+		{
+			window.userMenuView = new UserMenu({model: window.currentUser});
+			window.userMenuView.render();
+		}
+		if (!window.notificationPanelView)
+		{
+			window.notificationPanelView = new NotificationsPanel({model: window.notifications});
+			window.notificationPanelView.render();
+		}
+		if (!window.chatPanelView)
+		{
+			window.chatPanelView = new ChatPanel({model: window.chat});
+			window.chatPanelView.render();
+		}
+	},
+	hideLayout: function () {
+		$("#menu").hide();
+		if (window.userMenuView)
+		{
+			window.userMenuView.remove();
+			window.userMenuView = null;
+		}
+		if (window.notificationPanelView)
+		{
+			window.notificationPanelView.remove();
+			window.notificationPanelView = null;
+		}
+		if (window.chatPanelView)
+		{
+			window.chatPanelView.remove();
+			window.chatPanelView = null;
+		}
+	}
 });
