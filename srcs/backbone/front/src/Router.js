@@ -101,20 +101,5 @@ export default Backbone.Router.extend({
 		if (window.chatPanelView) {
 			window.location.reload();
 		}
-		// if (window.userMenuView)
-		// {
-		// 	window.userMenuView.remove();
-		// 	window.userMenuView = null;
-		// }
-		// if (window.notificationPanelView)
-		// {
-		// 	window.notificationPanelView.remove();
-		// 	window.notificationPanelView = null;
-		// }
-		// if (window.chatPanelView)
-		// {
-		// 	window.chatPanelView.remove();
-		// 	window.chatPanelView = null;
-		// }
 	}
 });
