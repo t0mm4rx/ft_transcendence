@@ -8,14 +8,21 @@ export default Backbone.View.extend({
 	el: "#page",
 	events: {
 		'click #login-button': function () {
+			// Here we'll replace the prompt by the 42 login process
 			const login = prompt("[Fake auth for now] Enter your login");
 			if (login) {
-				// Cookies.set('user', login);
-				// window.location.hash = "/";
 				
 				// Scenario 1: first user connection, we show the register panel
 				$("#auth-panel").addClass("auth-panel-open");
 				$("#auth-register").addClass("auth-panel-open");
+
+				// Scenario 2: the user is already known but has 2FA activated
+				// $("#auth-panel").addClass("auth-panel-open");
+				// $("#auth-2fa").addClass("auth-panel-open");
+				
+				// Scenario 3: the user is already known and has no 2FA -> direct login
+				// Cookies.set('user', login);
+				// window.location.hash = "/";
 			}
 		},
 		'click #auth-go-button': function () {
@@ -27,6 +34,11 @@ export default Backbone.View.extend({
 				Cookies.set('user', 'test');
 				window.location.hash = "/";
 			}
+		},
+		'click #auth-2fa-button': function () {
+			// Here we check if the 2fa is good
+			Cookies.set('user', 'test');
+			window.location.hash = "/";
 		}
 	},
 	render: function () {
@@ -52,7 +64,7 @@ export default Backbone.View.extend({
 						</g>
 					</svg>
 				</div>
-				<div id="auth-register">
+				<div id="auth-register" class="auth-panel-secondary">
 					<h2>Tell us more about yourself</h2>
 					<div id="auth-register-card">
 						<img src="https://randomuser.me/api/portraits/men/8.jpg" />
@@ -66,6 +78,10 @@ export default Backbone.View.extend({
 						</div>
 						<span class="button" id="auth-go-button">Go!</span>
 					</div>
+				</div>
+				<div id="auth-2fa" class="auth-panel-secondary">
+					<h2>2FA process here...</h2>
+					<span class="button" id="auth-2fa-button">Go!</span>
 				</div>
 			</div>`
 		);
