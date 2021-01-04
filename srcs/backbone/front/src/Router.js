@@ -79,7 +79,6 @@ export default Backbone.Router.extend({
 	},
 	/* Show chat panel, notification panel and other elements only visible when logged */
 	showLayout: function () {
-		console.log("Show");
 		$("#menu").show();
 		if (!window.userMenuView)
 		{
@@ -99,20 +98,23 @@ export default Backbone.Router.extend({
 	},
 	hideLayout: function () {
 		$("#menu").hide();
-		if (window.userMenuView)
-		{
-			window.userMenuView.remove();
-			window.userMenuView = null;
+		if (window.chatPanelView) {
+			window.location.reload();
 		}
-		if (window.notificationPanelView)
-		{
-			window.notificationPanelView.remove();
-			window.notificationPanelView = null;
-		}
-		if (window.chatPanelView)
-		{
-			window.chatPanelView.remove();
-			window.chatPanelView = null;
-		}
+		// if (window.userMenuView)
+		// {
+		// 	window.userMenuView.remove();
+		// 	window.userMenuView = null;
+		// }
+		// if (window.notificationPanelView)
+		// {
+		// 	window.notificationPanelView.remove();
+		// 	window.notificationPanelView = null;
+		// }
+		// if (window.chatPanelView)
+		// {
+		// 	window.chatPanelView.remove();
+		// 	window.chatPanelView = null;
+		// }
 	}
 });
