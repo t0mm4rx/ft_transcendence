@@ -121,6 +121,12 @@ a {
 	width: 150px;
 	margin-top: 20px;
 	animation: logo-anim 2s ease 0s infinite alternate;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none; 
 }
 
 @keyframes logo-anim {
