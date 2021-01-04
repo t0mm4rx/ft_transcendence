@@ -8,6 +8,7 @@
 - backbone for the front-end
 - SASS compiles everything in ./scss/ in ./dist/
 - Toastify.js for sending toasts
+- js-cookie for handling cookies
 
 ## Scripts
 - compile: compile the project for production
