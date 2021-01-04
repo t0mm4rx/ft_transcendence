@@ -6,7 +6,14 @@ users = User.create([
 	{username: "lucas", login: "llefranc", password: "helene"}
 	])
 	
-relation = Relation.create({user: users[0], other: users[1], status: 1})
+# friendship = Friendship.create([
+# 	{user_id: 1, friend_id: 2, accepted: true},
+# 	{user_id: 3, friend_id: 1},
+# 	])
+friendship = Friendship.create([
+	{user: users[0], friend: users[1], accepted: true},
+	{user: users[2], friend: users[0]},
+	])
 
 channels = Channel.create([
 	{ name: "general"},

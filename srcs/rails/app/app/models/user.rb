@@ -1,7 +1,9 @@
 class User < ApplicationRecord
 	has_secure_password
-	has_many :relations, dependent: :destroy
-	has_many :related_users, :class_name => 'Relation', :foreign_key => 'other_id'
+
+	has_many :pending_friends, -> {where accepted: false}, class_name: 'Friendship'
+	has_many :pending_requests, -> {where accepted: false}, class_name: 'Friendship', foreign_key: "friend_id"
+
 	has_many :channels_users, dependent: :destroy
 	has_many :channels, through: :channels_users
 	has_many :messages, dependent: :destroy
@@ -20,5 +22,42 @@ class User < ApplicationRecord
 	  self.admin ||= false
 	  self.online ||= false
 	  self.avatar_url ||= "https://cdn.intra.42.fr/users/small_#{self.login}.jpg"
-    end
+	end
+
+	def friendships
+		Friendship.where("user_id = ? OR friend_id = ?", id, id)
+	end
+
+	def friends
+		friendships.filter_map do |friendship|  
+			if friendship.accepted
+				friendship.user_id == id ? friendship.friend : friendship.user
+			end
+		end
+	end
+
+	def friends_with?(user)
+		Friendship.accepted_record?(id, user.id)
+	end
+
+	def friendship_status(user)
+		friendship = Friendship.find_record(id, user.id)
+		return nil if !friendship
+		return "friends" if friendship.accepted === true
+		friendship.user_id === id ? "request sent" : "request recv"
+	end
+
+	def send_request(user)
+		Friendship.create(user_id: id, friend_id: user.id)
+	end
+
+	def accept_friend(user)
+		Friendship.find_by(user_id: user.id, friend_id: id).update(accepted: true)
+		# Friendship.find_record(id, user.id).update(accepted: true)
+	end
+
+	def remove_request(user)
+		Friendship.find_record(id, user.id).destroy
+	end
+
 end
