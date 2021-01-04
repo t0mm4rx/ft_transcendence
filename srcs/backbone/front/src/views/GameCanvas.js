@@ -108,13 +108,12 @@ export default Backbone.View.extend({
         // this.playSound('../../assets/game_sound/score.ogg');
         this.ball.x = this.canvas.width / 2;
         this.ball.y = this.canvas.height / 2;
-        this.ball.speed = 5;
+        this.ball.speed = 8;
         this.ball.velocityX = -this.ball.velocityX;
     },
 
 	gameUpdate: function()
 	{
-        console.log(this.ball)
         var ball_update = JSON.parse(JSON.stringify(this.ball));
         // console.log("ball_update : ", ball_update);
 
@@ -164,17 +163,17 @@ export default Backbone.View.extend({
         if (this.ball.x - this.ball.radius < 0)
         {
             // oppnent win
-            this.right.score++;
+            this.ftsocket.sendMessage({ action: "to_broadcast", infos: { message: "update_score", content: { side: "right", score: (this.right.score + 1) }}});
             this.resetBall();
         }
         else if (this.ball.x + this.ball.radius > this.canvas.width)
         {
-            this.left.score++;
+            this.ftsocket.sendMessage({ action: "to_broadcast", infos: { message: "update_score", content: { side: "left", score: (this.left.score + 1) }}});
             this.resetBall();
         }
 
         if (this.left.score >= 11 || this.right.score >= 11)
-            this.state = state_enum["END"];
+            this.ftsocket.sendMessage({ action: "to_broadcast", infos: { message: "update_state", content: { state: state_enum["END"] }}});
     },
 
     /**
@@ -188,20 +187,19 @@ export default Backbone.View.extend({
         this.drawRect(0,0, this.canvas.width, this.canvas.height, "BLACK");
         this.context.globalAlpha = 1.0;
 
-        var textWidthT = this.context.measureText(this.left.name);
+        var textWidthT = this.context.measureText(this.left.player.name);
         var textWidthV = this.context.measureText("vs");
-        var textWidthM = this.context.measureText(this.right.name);
+        var textWidthM = this.context.measureText(this.right.player.name);
 
-        this.drawText(this.left.name, (this.canvas.width / 2) - (textWidthT.width/2), this.canvas.height / 4, "WHITE");
+        this.drawText(this.left.player.name, (this.canvas.width / 2) - (textWidthT.width/2), this.canvas.height / 4, "WHITE");
         this.drawText("vs", (this.canvas.width / 2) - (textWidthV.width/2), (this.canvas.height / 4) + 45, "WHITE");
-        this.drawText(this.right.name, (this.canvas.width / 2) - (textWidthM.width/2), (this.canvas.height / 4) + 90, "WHITE");
+        this.drawText(this.right.player.name, (this.canvas.width / 2) - (textWidthM.width/2), (this.canvas.height / 4) + 90, "WHITE");
         
         var actual_date = new Date();
         var diff_time = Math.trunc((4000 - (actual_date - this.begin_date)) / 1000);
         
         if (diff_time == 0 && this.player_info.side == "left")
-            // this.state = state_enum["INGAME"];
-            this.ftsocket.sendMessage({ action: "to_broadcast", content: { state: state_enum["INGAME"] }});
+            this.ftsocket.sendMessage({ action: "to_broadcast", infos: { message: "update_state", content: { state: state_enum["INGAME"] }}});
         else
             this.drawText(diff_time, (this.canvas.width / 2) - (this.context.measureText(diff_time + "").width / 2), (this.canvas.height - (this.canvas.height / 4)), "WHITE");
     },
@@ -215,7 +213,7 @@ export default Backbone.View.extend({
         var winner = (this.left.score >= 11) ? this.left : this.right;
         var looser = (winner == this.left) ? this.right : this.left;
 
-        var end_title = winner.name + " win !"
+        var end_title = winner.player.name + " win !"
         var textWidthWin = this.context.measureText(end_title);
         var textWidthWinScore = this.context.measureText(winner.score);
         var textWidthTil = this.context.measureText("-");
@@ -250,7 +248,7 @@ export default Backbone.View.extend({
             self.off();
             self.remove();
             // window.location.replace("/#home");
-        }, 1000);
+        }, 3000);
     },
 
 	game: function()
@@ -266,10 +264,7 @@ export default Backbone.View.extend({
                 break;
             case state_enum["INGAME"]:
                 if (this.player_info.side == "left")
-                {
-                    console.log("Im left");
                     this.gameUpdate();
-                }
                 this.gameRender();
                 break;
             default:
@@ -344,7 +339,7 @@ export default Backbone.View.extend({
 			x: this.canvas.width/2,
 			y: this.canvas.height/2,
 			radius: 10,
-			speed: 5,
+			speed: 8,
 			velocityX: 5,
 			velocityY: 0,
 			color: "WHITE",
@@ -374,6 +369,13 @@ export default Backbone.View.extend({
             {
                 if (msg.message.message == "update_state")
                     self.state = msg.message.content.state;
+                else if (msg.message.message == "update_score")
+                {
+                    if (msg.message.content.side == "left")
+                        self.left.score = msg.message.content.score;
+                    else if (msg.message.content.side == "right")
+                        self.right.score = msg.message.content.score;
+                }
                 else if (msg.message.message == "update_ball" && self.player_info.side != "left")
                     self.ball = msg.message.content;
                 else if (msg.message.message == "update_y"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_30_132150) do
+ActiveRecord::Schema.define(version: 2021_01_02_212602) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,6 +26,21 @@ ActiveRecord::Schema.define(version: 2020_12_30_132150) do
 
   create_table "channels", force: :cascade do |t|
     t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "game_rooms", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "player"
+    t.string "opponent"
+  end
+
+  create_table "guilds", force: :cascade do |t|
+    t.string "name"
+    t.string "anagram"
+    t.integer "score"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -63,13 +78,8 @@ ActiveRecord::Schema.define(version: 2020_12_30_132150) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "password_digest"
     t.string "token"
-  end
-  
-    create_table "game_rooms", force: :cascade do |t|
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.string "player"
-    t.string "opponent"
+    t.bigint "guild_id"
+    t.index ["guild_id"], name: "index_users_on_guild_id"
   end
 
   add_foreign_key "channel_users", "channels"
@@ -77,5 +87,4 @@ ActiveRecord::Schema.define(version: 2020_12_30_132150) do
   add_foreign_key "messages", "channels"
   add_foreign_key "messages", "users"
   add_foreign_key "relations", "users"
-
 end

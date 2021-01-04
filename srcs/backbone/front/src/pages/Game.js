@@ -45,7 +45,7 @@ export default Backbone.View.extend({
 		},
 		'click #change-user' : function() {
 			window.currentUser.attributes.id = 589;
-			window.currentUser.attributes.displayName = "Mathis T";
+			window.currentUser.attributes.displayName = "Mathis";
 		},
 		'end_game' : function(event, info){ this.$el.html(template); }
 	},
@@ -113,11 +113,12 @@ export default Backbone.View.extend({
 	{
 		// /!\ To change to be the actual url
 		// Ask the backend to create the "game_room".
-		fetch(`http://localhost:3000/game_rooms`,{
+		fetch(`http://localhost:3000/api/game_rooms`,{
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'Accept': 'application/json'
+				'Accept': 'application/json',
+				'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
 			},
 			body: JSON.stringify({
 				player: JSON.stringify({
@@ -191,11 +192,12 @@ export default Backbone.View.extend({
 		self.gameinfos.opponent = opponent_infos;
 
 		// Update game data on backend part
-		fetch(`http://localhost:3000/game_rooms/` + self.gameinfos.id,{
+		fetch(`http://localhost:3000/api/game_rooms/` + self.gameinfos.id,{
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
-				'Accept': 'application/json'
+				'Accept': 'application/json',
+				'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
 			},
 			body: JSON.stringify({
 				player: JSON.stringify(self.gameinfos.player),
@@ -232,7 +234,13 @@ export default Backbone.View.extend({
 			`);
 
 			// Ask backend to get a game that doesn't have opponend.
-			fetch(`http://localhost:3000/game/match_no_opponent`)
+			fetch(`http://localhost:3000/api/game/match_no_opponent`, {
+				headers: {
+					'Content-Type': 'application/json',
+					'Accept': 'application/json',
+					'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+				}
+			})
 				.then(response => response.json())
 				.then(searchResult => {
 
