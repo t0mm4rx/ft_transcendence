@@ -6,6 +6,8 @@ import $ from 'jquery';
 export default Backbone.View.extend({
 	initialize: function () {
 		this.currentChat = this.model.where('name', 'magrosje');
+		this.listenTo(this.model, 'add', this.renderChannels);
+		this.listenTo(this.currentChat, 'change', this.renderChat);
 	},
 	el: "#chat-container",
 	events: {
