@@ -11,7 +11,7 @@ module Api
     end
 
     def create
-      user = User.new(user_params)
+      user = User.new(user_params_init, params[:login])
       if user.save
         render json: user, status: :created
       else
@@ -21,8 +21,10 @@ module Api
 
     def update
       user = User.find(params[:id])
-      user ||= User.new(user_params)
-      user.update(user_params)
+      if !user
+        return render json: { error: "no such user" }, status: :not_found 
+      end
+      user.update(user_params_change)
       if user.save
         render json: user
       else
@@ -43,9 +45,13 @@ module Api
 
     private
 
-    def user_params
+    def user_params_init
       #params.require(:user).permit(:username, :login, :avatar_url)
       params.permit(:username, :login, :avatar_url, :password) #without require its allow to POST straight away some users, it's faster to test our API
+    end
+
+    def user_params_change
+      params.permit(:username, :avatar_url, :password, :guild_id)
     end
 
     def limit

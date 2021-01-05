@@ -12,17 +12,9 @@ class User < ApplicationRecord
 
 	validates :username, presence: true, length: { minimum:2, maximum: 30}, uniqueness: { case_sensitive: false }
 	validates :login, presence: true, length: { minimum:2, maximum: 30 }, uniqueness: { case_sensitive: false }
-	# validates :avatar_url, # format: { with: ConstantData::VALID_EMAIL_REGEX }
+	validates :avatar_url, presence: true, length: { minimum:5, maximum: 255 } # format: { with: ConstantData::VALID_EMAIL_REGEX }
 
 	after_initialize :set_defaults
-
-    def set_defaults
-      self.wins ||= 0
-	  self.losses ||= 0
-	  self.admin ||= false
-	  self.online ||= false
-	  self.avatar_url ||= "https://cdn.intra.42.fr/users/small_#{self.login}.jpg"
-	end
 
 	def friendships
 		Friendship.where("user_id = ? OR friend_id = ?", id, id)
@@ -43,7 +35,7 @@ class User < ApplicationRecord
 	def friendship_status(user)
 		friendship = Friendship.find_record(id, user.id)
 		return nil if !friendship
-		return "friends" if friendship.accepted === true
+		return "friends" if friendship.accepted
 		friendship.user_id === id ? "request sent" : "request recv"
 	end
 
@@ -60,4 +52,13 @@ class User < ApplicationRecord
 		Friendship.find_record(id, user.id).destroy
 	end
 
+	private
+
+    def set_defaults
+		self.wins ||= 0
+		self.losses ||= 0
+		self.admin ||= false
+		self.online ||= false
+		self.avatar_url ||= "https://cdn.intra.42.fr/users/small_#{self.login}.jpg"
+	end
 end
