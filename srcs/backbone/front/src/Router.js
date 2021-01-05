@@ -31,6 +31,8 @@ export default Backbone.Router.extend({
 		"test/": "test",
 		"auth": "auth",
 		"auth/": "auth",
+		"token": "token",
+		"token/": "token",
 		":whatever": "notFound",
 		":whatever/": "notFound",
 	},
@@ -71,6 +73,11 @@ export default Backbone.Router.extend({
 			this.hideLayout();
 			new Auth().render();
 		}
+	},
+	token: function () {
+		$("body").html("You are being redirected...");
+		window.sendToken("Secret data");
+		window.close();
 	},
 	notFound: function () {
 		window.location.hash = "/";
