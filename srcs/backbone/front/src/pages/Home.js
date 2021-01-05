@@ -26,8 +26,8 @@ export default Backbone.View.extend({
 		window.friends.forEach(friend => {
 			friends.append(
 				`<div class="friend-item">
-					<img src="${friend.attributes.avatar}" alt="${friend.attributes.login}'s profile picture"/>
-					<b class="friend-name">${friend.attributes.displayName}</b>
+					<img src="${friend.attributes.avatar}" alt="${friend.attributes.login}'s profile picture" onclick="window.location.hash='user/${friend.attributes.login}/'"/>
+					<b class="friend-name" onclick="window.location.hash='user/${friend.attributes.login}/'">${friend.attributes.displayName}</b>
 					<span class="friend-status${friend.attributes.status.indexOf("online") >= 0 ? " friend-status-online" : ""}">${friend.attributes.status}</span>
 					<span class="button-icon"><i class="far fa-comment"></i></span>
 					${friend.attributes.status === "online" ? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}

@@ -5,25 +5,13 @@ import $ from 'jquery';
 import toasts from '../utils/toasts';
 
 export default Backbone.View.extend({
+	initialize: function () {
+		this.isAuthOpen = false;
+	},
 	el: "#page",
 	events: {
 		'click #login-button': function () {
-			// Here we'll replace the prompt by the 42 login process
-			const login = prompt("[Fake auth for now] Enter your login");
-			if (login) {
-				
-				// Scenario 1: first user connection, we show the register panel
-				$("#auth-panel").addClass("auth-panel-open");
-				$("#auth-register").addClass("auth-panel-open");
-
-				// Scenario 2: the user is already known but has 2FA activated
-				// $("#auth-panel").addClass("auth-panel-open");
-				// $("#auth-2fa").addClass("auth-panel-open");
-				
-				// Scenario 3: the user is already known and has no 2FA -> direct login
-				// Cookies.set('user', login);
-				// window.location.hash = "/";
-			}
+			this.ask42Login();
 		},
 		'click #auth-go-button': function () {
 			const displayName = $("#display-name-input").val();
@@ -54,7 +42,8 @@ export default Backbone.View.extend({
 						${bubbles}
 						<img src="/assets/auth-illustration.svg" alt="Game illustration" />
 					</div>
-					<div>
+					<div style="position: relative;">
+						<div id="auth-open-overlay"><span>Authentification in progress...</span><img src="/assets/oval.svg"/></div>
 						<h2>Login with your 42 account to continue</h2>
 						<span class="button" id="login-button"><img src="/assets/42.svg" alt="School 42 logo"/>Log in</span>
 					</div>
@@ -86,4 +75,40 @@ export default Backbone.View.extend({
 			</div>`
 		);
 	},
+	toggleAuth: function() {
+		if (this.isAuthOpen) {
+			this.isAuthOpen = false;
+			// $("#auth-open-overlay").css("display", "none");
+			$("#auth-open-overlay").css("opacity", "0");
+			$("#auth-open-overlay").css("pointer-events", "none");
+		} else {
+			this.isAuthOpen = true;
+			// $("#auth-open-overlay").css("display", "flex");
+			$("#auth-open-overlay").css("opacity", "1");
+			$("#auth-open-overlay").css("pointer-events", "all");
+		}
+	},
+	ask42Login: function () {
+		const w = window.open("http://0.0.0.0:3000/api/logintra", "_blank", "width=500px,height=500px");
+		this.toggleAuth();
+		const check = setInterval(() => {
+			if (w.closed) {
+				this.toggleAuth();
+				clearInterval(check);
+
+				// Scenario 1: first user connection, we show the register panel
+				$("#auth-panel").addClass("auth-panel-open");
+				$("#auth-register").addClass("auth-panel-open");
+
+				// Scenario 2: the user is already known but has 2FA activated
+				// $("#auth-panel").addClass("auth-panel-open");
+				// $("#auth-2fa").addClass("auth-panel-open");
+				
+				// Scenario 3: the user is already known and has no 2FA -> direct login
+				// Cookies.set('user', login);
+				// window.location.hash = "/";
+
+			}
+		}, 100);
+	}
 });
