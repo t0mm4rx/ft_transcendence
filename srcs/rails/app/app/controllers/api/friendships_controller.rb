@@ -25,12 +25,9 @@ module Api
       if !friendship
         return { error: "no existing request from user"}, status: :not_found
       end
-      friendship.update_attribute(:accepted, true)
-      if friendship.save
-        render json: friendship, status: :created
-      else
-        render json: friendship.errors, status: :unprocessable_entity # 422
-      end
+      friendship.accepted = true
+      friendship.save!(validate: false)
+      render json: friendship
     end
 
     def destroy
@@ -59,6 +56,5 @@ module Api
         LIMIT_PAGINATION_MAX
       ].min
     end
-  
-end
+  end
 end

@@ -35,10 +35,11 @@ class Friendship < ApplicationRecord
   def not_the_same_as_user
     errors.add(:friend_id, "can't be the same as user") if friend_id === user_id
   end
-  
+
   def unique_combination
     if Friendship.exists?(friend_id, user_id)
       errors.add(:friend_id, "combination already exists")
     end
   end
+
 end
