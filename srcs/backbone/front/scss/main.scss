@@ -7,6 +7,7 @@
 @import './chat.scss';
 @import './auth.scss';
 @import './user-page.scss';
+@import './livestream-page.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html, body {
@@ -297,5 +298,35 @@ input[type="text"] {
 	}
 	.button-icon svg {
 		font-size: $l;
+	}
+}
+
+/*
+- Blinking live --------------------------------------------------------------------
+*/
+
+.blinking-live {
+	width: 15px;
+	height: 15px;
+	border-radius: 100%;
+	top: 50%;
+	left: 0;
+	margin: 10px;
+	background-color: $red;
+	animation: blinking-animation 1s linear 0s infinite alternate;
+}
+
+@keyframes blinking-animation {
+	from {
+		opacity: 1;
+	}
+	40% {
+		opacity: 1;
+	}
+	60% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 0;
 	}
 }

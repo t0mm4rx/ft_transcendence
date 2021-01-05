@@ -10,16 +10,6 @@
 		position: relative;
 		
 	}
-	#blinking-live {
-		width: 15px;
-		height: 15px;
-		border-radius: 100%;
-		top: 50%;
-		left: 0;
-		margin: 10px;
-		background-color: $red;
-		animation: blinking-animation 1s linear 0s infinite alternate;
-	}
 	.game-item {
 		display: flex;
 		align-items: center;
@@ -40,20 +30,5 @@
 				font-size: $m;
 			}
 		}
-	}
-}
-
-@keyframes blinking-animation {
-	from {
-		opacity: 1;
-	}
-	40% {
-		opacity: 1;
-	}
-	60% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 0;
 	}
 }

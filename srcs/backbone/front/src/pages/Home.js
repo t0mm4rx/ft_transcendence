@@ -19,7 +19,7 @@ export default Backbone.View.extend({
 				`<div class="game-item">
 					<span><b>${game.attributes.player1}</b> vs. <b>${game.attributes.player2}</b></span>
 					<span>${game.attributes.type}</span>
-					<a class="button-icon button-icon-accent"><i class="fas fa-tv"></i></a>
+					<a class="button-icon button-icon-accent" onclick="window.location.hash='livestream/42/'"><i class="fas fa-tv"></i></a>
 				</div>`
 			);
 		});

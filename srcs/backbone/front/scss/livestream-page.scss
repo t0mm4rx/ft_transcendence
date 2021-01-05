@@ -1,0 +1,35 @@
+#livestream-panel {
+	display: flex;
+	#game {
+		width: 600px;
+		height: 400px;
+		background-color: black;
+	}
+	#stream-infos {
+		display: flex;
+		flex-direction: column;
+		padding: 20px;
+		h2 {
+			display: flex;
+			align-items: center;
+		}
+		#opponents-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			flex: 1;
+			.opponent {
+				display: flex;
+				align-items: center;
+				cursor: pointer;
+				img {
+					width: 50px;
+					height: 50px;
+					margin: 10px;
+					border-radius: 100%;
+				}
+			}
+		}
+	}
+}
