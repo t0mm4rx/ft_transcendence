@@ -10,9 +10,13 @@ module Api
 				client_secret:"e0ce000d0f730499bd97e4147a1e349e1c10e4cdaa10d68b53a496e7e5f6a83d",
 				code:params[:code],
 				redirect_uri:"http://127.0.0.1:3000/api/accessintra",}).body)
+
 			#get request with header access token
-			render json: HTTParty.get("https://api.intra.42.fr/v2/me", headers: {Authorization: "Bearer #{token["access_token"]}"})
-			#TODO : parse the get request to transfer info into User, should we do a before action in user?
+			info = HTTParty.get("https://api.intra.42.fr/v2/me", headers: {Authorization: "Bearer #{token["access_token"]}"})
+
+			#method to create a new user and token based on 42 infos
+			api_token = Accessintra.create_user(info)
+			render json: api_token, status: :created
 		end
 	end
 end
