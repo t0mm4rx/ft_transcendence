@@ -108,4 +108,26 @@
 		margin: 10px 5px;
 		flex: 1;
 	}
+	#history-panel-container, #friends-panel-content {
+		display: flex;
+		flex-direction: column;
+	}
+	.history-item {
+		background-color: $grey_dark;
+		padding: 20px;
+		display: flex;
+		align-items: center;
+		span:nth-child(1) {
+			flex: 1;
+		}
+		.history-item-win {
+			color: $blue;
+		}
+		.history-item-info {
+			color: $grey_accent;
+		}
+		.history-item-loss {
+			color: $red;
+		}
+	}
 }

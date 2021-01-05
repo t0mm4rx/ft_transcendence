@@ -267,3 +267,34 @@ input[type="text"] {
 	margin-top: 10px;
 	margin-bottom: 10px;
 }
+
+/*
+- Friend item (in friend listings) --------------------------------------------------------------------
+*/
+.friend-item {
+	display: flex;
+	align-items: center;
+	background-color: $grey_dark_light;
+	font-size: $m;
+	img {
+		height: 70px;
+		width: auto;
+	}
+	span, b {
+		margin: 10px;
+	}
+	img, b  {
+		cursor: pointer;
+	}
+	.friend-status {
+		text-align: right;
+		flex: 1;
+		color: $grey_accent;
+	}
+	.friend-status-online {
+		color: $blue;
+	}
+	.button-icon svg {
+		font-size: $l;
+	}
+}
