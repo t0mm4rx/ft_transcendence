@@ -30,6 +30,35 @@ ActiveRecord::Schema.define(version: 2020_12_30_132150) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+<<<<<<< Updated upstream
+=======
+  create_table "friendships", id: false, force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "friend_id", null: false
+    t.boolean "accepted", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["friend_id"], name: "index_friendships_on_friend_id"
+    t.index ["user_id", "friend_id"], name: "index_friendships_on_user_id_and_friend_id", unique: true
+    t.index ["user_id"], name: "index_friendships_on_user_id"
+  end
+
+  create_table "game_rooms", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "player"
+    t.string "opponent"
+  end
+
+  create_table "guilds", force: :cascade do |t|
+    t.string "name"
+    t.string "anagram"
+    t.integer "score"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+>>>>>>> Stashed changes
   create_table "messages", force: :cascade do |t|
     t.bigint "channel_id", null: false
     t.bigint "user_id", null: false

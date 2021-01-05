@@ -89,7 +89,20 @@ export default Backbone.View.extend({
 		}
 	},
 	ask42Login: function () {
+		let creation = null;
+		let token = null;
 		const w = window.open("http://0.0.0.0:3000/api/logintra", "_blank", "width=500px,height=500px");
+		window.addEventListener('message', event => {
+			w.close();
+			console.log(event.data.params);
+			const params = new URLSearchParams("?" + event.data.params);
+			if (!params.get("token") || !params.get("creation")) {
+				toasts.notifyError("Cannot get the 42 API token");
+				return;
+			}
+			creation = eval(params.get("creation"));
+			token = params.get("token");
+		}); 
 		this.toggleAuth();
 		const check = setInterval(() => {
 			if (w.closed) {
@@ -97,16 +110,20 @@ export default Backbone.View.extend({
 				clearInterval(check);
 
 				// Scenario 1: first user connection, we show the register panel
-				$("#auth-panel").addClass("auth-panel-open");
-				$("#auth-register").addClass("auth-panel-open");
+				if (creation) {
+					$("#auth-panel").addClass("auth-panel-open");
+					$("#auth-register").addClass("auth-panel-open");
+				}
 
 				// Scenario 2: the user is already known but has 2FA activated
 				// $("#auth-panel").addClass("auth-panel-open");
 				// $("#auth-2fa").addClass("auth-panel-open");
 				
 				// Scenario 3: the user is already known and has no 2FA -> direct login
-				// Cookies.set('user', login);
-				// window.location.hash = "/";
+				if (!creation) {
+					Cookies.set('user', token);
+					window.location.hash = "/";
+				}
 
 			}
 		}, 100);
