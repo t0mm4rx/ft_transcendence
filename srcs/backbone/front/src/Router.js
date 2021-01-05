@@ -13,6 +13,7 @@ import UserMenu from './views/UserMenu';
 import Cookies from 'js-cookie';
 import $ from 'jquery';
 import User from './pages/User';
+import Livestream from './pages/Livestream';
 
 export default Backbone.Router.extend({
 	routes: {
@@ -25,6 +26,8 @@ export default Backbone.Router.extend({
 		"guilds/": "guilds",
 		"game": "game",
 		"game/": "game",
+		"livestream/:id": "livestream",
+		"livestream/:id/": "livestream",
 		"tournaments": "tournaments",
 		"tournaments/": "tournaments",
 		"test": "test",
@@ -55,6 +58,11 @@ export default Backbone.Router.extend({
 		this.checkLogged();
 		this.showLayout();
 		new Game().render();
+	},
+	livestream: function () {
+		this.checkLogged();
+		this.showLayout();
+		new Livestream().render();
 	},
 	tournaments: function () {
 		this.checkLogged();
