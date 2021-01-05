@@ -4,9 +4,6 @@ import io from 'sockjs-client';
 
 const Game = Backbone.Model.extend({
 
-    initialize: function(options) 
-    {
-    }
 });
 
 const GameCollection = Backbone.Collection.extend({});

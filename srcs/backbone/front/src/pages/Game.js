@@ -47,7 +47,24 @@ export default Backbone.View.extend({
 			window.currentUser.attributes.id = 589;
 			window.currentUser.attributes.displayName = "Mathis";
 		},
-		'end_game' : function(event, info){ this.$el.html(template); }
+		'end_game' : function(event, info)
+		{
+			console.log("Info:", info);
+			// Update game data on backend part
+			fetch(`http://localhost:3000/api/game_rooms/` + info.game_id,{
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					'Accept': 'application/json',
+					'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+				},
+				body: JSON.stringify({
+					status: "ended"
+				})
+			});
+
+			this.$el.html(template);
+		}
 	},
 
 	/**
@@ -125,7 +142,8 @@ export default Backbone.View.extend({
 					name: window.currentUser.attributes.displayName,
 					id: window.currentUser.attributes.id
 				}),
-				opponent: ""
+				opponent: "",
+				status: "active"
 			})
 		})
 		.then(res => res.json())

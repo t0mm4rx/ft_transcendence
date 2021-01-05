@@ -48,7 +48,7 @@ module Api
 
             # require() : mark required parameter
             # permit() : set the autorized parameter
-            params.require(:game_room).permit(:player, :opponent)
+            params.require(:game_room).permit(:player, :opponent, :status)
         end
     end
 end

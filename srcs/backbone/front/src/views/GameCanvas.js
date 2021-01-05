@@ -13,19 +13,38 @@ const state_enum = {
 export default Backbone.View.extend({
     el: "#game-canvas",
 
+    /**
+     * Initialization of this view.
+     * @param {*} ftsocket the socket connected to the backend "game_room"
+     * @param {*} gameinfos the informations about the game
+     */
 	initialize: function(ftsocket, gameinfos)
 	{
+        // Base State.
         this.state = state_enum["BEGIN"];
+
+        // Game id.
+        this.game_id = gameinfos.id;
+
+        // This ftsocket is the ftsocket given by "Game" view.
         this.ftsocket = ftsocket;
 
-        this.player_info = (gameinfos.player.id == window.currentUser.attributes.id) ? gameinfos.player : gameinfos.opponent;
-        this.opponent_info = (this.player_info == gameinfos.player) ? gameinfos.opponent : gameinfos.player;
+        // Here the player is this client.
+        this.player_info = 
+            (gameinfos.player.id == window.currentUser.attributes.id) 
+                ? gameinfos.player : gameinfos.opponent;
+
+        // Here the opponent is the opponent client.
+        this.opponent_info = 
+            (this.player_info == gameinfos.player) 
+                ? gameinfos.opponent : gameinfos.player;
 
         // Begin State vars
         this.begin_date = new Date();
         this.prev_date = new Date();
         this.begin_count = 3;
 
+        // Game loop interval
         var self = this;
 		this.timer = setInterval(function(){
 			self.game();
@@ -34,20 +53,39 @@ export default Backbone.View.extend({
         this.render();
     },
     
+    // Events
     events: { "mousemove": "mouseMoveHandler" },
 
+    /**
+     * Draw the net on the game canvas.
+     */
 	drawNet: function()
 	{
 		for (let i = 0; i <= this.canvas.height; i += 15)
 			this.drawRect(this.net.x, this.net.y + i, this.net.width, this.net.height, this.net.color);
 	},
 
+    /**
+     * Draw a rectangle on the game canvas.
+     * @param {number} x the top-left x position of the rectangle.
+     * @param {number} y the top-left y position of the rectangle.
+     * @param {number} w the width of the rectangle.
+     * @param {number} h the height of the rectangle.
+     * @param {string} color the color of the rectangle.
+     */
 	drawRect: function(x,y,w,h,color)
 	{
 		this.context.fillStyle = color;
 		this.context.fillRect(x,y,w,h);
 	},
 
+    /**
+     * Draw a circle on the game canvas.
+     * @param {number} x the x position of the middle of the circle.
+     * @param {number} y the y position of the middle of the circle.
+     * @param {number} r the radius of the circle.
+     * @param {string} color the color of the circle.
+     */
 	drawCicle: function(x,y,r,color)
 	{
 		this.context.fillStyle = color;
@@ -57,6 +95,13 @@ export default Backbone.View.extend({
 		this.context.fill();
 	},
 
+    /**
+     * Draw a text on the game canvas.
+     * @param {string} text the text to print.
+     * @param {number} x the top-left x position of the text.
+     * @param {number} y the top-left y position of the text.
+     * @param {string} color the color of the text.
+     */
 	drawText: function(text,x,y,color)
 	{
 		this.context.fillStyle = color;
@@ -64,23 +109,37 @@ export default Backbone.View.extend({
 		this.context.fillText(text,x,y);
 	},
 
+    /**
+     * Draw every objects of the game.
+     */
 	gameRender: function()
 	{
         // Clear screen
 		this.drawRect(0,0,this.canvas.width,this.canvas.height, "BLACK");
 
+        // Draw the net.
 		this.drawNet();
 
-        // Draw score
+        // Draw score of each player
 		this.drawText(this.left.score, this.canvas.width / 4, this.canvas.height / 5, "WHITE");
 		this.drawText(this.right.score, (3 * this.canvas.width / 4) - 45, this.canvas.height / 5, "WHITE");
-	
+    
+        // Draw players paddles
 		this.drawRect(this.left.x, this.left.y, this.left.width, this.left.height, this.left.color);
 		this.drawRect(this.right.x, this.right.y, this.right.width, this.right.height, this.right.color);
 
+        // Draw the ball
 		this.drawCicle(this.ball.x, this.ball.y, this.ball.radius, this.ball.color);
 	},
 
+    /**
+     * Detect a collision between a player and 
+     * the ball.
+     * @param {ball} b the balle.
+     * @param {player} p the player.
+     * @returns true if a ball enter in collision 
+     * with the player paddle, false otherwise.
+     */
 	collision: function(b, p)
 	{
 		b.top = b.y - b.radius;
@@ -96,6 +155,10 @@ export default Backbone.View.extend({
 		return (b.right > p.left && b.bottom > p.top && b.left < p.right && b.top < p.bottom);
     },
     
+    /**
+     * Play a sound.
+     * @param {string} sound_path the sound path.
+     */
     playSound: function(sound_path)
     {
         var audio = new Audio(sound_path);
@@ -103,6 +166,11 @@ export default Backbone.View.extend({
         audio.play();
     },
 
+    /**
+     * Reset ball position and speed. Invert the
+     * ball velocity on X to push the ball toward the
+     * last player to score.
+     */
     resetBall: function()
     {
         // this.playSound('../../assets/game_sound/score.ogg');
@@ -112,10 +180,65 @@ export default Backbone.View.extend({
         this.ball.velocityX = -this.ball.velocityX;
     },
 
+    detectGoal: function()
+    {
+        // Detect if the ball is before the left player on the canvas.
+        if (this.ball.x - this.ball.radius < 0)
+        {
+            // Right player score. Send a message to clients to update score.
+            this.ftsocket.sendMessage({ 
+                action: "to_broadcast", 
+                infos: { 
+                    message: "update_score", 
+                    content: { 
+                        side: "right", 
+                        score: (this.right.score + 1)
+            }}}, false);
+
+            // Reset ball position.
+            this.resetBall();
+
+        } // Detect if the ball is after the right player on the canvas.
+        else if (this.ball.x + this.ball.radius > this.canvas.width)
+        {
+            // Left player score. Send a message to clients to update score.
+            this.ftsocket.sendMessage({
+                action: "to_broadcast", 
+                infos: { 
+                    message: "update_score",
+                    content: { 
+                        side: "left", 
+                        score: (this.left.score + 1)
+            }}}, false);
+
+            // Reset ball position.
+            this.resetBall();
+
+        }
+
+        // Detect if a player win.
+        if (this.left.score >= 11 || this.right.score >= 11)
+            // Send a message to clients to change state to end state.
+            this.ftsocket.sendMessage({
+                action: "to_broadcast",
+                infos: {
+                    message: "update_state",
+                    content: {
+                        state: state_enum["END"]
+            }}}, false);
+    },
+
+    /**
+     * This function is only executed by the left player.
+     * Like it's diffuclt to have the game AI on the backend
+     * one of the player need to do the calculs.
+     * 
+     * Update ball position, check ball things in function
+     * of it position.
+     */
 	gameUpdate: function()
 	{
         var ball_update = JSON.parse(JSON.stringify(this.ball));
-        // console.log("ball_update : ", ball_update);
 
 		ball_update.x += ball_update.velocityX;
 		ball_update.y += ball_update.velocityY;
@@ -132,7 +255,6 @@ export default Backbone.View.extend({
     
         if (this.collision(ball_update, player))
         {
-            // ball_update.velocityX = -ball_update.velocityX;
             // Where the ball hit the player
             let collidePoint = ball_update.y - (player.y + player.height / 2);
 
@@ -154,26 +276,19 @@ export default Backbone.View.extend({
             // this.playSound('../../assets/game_sound/wall_hit.ogg');
         }
 
-        // console.log("PREV = ", this.ball);
-        this.ftsocket.sendMessage({ action: "to_broadcast", infos: { message: "update_ball", content: ball_update }}, false);
+        // Send ball position to other clients.
+        this.ftsocket.sendMessage({
+            action: "to_broadcast",
+            infos: {
+                message: "update_ball",
+                content: ball_update
+        }}, false);
+
+        // Set new position of the ball.
         this.ball = ball_update;
-        // console.log("NEXT = ", this.ball);
 
-        // detect goal
-        if (this.ball.x - this.ball.radius < 0)
-        {
-            // oppnent win
-            this.ftsocket.sendMessage({ action: "to_broadcast", infos: { message: "update_score", content: { side: "right", score: (this.right.score + 1) }}});
-            this.resetBall();
-        }
-        else if (this.ball.x + this.ball.radius > this.canvas.width)
-        {
-            this.ftsocket.sendMessage({ action: "to_broadcast", infos: { message: "update_score", content: { side: "left", score: (this.left.score + 1) }}});
-            this.resetBall();
-        }
-
-        if (this.left.score >= 11 || this.right.score >= 11)
-            this.ftsocket.sendMessage({ action: "to_broadcast", infos: { message: "update_state", content: { state: state_enum["END"] }}});
+        // Detect goal.
+        this.detectGoal();
     },
 
     /**
@@ -183,50 +298,108 @@ export default Backbone.View.extend({
      */
     begin: function()
     {
+        // Background.
         this.context.globalAlpha = 0.7;
         this.drawRect(0,0, this.canvas.width, this.canvas.height, "BLACK");
         this.context.globalAlpha = 1.0;
 
+        // Width of left/right player and of "vs" strings.
         var textWidthT = this.context.measureText(this.left.player.name);
         var textWidthV = this.context.measureText("vs");
         var textWidthM = this.context.measureText(this.right.player.name);
 
-        this.drawText(this.left.player.name, (this.canvas.width / 2) - (textWidthT.width/2), this.canvas.height / 4, "WHITE");
-        this.drawText("vs", (this.canvas.width / 2) - (textWidthV.width/2), (this.canvas.height / 4) + 45, "WHITE");
-        this.drawText(this.right.player.name, (this.canvas.width / 2) - (textWidthM.width/2), (this.canvas.height / 4) + 90, "WHITE");
+        // Draw left player name.
+        this.drawText(this.left.player.name,
+            (this.canvas.width / 2) - (textWidthT.width/2), // Position in x.
+            this.canvas.height / 4, // Position in y.
+            "WHITE"); // Color.
+
+        // Draw "vs" string.
+        this.drawText("vs",
+            (this.canvas.width / 2) - (textWidthV.width/2),
+            (this.canvas.height / 4) + 45,
+            "WHITE");
+
+        // Draw right player name.
+        this.drawText(this.right.player.name,
+            (this.canvas.width / 2) - (textWidthM.width/2),
+            (this.canvas.height / 4) + 90,
+            "WHITE");
         
+        // Countdown. 
         var actual_date = new Date();
         var diff_time = Math.trunc((4000 - (actual_date - this.begin_date)) / 1000);
         
+        // Detect of time before start is 0. Only executed by left player.
         if (diff_time == 0 && this.player_info.side == "left")
-            this.ftsocket.sendMessage({ action: "to_broadcast", infos: { message: "update_state", content: { state: state_enum["INGAME"] }}});
-        else
-            this.drawText(diff_time, (this.canvas.width / 2) - (this.context.measureText(diff_time + "").width / 2), (this.canvas.height - (this.canvas.height / 4)), "WHITE");
+            // Update state to "in game" state.
+            this.ftsocket.sendMessage({
+                action: "to_broadcast",
+                infos: {
+                    message: "update_state",
+                    content: {
+                        state: state_enum["END"]
+            }}});
+        else // Draw countdown.
+            this.drawText(diff_time,
+                (this.canvas.width / 2) - (this.context.measureText(diff_time + "").width / 2),
+                (this.canvas.height - (this.canvas.height / 4)),
+                "WHITE");
     },
 
+    /**
+     * End state. Draw match result.
+     */
     end: function()
     {
+        // Background.
         this.context.globalAlpha = 0.7;
         this.drawRect(0,0, this.canvas.width, this.canvas.height, "BLACK");
         this.context.globalAlpha = 1.0;
         
+        // Get who is the winner / looser.
         var winner = (this.left.score >= 11) ? this.left : this.right;
         var looser = (winner == this.left) ? this.right : this.left;
 
+        // End title.
         var end_title = winner.player.name + " win !"
+
+        // Width of "end title", winner/looser score and of "-" strings.
         var textWidthWin = this.context.measureText(end_title);
         var textWidthWinScore = this.context.measureText(winner.score);
         var textWidthTil = this.context.measureText("-");
         var textWidthLosScore = this.context.measureText(looser.score);
         
-        this.drawText(end_title, (this.canvas.width / 2) - (textWidthWin.width/2), this.canvas.height / 4, "WHITE");
-        this.drawText(winner.score, (this.canvas.width / 2) - (textWidthWinScore.width/2), this.canvas.height / 2.5, "WHITE");
-        this.drawText("-", (this.canvas.width / 2) - (textWidthTil.width/2), this.canvas.height / 2, "WHITE");
-        this.drawText(looser.score, (this.canvas.width / 2) - (textWidthLosScore.width/2), (this.canvas.height / 2) + ((this.canvas.height / 2) - this.canvas.height / 2.5), "WHITE");
+        // Draw end title.
+        this.drawText(end_title,
+            (this.canvas.width / 2) - (textWidthWin.width/2),
+            this.canvas.height / 4,
+            "WHITE");
         
+        // Draw winner score.
+        this.drawText(winner.score,
+            (this.canvas.width / 2) - (textWidthWinScore.width/2),
+            this.canvas.height / 2.5,
+            "WHITE");
+        
+        // Draw "-" string.
+        this.drawText("-",
+            (this.canvas.width / 2) - (textWidthTil.width/2),
+            this.canvas.height / 2,
+            "WHITE");
+        
+        // Draw looser score.
+        this.drawText(looser.score,
+            (this.canvas.width / 2) - (textWidthLosScore.width/2),
+            (this.canvas.height / 2) + ((this.canvas.height / 2) - this.canvas.height / 2.5),
+            "WHITE");
+        
+        // Stop game loop interval.
         clearInterval(this.timer);
 
+        // Match history variable.
         this.match_history = {
+            game_id: this.game_id,
             left: {
                 player_id: this.left.id,
                 player_name: this.left.name,
@@ -241,27 +414,36 @@ export default Backbone.View.extend({
             }
         }
 
+        // Return to "Direct game" menu.
         var self = this;
         setTimeout(function()
         {
             self.$el.trigger('end_game', self.match_history);
             self.off();
             self.remove();
-            // window.location.replace("/#home");
         }, 3000);
     },
 
+    /**
+     * Game loop.
+     */
 	game: function()
 	{
         switch (this.state) {
+
+            // Begin state. begin().
             case state_enum["BEGIN"]:
                 this.gameRender();
                 this.begin();
                 break;
+            
+            // End state. end().
             case state_enum["END"]:
                 this.gameRender();
                 this.end();
                 break;
+            
+            // In game state. gameUpdate() , gameRender().
             case state_enum["INGAME"]:
                 if (this.player_info.side == "left")
                     this.gameUpdate();
@@ -273,34 +455,89 @@ export default Backbone.View.extend({
 
 	},
 
-    // NE PREND PAS EN COMPTE LE PADDING
-    // https://developer.mozilla.org/fr/docs/Web/API/Element/getBoundingClientRect
+    /**
+     * Capture mouse mouvement on the canvas.
+     * @param {event} event the event.
+     */
     mouseMoveHandler: function (event)
     {
+        // The canvas rectangle.
         let rect = this.canvas.getBoundingClientRect();
 
+        // Player info. 
         var player = this.player_info.is;
 
+        // Set player paddle y at mouse position.
         player.y = event.pageY - rect.top - player.height / 2;
+
+        // Avoid the paddle to be outside of the canvas.
         if (event.pageY + player.height / 2 + 5 > rect.bottom)
             player.y = rect.height - player.height - 5;
         else if (event.pageY - player.height / 2 - 5 < rect.top)
             player.y = 5;
 
-        // Send to opponent
-        this.ftsocket.sendMessage({action: "to_broadcast", infos: {message: "update_y", content: {player_id: player.player.id, y: player.y}}}, false);
+        // Send to other client the paddle position.
+        this.ftsocket.sendMessage({
+            action: "to_broadcast",
+            infos: {
+                message: "update_y",
+                content: {
+                    player_id: player.player.id,
+                    y: player.y
+        }}}, false);
+    },
+
+    /**
+     * Treat messages from the socket to interact with the game.
+     */
+    messageTreatment: function(self)
+    {
+        this.ftsocket.socket.onmessage = function(event) {
+
+            // Event variables.
+            const event_res = event.data;
+            const msg = JSON.parse(event_res);
+
+            // Ignores pings.
+            if (msg.type === "ping")
+                return;
+
+            if (msg.message)
+            {
+                // Update state.
+                if (msg.message.message == "update_state")
+                    self.state = msg.message.content.state;
+                // Update score.
+                else if (msg.message.message == "update_score")
+                {
+                    if (msg.message.content.side == "left")
+                        self.left.score = msg.message.content.score;
+                    else if (msg.message.content.side == "right")
+                        self.right.score = msg.message.content.score;
+                }
+                // Update ball position.
+                else if (msg.message.message == "update_ball" && self.player_info.side != "left")
+                    self.ball = msg.message.content;
+                // Update opponent paddle position
+                else if (msg.message.message == "update_y"
+                    && msg.message.content.player_id == self.opponent_info.id)
+                        self.opponent_info.is.y = msg.message.content.y;
+            }
+        };
     },
 
     render: function ()
     {
         var self = this;
 
+        // Cavas elements.
         this.canvas = this.$el[0];
 		this.context = this.canvas.getContext("2d");
 
         var left_player;
         var right_player;
 
+        // Define left and right player.
         if (this.player_info.side == "left")
         {
             left_player = this.player_info;
@@ -312,6 +549,7 @@ export default Backbone.View.extend({
             right_player = this.player_info
         }
 
+        // Init left player.
 		this.left = {
             player: left_player,
 			x: ((left_player.side == "left") ? 5 : this.canvas.width - 15),
@@ -322,6 +560,7 @@ export default Backbone.View.extend({
 			score: 0
 		}
 
+        // Init right player.
 		this.right = {
             player: right_player,
 			x: ((right_player.side == "left") ? 5 : this.canvas.width - 15),
@@ -332,9 +571,11 @@ export default Backbone.View.extend({
 			score: 0
         }
         
+        // Set the players sides to the players.
         this.left.player.is = this.left;
         this.right.player.is = this.right;
 
+        // Init ball.
 		this.ball = {
 			x: this.canvas.width/2,
 			y: this.canvas.height/2,
@@ -345,6 +586,7 @@ export default Backbone.View.extend({
 			color: "WHITE",
         }
         
+        // Init net.
 		this.net = {
 			x: (this.canvas.width / 2) - 1,
 			y: 0,
@@ -353,35 +595,7 @@ export default Backbone.View.extend({
 			color: "WHITE"
         }
         
-        console.log("PLAYER : ", this.player_info);
-        console.log("OPPONENT : ", this.opponent_info);
-
-        this.ftsocket.socket.onmessage = function(event) {  
-            const event_res = event.data;
-
-            const msg = JSON.parse(event_res);
-
-            // Ignores pings.
-            if (msg.type === "ping")
-                return;
-
-            if (msg.message)
-            {
-                if (msg.message.message == "update_state")
-                    self.state = msg.message.content.state;
-                else if (msg.message.message == "update_score")
-                {
-                    if (msg.message.content.side == "left")
-                        self.left.score = msg.message.content.score;
-                    else if (msg.message.content.side == "right")
-                        self.right.score = msg.message.content.score;
-                }
-                else if (msg.message.message == "update_ball" && self.player_info.side != "left")
-                    self.ball = msg.message.content;
-                else if (msg.message.message == "update_y"
-                    && msg.message.content.player_id == self.opponent_info.id)
-                        self.opponent_info.is.y = msg.message.content.y;
-            }
-        };
-    },
+        // Setup message treatment.
+        this.messageTreatment(self);
+    }
 });

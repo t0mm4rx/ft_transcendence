@@ -18,8 +18,6 @@ Rails.application.routes.draw do
     get '/game/match_no_opponent', to: 'game_rooms#first_no_oppenent'
 end
 
-  # get '/game/end_match/:id', to: 'game_rooms#end_game'
-
   mount ActionCable.server => '/cable'
 
 end
