@@ -1,5 +1,5 @@
 @import './variables.scss';
-@import './game.scss';
+@import './game-page.scss';
 @import './menu.scss';
 @import './notification-panel.scss';
 @import './test.scss';
@@ -239,9 +239,10 @@ a {
 	width: 80%;
 	height: 80%;
 	overflow-y: auto;
-	// display: flex;
-	// align-items: center;
-	// justify-content: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 }
 
 /*
