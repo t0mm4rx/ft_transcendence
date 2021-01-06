@@ -1,17 +1,17 @@
 module Api
   class UsersController < ApplicationController
     LIMIT_PAGINATION_MAX = 20
-    skip_before_action :authenticate_request
+    skip_before_action :authenticate_request, only: :create
     
     def index
       # users = User.where(online: true).limit(limit).offset(params[:offset])
       # users = User.limit(limit).offset(params[:offset])
       users = User.order(online: :desc).limit(limit).offset(params[:offset])
-      render json: users
+      render json: users, each_serializer: FriendSerializer
     end
 
     def create
-      user = User.new(user_params)
+      user = User.new(user_params_init)
       if user.save
         render json: user, status: :created
       else
@@ -21,8 +21,10 @@ module Api
 
     def update
       user = User.find(params[:id])
-      user ||= User.new(user_params)
-      user.update(user_params)
+      if !user
+        return render json: { error: "no such user" }, status: :not_found 
+      end
+      user.update(user_params_change)
       if user.save
         render json: user
       else
@@ -38,14 +40,18 @@ module Api
     def show
       user = User.find(params[:id])
 
-      render json: user
+      render json: user, relation: get_relation_to(user)
     end
 
     private
 
-    def user_params
+    def user_params_init
       #params.require(:user).permit(:username, :login, :avatar_url)
       params.permit(:username, :login, :avatar_url, :password) #without require its allow to POST straight away some users, it's faster to test our API
+    end
+
+    def user_params_change
+      params.permit(:username, :avatar_url, :password, :guild_id)
     end
 
     def limit
@@ -53,6 +59,11 @@ module Api
         params.fetch(:limit, LIMIT_PAGINATION_MAX).to_i,
         LIMIT_PAGINATION_MAX
       ].min
+    end
+
+    def get_relation_to(user)
+      return "current_user" if user === current_user 
+      current_user.friendship_status(user)
     end
   end
 end

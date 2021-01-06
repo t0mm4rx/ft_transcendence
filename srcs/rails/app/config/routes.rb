@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   namespace :api do
     root 'users#index'
     resources :channels do
@@ -7,8 +6,11 @@ Rails.application.routes.draw do
       resources :messages
     end
     resources :users do
-      resources :friends, controller: 'relations', shallow: true
+      resources :friends, controller: 'friendships', only: :index
     end
+    
+    resources :friends, controller: 'friendships', only: [:create, :update, :destroy]
+
     resources :logintra, only: :index
     resources :accessintra, only: :index
     post 'authenticate', to: 'authentication#authenticate'

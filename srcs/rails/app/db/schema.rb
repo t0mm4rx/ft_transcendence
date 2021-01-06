@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_30_132150) do
+ActiveRecord::Schema.define(version: 2021_01_04_183046) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,9 +30,7 @@ ActiveRecord::Schema.define(version: 2020_12_30_132150) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-<<<<<<< Updated upstream
-=======
-  create_table "friendships", id: false, force: :cascade do |t|
+  create_table "friendships", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "friend_id", null: false
     t.boolean "accepted", default: false
@@ -58,7 +56,6 @@ ActiveRecord::Schema.define(version: 2020_12_30_132150) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
->>>>>>> Stashed changes
   create_table "messages", force: :cascade do |t|
     t.bigint "channel_id", null: false
     t.bigint "user_id", null: false
@@ -67,16 +64,6 @@ ActiveRecord::Schema.define(version: 2020_12_30_132150) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["channel_id"], name: "index_messages_on_channel_id"
     t.index ["user_id"], name: "index_messages_on_user_id"
-  end
-
-  create_table "relations", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "other_id", null: false
-    t.integer "status"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["other_id"], name: "index_relations_on_other_id"
-    t.index ["user_id"], name: "index_relations_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -92,19 +79,14 @@ ActiveRecord::Schema.define(version: 2020_12_30_132150) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "password_digest"
     t.string "token"
-  end
-  
-    create_table "game_rooms", force: :cascade do |t|
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.string "player"
-    t.string "opponent"
+    t.bigint "guild_id"
+    t.index ["guild_id"], name: "index_users_on_guild_id"
   end
 
   add_foreign_key "channel_users", "channels"
   add_foreign_key "channel_users", "users"
+  add_foreign_key "friendships", "users"
+  add_foreign_key "friendships", "users", column: "friend_id"
   add_foreign_key "messages", "channels"
   add_foreign_key "messages", "users"
-  add_foreign_key "relations", "users"
-
 end
