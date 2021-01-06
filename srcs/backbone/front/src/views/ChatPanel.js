@@ -1,77 +1,131 @@
 /* Chat panel view. Like the notification panel, the frame template is used to open/close the panel.*/
-import Backbone from 'backbone';
-import template from '../../templates/chat.html';
-import $ from 'jquery';
+import Backbone from "backbone";
+import template from "../../templates/chat.html";
+import { FtSocket, FtSocketCollection } from "../models/FtSocket";
+import $ from "jquery";
 
 export default Backbone.View.extend({
-	initialize: function () {
-		this.currentChat = this.model.where('name', 'magrosje');
-		this.listenTo(this.model, 'add', this.renderChannels);
-		this.listenTo(this.currentChat, 'change', this.renderChat);
-	},
-	el: "#chat-container",
-	events: {
-		'click #chat-panel-close': function () {
-			$("#chat-panel").removeClass("chat-panel-open");
-		},
-		'click #chat-icon': function () {
-			$("#chat-panel").addClass("chat-panel-open");
-		},
-		'click .chat-channel': function (el) {
-			let find = null;
-			this.model.forEach(item => {
-				if (item.attributes.name === el.target.innerText)
-					find = item;
-			});
-			this.currentChat = find;
-			this.renderChannels();
-			this.renderMessages();
-		}
-	},
-	render: function () {
-		this.$el.html(template);
-		this.renderChannels();
-		this.renderMessages();
-	},
-	renderChannels: function () {
-		$("#chat-channels").html("");
-		this.model.forEach(channel => {
-			$("#chat-channels").append(
-				`<span class="chat-channel${this.currentChat === channel ? " channel-current" : ""}">${channel.attributes.name}</span>`
-			);
-		});
-	},
-	renderMessages: function () {
-		$("#chat-chat").html("");
-		if (this.currentChat) {
-			$("#chat-chat").append(
-				`<div class="chat-header">
-					${!!this.currentChat.attributes.avatar ? `<img src=\"${this.currentChat.attributes.avatar}\" />` : ""}
+  initialize: function () {
+    this.currentChat = this.model.models[0];
+    this.currentMessages = window.currentMessages;
+    this.listenTo(this.model, "add", this.renderChannels);
+    this.listenTo(this.currentChat, "change", this.renderChat);
+    this.listenTo(this.currentMessages, "change", this.renderMessages);
+    this.model.on("sync", () => this.render(), this);
+    this.ftsocket = new FtSocket({ id: 1, channel: "MessageChannel" });
+  },
+  el: "#chat-container",
+  events: {
+    "click #chat-panel-close": function () {
+      $("#chat-panel").removeClass("chat-panel-open");
+    },
+    "click #chat-icon": function () {
+      $("#chat-panel").addClass("chat-panel-open");
+    },
+    "click .chat-channel": function (el) {
+      let find = null;
+      this.model.forEach((item) => {
+        if (item.attributes.name === el.target.innerText) find = item;
+      });
+      this.currentChat = find;
+      const channelId = this.currentChat.attributes.id;
+      // this.currentMessages.attributes.channel_id = channelId;
+      console.log("CURRENT MESSAGES:", this.currentMessages);
+      console.log("CHANNEL ID:", channelId);
+
+      // console.log("log: ", this.currentMessages);
+      this.currentMessages.fetch({
+        success: this.renderMessages(),
+        failure: console.log("FAILED TO FETCH"),
+        headers: window.apiheaders,
+      });
+      this.renderChannels();
+    },
+    "click #submitButton": function (e) {
+      const input = $("#chat-input").val();
+      console.log("INPUT: ", input);
+      console.log("current chat: ", this.currentMessages);
+      const message = this.currentMessages.add({
+        body: input,
+        username: window.currentUser.attributes.username,
+      });
+      //   this.ftsocket.socket.onmessage();
+      console.log("current chat: ", this.currentMessages);
+      message.save();
+    },
+    // this.ftsocket.socket.onmessage = function(event)
+    //     {
+    //     const event_res = event.data;
+    //     const msg = JSON.parse(event_res);
+    //     // Ignores pings.
+    //     if (msg.type === "ping")
+    //         return;
+    //     if (msg.message)
+    //     {
+    //         console.log(msg.message);
+    //     };
+    // };
+  },
+  render: function () {
+    this.$el.html(template);
+    this.renderChannels();
+    this.renderMessages();
+  },
+  renderChannels: function () {
+    $("#chat-channels").html("");
+    this.model.forEach((channel) => {
+      $("#chat-channels").append(
+        `<span class="chat-channel${
+          this.currentChat === channel ? " channel-current" : ""
+        }">${channel.attributes.name}</span>`
+      );
+    });
+  },
+  renderMessages: function () {
+    $("#chat-chat").html("");
+    if (this.currentChat && this.currentMessages) {
+      $("#chat-chat").append(
+        `<div class="chat-header">
+					${
+            !!this.currentChat.attributes.avatar
+              ? `<img src=\"${this.currentChat.attributes.avatar}\" />`
+              : ""
+          }
 					<span>${this.currentChat.attributes.name}</span>
 				</div>
 				<div id="chat-messages"></div>
-				<div class="chat-input">
-					<input type="text" id="chat-input" placeholder="Send something"/>
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="Send something"/>
+            <input id="submitButton" type="button" value="Send" />
 				</div>`
-			);
-			this.renderChat();
-		}
-	},
-	renderChat: function() {
-		$("#chat-messages").html();
-		let lastUser = null;
-		this.currentChat.attributes.messages.forEach(message => {
-			let html = "";
-			html += `<div class=\"chat-message-container ${message.from === window.currentUser.attributes.login ? "chat-message-container-me" : ""} ${lastUser === message.from ? "chat-message-container-no-margin" : ""}\">`;
-			if (lastUser !== message.from)
-				html +=
-					`<div class="chat-message-infos"><span>${message.from}</span><span>${new Date(message.date).toISOString().split('.')[0].replace('T', ' ')}</span></div>`
-				;
-			html += `<span class="chat-message">${message.message}</span>`;
-			html += "</div>";
-			lastUser = message.from;
-			$("#chat-messages").append(html);
-		});
-		document.querySelector("#chat-messages").scrollTop = document.querySelector("#chat-messages").scrollHeight;
-	}
+      );
+      this.renderChat();
+    }
+  },
+  renderChat: function () {
+    $("#chat-messages").html();
+    let lastUser = null;
+    const messages = this.currentMessages.models;
+    messages.forEach((message) => {
+      let html = "";
+      html += `<div class=\"chat-message-container ${
+        message.attributes.username === window.currentUser.attributes.username
+          ? "chat-message-container-me"
+          : ""
+      } ${
+        lastUser === message.attributes.username
+          ? "chat-message-container-no-margin"
+          : ""
+      }\">`;
+      if (lastUser !== message.attributes.username)
+        html += `<div class="chat-message-infos"><span>${message.attributes.username}</span><span>${message.attributes.date}</span></div>`;
+      html += `<span class="chat-message">${message.attributes.body}</span>`;
+      html += "</div>";
+      lastUser = message.attributes.username;
+      $("#chat-messages").append(html);
+    });
+    document.querySelector("#chat-messages").scrollTop = document.querySelector(
+      "#chat-messages"
+    ).scrollHeight;
+  },
 });
