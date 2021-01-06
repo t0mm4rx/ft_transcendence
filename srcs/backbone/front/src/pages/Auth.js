@@ -3,10 +3,14 @@ import Backbone from 'backbone';
 import Cookies from 'js-cookie';
 import $ from 'jquery';
 import toasts from '../utils/toasts';
+import { User } from '../models/User';
+import { loadCurrentUser } from '../utils/globals';
 
 export default Backbone.View.extend({
 	initialize: function () {
 		this.isAuthOpen = false;
+		this.token = null;
+		this.listenTo(window.currentUser, 'change', this.renderSignup);
 	},
 	el: "#page",
 	events: {
@@ -18,15 +22,14 @@ export default Backbone.View.extend({
 			if (displayName.length <= 0) {
 				toasts.notifyError("The display name can't be empty");
 			} else {
+				window.currentUser.save('username', displayName);
 				toasts.notifySuccess("Your account has been created");
-				Cookies.set('user', 'test');
 				window.location.hash = "/";
 			}
 		},
 		'click #auth-2fa-button': function () {
 			// Here we check if the 2fa is good
-			Cookies.set('user', 'test');
-			window.location.hash = "/";
+			this.login(this.token);
 		}
 	},
 	render: function () {
@@ -54,24 +57,30 @@ export default Backbone.View.extend({
 					</svg>
 				</div>
 				<div id="auth-register" class="auth-panel-secondary">
-					<h2>Tell us more about yourself</h2>
-					<div id="auth-register-card">
-						<img src="https://randomuser.me/api/portraits/men/8.jpg" />
-						<div class="input-wrapper">
-							<span>Display name</span>
-							<input type="text" placeholder="AwesomeBob" id="display-name-input" />
-						</div>
-						<div class="checkbox-wrapper">
-							<input type="checkbox" id="2fa-input" name="2fa-input">
-							<label for="2fa-input">I want to use 2FA</label>
-						</div>
-						<span class="button" id="auth-go-button">Go!</span>
-					</div>
+					
 				</div>
 				<div id="auth-2fa" class="auth-panel-secondary">
 					<h2>2FA process here...</h2>
 					<span class="button" id="auth-2fa-button">Go!</span>
 				</div>
+			</div>`
+		);
+		this.renderSignup();
+	},
+	renderSignup: function () {
+		$("#auth-register").html(
+			`<h2>Tell us more about yourself</h2>
+			<div id="auth-register-card">
+				<img src="${window.currentUser.get('avatar_url') || ""}" />
+				<div class="input-wrapper">
+					<span>Display name</span>
+					<input type="text" placeholder="AwesomeBob" id="display-name-input" />
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="2fa-input" name="2fa-input">
+					<label for="2fa-input">I want to use 2FA</label>
+				</div>
+				<span class="button" id="auth-go-button">Go!</span>
 			</div>`
 		);
 	},
@@ -89,26 +98,57 @@ export default Backbone.View.extend({
 		}
 	},
 	ask42Login: function () {
+		let creation = null;
+		let token = null;
 		const w = window.open("http://0.0.0.0:3000/api/logintra", "_blank", "width=500px,height=500px");
+		window.addEventListener('message', event => {
+			w.close();
+			const params = new URLSearchParams("?" + event.data.params);
+			if (!params.get("token") || !params.get("creation")) {
+				toasts.notifyError("Cannot get the 42 API token");
+				return;
+			}
+			creation = eval(params.get("creation"));
+			token = params.get("token");
+		}); 
 		this.toggleAuth();
 		const check = setInterval(() => {
 			if (w.closed) {
 				this.toggleAuth();
 				clearInterval(check);
 
+				if (!token) {
+					toasts.notifyError("The authentification process hasn't been completed");
+					return;
+				}
+
+				Cookies.set('user', token);
+				$(document).trigger('token_changed');
+				loadCurrentUser();
+
 				// Scenario 1: first user connection, we show the register panel
-				$("#auth-panel").addClass("auth-panel-open");
-				$("#auth-register").addClass("auth-panel-open");
+				if (creation) {
+					$("#auth-panel").addClass("auth-panel-open");
+					$("#auth-register").addClass("auth-panel-open");
+					return;
+				}
 
 				// Scenario 2: the user is already known but has 2FA activated
 				// $("#auth-panel").addClass("auth-panel-open");
 				// $("#auth-2fa").addClass("auth-panel-open");
 				
 				// Scenario 3: the user is already known and has no 2FA -> direct login
-				// Cookies.set('user', login);
-				// window.location.hash = "/";
+				if (!creation) {
+					this.login(token);
+				}
 
 			}
 		}, 100);
+	},
+	login: function (token) {
+		Cookies.set('user', token);
+		$(document).trigger("token_changed");
+		loadCurrentUser();
+		window.location.hash = "/";
 	}
 });

@@ -84,8 +84,9 @@ export default Backbone.Router.extend({
 	},
 	token: function () {
 		$("body").html("You are being redirected...");
-		window.sendToken("Secret data");
-		window.close();
+		window.opener.postMessage({
+			params: window.location.href.split("?")[1]
+		}, "*");
 	},
 	notFound: function () {
 		window.location.hash = "/";
