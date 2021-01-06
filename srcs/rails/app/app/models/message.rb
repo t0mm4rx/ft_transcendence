@@ -2,7 +2,7 @@ class Message < ApplicationRecord
   belongs_to :channel
   belongs_to :user
 
-  def user
+  def username
     user.username
   end
   def date
