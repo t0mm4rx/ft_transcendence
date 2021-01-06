@@ -1,5 +1,8 @@
 #auth-panel-container {
 	position: relative;
+	max-width: 1400px;
+	width: 80%;
+	margin: auto;
 }
 
 #auth-panel {
@@ -9,6 +12,25 @@
 	max-width: 1400px;
 	margin: auto;
 	transition: 1s ease all;
+	#auth-open-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: $grey;
+		z-index: 2;
+		flex-direction: column;
+		img {
+			margin: 20px;
+		}
+		opacity: 0;
+		pointer-events: none;
+		transition: .3s ease all;
+	}
 	div {
 		flex: 1;
 	}
@@ -19,16 +41,17 @@
 			position: absolute;
 			border-radius: 100%;
 			background-color: $grey_dark;
-			z-index: 2;
+			z-index: 3;
 			animation: bubble-animation 5s ease;
 		}
 		img {
 			position: absolute;
 			height: 80%;
+			max-width: 80%;
 			width: auto;
 			bottom: 0;
 			left: 0;
-			z-index: 3;
+			z-index: 4;
 			animation: illustration-animation 3s ease;
 		}
 	}
@@ -49,7 +72,7 @@
 		top: 0;
 		height: 600px;
 		transform: translateX(-50%) translateX(10px);
-		z-index: 0;
+		z-index: 2;
 		pointer-events: none;
 	}
 }

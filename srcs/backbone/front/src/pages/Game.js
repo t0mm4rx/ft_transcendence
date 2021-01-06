@@ -49,20 +49,36 @@ export default Backbone.View.extend({
 		},
 		'end_game' : function(event, info)
 		{
-			console.log("Info:", info);
-			// Update game data on backend part
-			fetch(`http://localhost:3000/api/game_rooms/` + info.game_id,{
-				method: 'PATCH',
+			// Get actual informations about the game
+			fetch(`http://localhost:3000/api/game_rooms/` + info.game_id, {
 				headers: {
 					'Content-Type': 'application/json',
 					'Accept': 'application/json',
 					'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
-				},
-				body: JSON.stringify({
-					status: "ended"
-				})
+				}
+			})
+			.then(response => response.json())
+			.then(searchResult => {
+
+				// Update game data on backend part
+				fetch(`http://localhost:3000/api/game_rooms/` + info.game_id,{
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': 'application/json',
+						'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+					},
+					body: JSON.stringify({
+						player: searchResult.player,
+						opponent: searchResult.opponent,
+						status: "ended",
+						number_player: searchResult.number_player
+					})
+				});
+
 			});
 
+			this.ftsocket.closeConnection();
 			this.$el.html(template);
 		}
 	},
@@ -77,7 +93,7 @@ export default Backbone.View.extend({
 	 * @param {*} self this view, given because this function
 	 * is used "asyncly".
 	 */
-	startGame: function(panel, self)
+	startGame: function(panel, self, connection_type)
 	{
 		panel.html(`
 			<div id="game-canvas-div">
@@ -88,7 +104,7 @@ export default Backbone.View.extend({
 		self.gameinfos.player.side = "left";
 		self.gameinfos.opponent.side = "right";
 
-		self.game = new GameCanvas(self.ftsocket, self.gameinfos);
+		self.game = new GameCanvas(self.ftsocket, self.gameinfos, connection_type);
 	},
 
 	/**
@@ -110,9 +126,99 @@ export default Backbone.View.extend({
 		);
 
 		// Wait 3 secondes to "start", for the show.
-		setTimeout(function() {
-			self.startGame(panel, self);
+		var show = setTimeout(function() {
+			console.log("Start normal game");
+			self.startGame(panel, self, "normal");
 		}, 3000);
+
+		self.ftsocket.socket.onmessage = function(event) { 
+			
+			const event_res = event.data;
+			const msg = JSON.parse(event_res);
+
+			// Ignores pings.
+			if (msg.type === "ping")
+				return;
+			
+			if (msg.message && msg.message.message == "client_quit")
+			{
+				clearTimeout(show);
+
+				// Get actual informations about the game
+				fetch(`http://localhost:3000/api/game_rooms/` + self.gameinfos.id, {
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': 'application/json',
+						'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+					}
+				})
+				.then(response => response.json())
+				.then(searchResult => {
+
+					// Update game data on backend part
+					fetch(`http://localhost:3000/api/game_rooms/` + self.gameinfos.id,{
+						method: 'PATCH',
+						headers: {
+							'Content-Type': 'application/json',
+							'Accept': 'application/json',
+							'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+						},
+						body: JSON.stringify({
+							player: searchResult.player,
+							opponent: searchResult.opponent,
+							status: "ended",
+							number_player: searchResult.number_player
+						})
+					});
+
+				});
+
+				panel.html(`
+					<h1>Player ` + (JSON.parse(msg.message.content)).display_name + ` disconnected ...</h1>`
+				);
+
+				self.ftsocket.closeConnection();
+				setTimeout(function() {
+					self.findNormal();
+				}, 2000);
+			}
+		};
+	},
+
+	waitOpponent: function(self, panel, game_infos)
+	{
+		// Create new socket between frontend and backend
+		self.ftsocket = new FtSocket({id: game_infos.id, channel: 'GameRoomChannel'});
+
+		self.ftsocket.sendMessage({
+			action: "whoami",
+			infos: {
+				player_id: window.currentUser.attributes.id,
+				display_name: window.currentUser.attributes.displayName
+		}}, true, true);
+
+		/* 
+		* Setup the socket to catch "everyone_ready" message to
+		* start the game.
+		*/
+		self.ftsocket.socket.onmessage = function(event) { 
+			
+			const event_res = event.data;
+			const msg = JSON.parse(event_res);
+
+			// Ignores pings.
+			if (msg.type === "ping")
+				return;
+			
+			if (msg.message && msg.message.message == "everyone_ready")
+			{
+				// Get opponent informations
+				self.gameinfos.opponent = msg.message.content;
+
+				// "Start" the game for this client.
+				self.gameFound(panel, self);
+			}
+		};
 	},
 
 	/**
@@ -143,7 +249,8 @@ export default Backbone.View.extend({
 					id: window.currentUser.attributes.id
 				}),
 				opponent: "",
-				status: "active"
+				status: "notstarted",
+				number_player: 0
 			})
 		})
 		.then(res => res.json())
@@ -154,31 +261,8 @@ export default Backbone.View.extend({
 			// Get "player" (game creator, this client) informations.
 			self.gameinfos.player = JSON.parse(self.gameinfos.player);
 
-			// Create new socket between frontend and backend
-			self.ftsocket = new FtSocket({id: createResult.id, channel: 'GameRoomChannel'});
-
-			/* 
-			* Setup the socket to catch "everyone_ready" message to
-			* start the game.
-			*/
-			self.ftsocket.socket.onmessage = function(event) { 
-				
-				const event_res = event.data;
-				const msg = JSON.parse(event_res);
-
-				// Ignores pings.
-				if (msg.type === "ping")
-					return;
-				
-				if (msg.message && msg.message.message == "everyone_ready")
-				{
-					// Get opponent informations
-					self.gameinfos.opponent = msg.message.content;
-
-					// "Start" the game for this client.
-					self.gameFound(panel, self);
-				}
-			};
+			// Wait opponent.
+			this.waitOpponent(self, panel, createResult);
 		});
 	},
 
@@ -219,22 +303,110 @@ export default Backbone.View.extend({
 			},
 			body: JSON.stringify({
 				player: JSON.stringify(self.gameinfos.player),
-				opponent: JSON.stringify(self.gameinfos.opponent)
+				opponent: JSON.stringify(self.gameinfos.opponent),
+				status: "active"
 			})
 		});
 
 		// Connect this client to the "game_room" socket.
-		self.ftsocket = new FtSocket({id: self.gameinfos.id, channel: 'GameRoomChannel'});
+		self.ftsocket = new FtSocket({
+			id: self.gameinfos.id,
+			channel: 'GameRoomChannel'
+		});
+
+		self.ftsocket.sendMessage({
+			action: "whoami",
+			infos: {
+				player_id: window.currentUser.attributes.id,
+				display_name: window.currentUser.attributes.displayName
+		}}, true, true);
 
 		/*
 		* Send the "everyone_ready" message to the "player" (other client).
 		* "Start" the game for this client. Executed after 2 secondes to be
-		* sure that the socket is connected.
+		* sure that the socket is connected (and for the show).
 		*/
 		setTimeout(function() {
-			self.ftsocket.sendMessage({action: "to_broadcast", infos: {message: "everyone_ready", content: opponent_infos}});
+
+			self.ftsocket.sendMessage({
+				action: "to_broadcast",
+				infos: {
+					message: "everyone_ready",
+					content: opponent_infos
+			}});
+
 			self.gameFound(panel, self);
 		}, 2000);
+	},
+
+	/**
+	 * Detect if the player is diconnected
+	 * of a game.
+	 * @param {view} self the view.
+	 * @returns true if the player was disconnected,
+	 * in this case, the gameinfos has resetup with the
+	 * content of the database, false otherwise.
+	 */
+	isDisconnected: async function(self)
+	{
+		// This player informations.
+		var this_player = {
+			name: window.currentUser.attributes.displayName,
+			id: window.currentUser.attributes.id
+		}
+
+		// Return value.
+		var is_disco = true;
+
+		// Request to the backend.
+		await fetch(`http://localhost:3000/api/game/is_disconnected`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+				'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+			},
+			body: JSON.stringify({
+				player: JSON.stringify(this_player)
+			})
+		})
+		.then(response => response.json())
+		.then(searchResult => {
+
+			// Check the response of the backend.
+			if (searchResult == null)
+				is_disco = false;
+			else // Resetup game values
+			{
+				is_disco = true;
+				self.gameinfos = searchResult;
+
+				self.gameinfos.player = JSON.parse(self.gameinfos.player);
+
+				if (self.gameinfos.opponent !== "")
+					self.gameinfos.opponent = JSON.parse(self.gameinfos.opponent);
+			}
+
+		});
+
+		return (is_disco);
+	},
+
+	reconnection: function(self, panel)
+	{
+		// Create new socket between frontend and backend
+		self.ftsocket = new FtSocket({id: self.gameinfos.id, channel: 'GameRoomChannel'});
+
+		self.ftsocket.sendMessage({
+			action: "whoami",
+			infos: {
+				player_id: window.currentUser.attributes.id,
+				display_name: window.currentUser.attributes.displayName
+		}}, true, true);
+
+		setTimeout(function() {
+			self.startGame(panel, self, "reconnection");
+		}, 1000);
 	},
 
 	/**
@@ -242,38 +414,49 @@ export default Backbone.View.extend({
 	 *  a new game will be create, otherwise the finded
 	 *  game will be joined.
 	 */
-	findNormal: function()
+	findNormal: async function()
 	{
 		var self = this.self;
 		const panel = $("#game-panel");
 		
 		panel.html(`
 			<h1>Searching for opponent...</h1>
-			`);
+		`);
 
-			// Ask backend to get a game that doesn't have opponend.
-			fetch(`http://localhost:3000/api/game/match_no_opponent`, {
-				headers: {
-					'Content-Type': 'application/json',
-					'Accept': 'application/json',
-					'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
-				}
-			})
-				.then(response => response.json())
-				.then(searchResult => {
+		var disco = await this.isDisconnected(self);
+		if (disco == true)
+		{
+			console.log("Game infos = ", self.gameinfos)
+			if (self.gameinfos.status == "notstarted")
+				this.waitOpponent(self, panel, self.gameinfos);
+			else if (self.gameinfos.status == "active")
+				this.reconnection(self, panel);
+			return;
+		} 
 
-					// Create new match if no one was found
-					if (searchResult === null)
-					{
-						self.createNewGame(self, panel);
-						return;
-					}
+		// Ask backend to get a game that doesn't have opponend.
+		fetch(`http://localhost:3000/api/game/match_no_opponent`, {
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+				'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+			}
+		})
+		.then(response => response.json())
+		.then(searchResult => {
 
-					self.gameinfos = searchResult;
+			// Create new match if no one was found
+			if (searchResult === null)
+			{
+				self.createNewGame(self, panel);
+				return;
+			}
 
-					// Join the finded game
-					this.joinGame(self, panel);
-			});
+			self.gameinfos = searchResult;
+
+			// Join the finded game
+			this.joinGame(self, panel);
+		});
 	},
 
 	/**

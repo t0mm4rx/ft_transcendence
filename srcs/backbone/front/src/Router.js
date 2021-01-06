@@ -12,6 +12,7 @@ import ChatPanel from './views/ChatPanel';
 import UserMenu from './views/UserMenu';
 import Cookies from 'js-cookie';
 import $ from 'jquery';
+import User from './pages/User';
 
 export default Backbone.Router.extend({
 	routes: {
@@ -29,7 +30,11 @@ export default Backbone.Router.extend({
 		"test": "test",
 		"test/": "test",
 		"auth": "auth",
-		"auth/": "auth"
+		"auth/": "auth",
+		"token": "token",
+		"token/": "token",
+		":whatever": "notFound",
+		":whatever/": "notFound",
 	},
 	home: function () {
 		this.checkLogged();
@@ -39,8 +44,7 @@ export default Backbone.Router.extend({
 	user: function (id) {
 		this.checkLogged();
 		this.showLayout();
-		console.log(id);
-		console.log("User view");
+		new User({login: id}).render();
 	},
 	guilds: function () {
 		this.checkLogged();
@@ -69,6 +73,14 @@ export default Backbone.Router.extend({
 			this.hideLayout();
 			new Auth().render();
 		}
+	},
+	token: function () {
+		$("body").html("You are being redirected...");
+		window.sendToken("Secret data");
+		window.close();
+	},
+	notFound: function () {
+		window.location.hash = "/";
 	},
 	/* Check if the user is logged, if not we redirect him to the auth page */
 	checkLogged: function () {

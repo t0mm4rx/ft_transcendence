@@ -1,4 +1,5 @@
 #home-section {
+	align-self: stretch;
 	display: flex;
 	> .panel {
 		flex: 1;
@@ -38,32 +39,6 @@
 			svg {
 				font-size: $m;
 			}
-		}
-	}
-	.friend-item {
-		display: flex;
-		align-items: center;
-		background-color: $grey_dark_light;
-		font-size: $m;
-		img {
-			height: 70px;
-			width: auto;
-		}
-		span, b {
-			margin: 10px;
-		}
-		img, b  {
-			cursor: pointer;
-		}
-		.friend-status {
-			text-align: right;
-			flex: 1;
-		}
-		.friend-status-online {
-			color: $blue;
-		}
-		.button-icon svg {
-			font-size: $l;
 		}
 	}
 }

@@ -7,7 +7,7 @@ const state_enum = {
     "BEGIN": 1,
     "INGAME": 2,
     "END": 3,
-    "PAUSED": 4
+    "DISCONNECTION": 4
 };
 
 export default Backbone.View.extend({
@@ -18,10 +18,16 @@ export default Backbone.View.extend({
      * @param {*} ftsocket the socket connected to the backend "game_room"
      * @param {*} gameinfos the informations about the game
      */
-	initialize: function(ftsocket, gameinfos)
+	initialize: function(ftsocket, gameinfos, connection_type)
 	{
         // Base State.
-        this.state = state_enum["BEGIN"];
+        if (connection_type == "reconnection")
+            this.state = state_enum["DISCONNECTION"];
+        else
+            this.state = state_enum["BEGIN"];
+
+        // normal, reconnection, stream
+        this.connection_type = connection_type;
 
         // Game id.
         this.game_id = gameinfos.id;
@@ -46,8 +52,8 @@ export default Backbone.View.extend({
 
         // Game loop interval
         var self = this;
-		this.timer = setInterval(function(){
-			self.game();
+        this.timer = setInterval(function(){
+            self.game();
         }, 1000 / 30);
         
         this.render();
@@ -55,6 +61,41 @@ export default Backbone.View.extend({
     
     // Events
     events: { "mousemove": "mouseMoveHandler" },
+
+    /**
+     * Capture mouse mouvement on the canvas.
+     * @param {event} event the event.
+     */
+    mouseMoveHandler: function (event)
+    {
+        if (self.state != state_enum["DISCONNECTION"])
+        {
+            // The canvas rectangle.
+            let rect = this.canvas.getBoundingClientRect();
+
+            // Player info. 
+            var player = this.player_info.is;
+
+            // Set player paddle y at mouse position.
+            player.y = event.pageY - rect.top - player.height / 2;
+
+            // Avoid the paddle to be outside of the canvas.
+            if (event.pageY + player.height / 2 + 5 > rect.bottom)
+                player.y = rect.height - player.height - 5;
+            else if (event.pageY - player.height / 2 - 5 < rect.top)
+                player.y = 5;
+
+            // Send to other client the paddle position.
+            this.ftsocket.sendMessage({
+                action: "to_broadcast",
+                infos: {
+                    message: "update_y",
+                    content: {
+                        player_id: player.player.id,
+                        y: player.y
+            }}}, false);
+        }
+    },
 
     /**
      * Draw the net on the game canvas.
@@ -114,23 +155,26 @@ export default Backbone.View.extend({
      */
 	gameRender: function()
 	{
-        // Clear screen
-		this.drawRect(0,0,this.canvas.width,this.canvas.height, "BLACK");
+        if (this.left && this.right && this.ball)
+        {
+            // Clear screen
+            this.drawRect(0,0,this.canvas.width,this.canvas.height, "BLACK");
 
-        // Draw the net.
-		this.drawNet();
+            // Draw the net.
+            this.drawNet();
 
-        // Draw score of each player
-		this.drawText(this.left.score, this.canvas.width / 4, this.canvas.height / 5, "WHITE");
-		this.drawText(this.right.score, (3 * this.canvas.width / 4) - 45, this.canvas.height / 5, "WHITE");
-    
-        // Draw players paddles
-		this.drawRect(this.left.x, this.left.y, this.left.width, this.left.height, this.left.color);
-		this.drawRect(this.right.x, this.right.y, this.right.width, this.right.height, this.right.color);
+            // Draw score of each player
+            this.drawText(this.left.score, this.canvas.width / 4, this.canvas.height / 5, "WHITE");
+            this.drawText(this.right.score, (3 * this.canvas.width / 4) - 45, this.canvas.height / 5, "WHITE");
+        
+            // Draw players paddles
+            this.drawRect(this.left.x, this.left.y, this.left.width, this.left.height, this.left.color);
+            this.drawRect(this.right.x, this.right.y, this.right.width, this.right.height, this.right.color);
 
-        // Draw the ball
-		this.drawCicle(this.ball.x, this.ball.y, this.ball.radius, this.ball.color);
-	},
+            // Draw the ball
+            this.drawCicle(this.ball.x, this.ball.y, this.ball.radius, this.ball.color);
+        }
+    },
 
     /**
      * Detect a collision between a player and 
@@ -338,7 +382,7 @@ export default Backbone.View.extend({
                 infos: {
                     message: "update_state",
                     content: {
-                        state: state_enum["END"]
+                        state: state_enum["INGAME"]
             }}});
         else // Draw countdown.
             this.drawText(diff_time,
@@ -424,6 +468,24 @@ export default Backbone.View.extend({
         }, 3000);
     },
 
+    disconnection: function()
+    {
+        // Background.
+        this.context.globalAlpha = 0.7;
+        this.drawRect(0,0, this.canvas.width, this.canvas.height, "BLACK");
+        this.context.globalAlpha = 1.0;
+
+        if (this.disconnect_values != null)
+        {
+            var text = "Player " + this.disconnect_values.display_name + " is disconnected...";
+            var textWidth = this.context.measureText(text);
+            this.drawText(text,
+                (this.canvas.width / 2) - (textWidth.width/2),
+                this.canvas.height / 4,
+                "WHITE");
+        }
+    },
+
     /**
      * Game loop.
      */
@@ -449,43 +511,17 @@ export default Backbone.View.extend({
                     this.gameUpdate();
                 this.gameRender();
                 break;
+
+            case state_enum["DISCONNECTION"]:
+                this.gameRender();
+                this.disconnection();
+                break;
+
             default:
                 break;
         }
 
 	},
-
-    /**
-     * Capture mouse mouvement on the canvas.
-     * @param {event} event the event.
-     */
-    mouseMoveHandler: function (event)
-    {
-        // The canvas rectangle.
-        let rect = this.canvas.getBoundingClientRect();
-
-        // Player info. 
-        var player = this.player_info.is;
-
-        // Set player paddle y at mouse position.
-        player.y = event.pageY - rect.top - player.height / 2;
-
-        // Avoid the paddle to be outside of the canvas.
-        if (event.pageY + player.height / 2 + 5 > rect.bottom)
-            player.y = rect.height - player.height - 5;
-        else if (event.pageY - player.height / 2 - 5 < rect.top)
-            player.y = 5;
-
-        // Send to other client the paddle position.
-        this.ftsocket.sendMessage({
-            action: "to_broadcast",
-            infos: {
-                message: "update_y",
-                content: {
-                    player_id: player.player.id,
-                    y: player.y
-        }}}, false);
-    },
 
     /**
      * Treat messages from the socket to interact with the game.
@@ -506,22 +542,84 @@ export default Backbone.View.extend({
             {
                 // Update state.
                 if (msg.message.message == "update_state")
-                    self.state = msg.message.content.state;
-                // Update score.
-                else if (msg.message.message == "update_score")
                 {
-                    if (msg.message.content.side == "left")
-                        self.left.score = msg.message.content.score;
-                    else if (msg.message.content.side == "right")
-                        self.right.score = msg.message.content.score;
+                    self.state = msg.message.content.state;
+                    if (self.state == state_enum["BEGIN"])
+                        self.begin_date = new Date();
                 }
-                // Update ball position.
-                else if (msg.message.message == "update_ball" && self.player_info.side != "left")
-                    self.ball = msg.message.content;
-                // Update opponent paddle position
-                else if (msg.message.message == "update_y"
-                    && msg.message.content.player_id == self.opponent_info.id)
-                        self.opponent_info.is.y = msg.message.content.y;
+                else if (self.state != state_enum["DISCONNECTION"])
+                {
+                    // Update score.
+                    if (msg.message.message == "update_score")
+                    {
+                        if (msg.message.content.side == "left")
+                            self.left.score = msg.message.content.score;
+                        else if (msg.message.content.side == "right")
+                            self.right.score = msg.message.content.score;
+                    }
+                    // Update ball position.
+                    else if (msg.message.message == "update_ball"
+                        && self.player_info.side != "left")
+                        self.ball = msg.message.content;
+                    // Update opponent paddle position
+                    else if (msg.message.message == "update_y"
+                        && msg.message.content.player_id == self.opponent_info.id)
+                            self.opponent_info.is.y = msg.message.content.y;
+                    else if (msg.message.message == "client_quit")
+                    {
+                        self.state = state_enum["DISCONNECTION"];
+                        self.disconnect_values = JSON.parse(msg.message.content);
+                        self.messageTreatment(self);
+                    }
+                }
+                else if (self.state == state_enum["DISCONNECTION"])
+                {
+                    if (msg.message.message == "need_infos"
+                        && self.player_info
+                        && msg.message.content.sender != self.player_info.id)
+                    {
+                        self.left.player.is = null;
+                        self.right.player.is = null;
+                        self.ftsocket.sendMessage({ 
+                            action: "to_broadcast", 
+                            infos: { 
+                                message: "force_infos", 
+                                content: { left: self.left, right: self.right, ball: self.ball }
+                        }}, true, true);
+                    }
+                    else if (msg.message.message == "force_infos")
+                    {
+                        self.left = msg.message.content.left;
+                        self.right = msg.message.content.right;
+                        self.ball = msg.message.content.ball;
+
+                        // Set the players sides to the players.
+                        self.left.player.is = self.left;
+                        self.right.player.is = self.right;
+
+                        if (self.left.player.id == window.currentUser.attributes.id)
+                        {
+                            self.player_info.is = self.left;
+                            self.opponent_info.is = self.right;
+                        }
+                        else if (self.right.player.id == window.currentUser.attributes.id)
+                        {
+                            self.player_info.is = self.right;
+                            self.opponent_info.is = self.left;
+                        }
+
+                        if (self.player_info.id == self.left.player.id)
+                        {
+                            self.ftsocket.sendMessage({
+                                action: "to_broadcast",
+                                infos: {
+                                    message: "update_state",
+                                    content: {
+                                        state: state_enum["BEGIN"]
+                            }}}, true);
+                        }
+                    }
+                }
             }
         };
     },
@@ -549,41 +647,54 @@ export default Backbone.View.extend({
             right_player = this.player_info
         }
 
-        // Init left player.
-		this.left = {
-            player: left_player,
-			x: ((left_player.side == "left") ? 5 : this.canvas.width - 15),
-			y: this.canvas.height/2 - 100/2,
-			width: 10,
-			height: 100,
-			color: "WHITE",
-			score: 0
-		}
+        if (this.connection_type == "normal")
+        {
+            // Init left player.
+            this.left = {
+                player: left_player,
+                x: ((left_player.side == "left") ? 5 : this.canvas.width - 15),
+                y: this.canvas.height/2 - 100/2,
+                width: 10,
+                height: 100,
+                color: "WHITE",
+                score: 0
+            }
 
-        // Init right player.
-		this.right = {
-            player: right_player,
-			x: ((right_player.side == "left") ? 5 : this.canvas.width - 15),
-			y: this.canvas.height/2 - 100/2,
-			width: 10,
-			height: 100,
-			color: "WHITE",
-			score: 0
+            // Init right player.
+            this.right = {
+                player: right_player,
+                x: ((right_player.side == "left") ? 5 : this.canvas.width - 15),
+                y: this.canvas.height/2 - 100/2,
+                width: 10,
+                height: 100,
+                color: "WHITE",
+                score: 0
+            }
+
+            // Init ball.
+            this.ball = {
+                x: this.canvas.width/2,
+                y: this.canvas.height/2,
+                radius: 10,
+                speed: 8,
+                velocityX: 5,
+                velocityY: 0,
+                color: "WHITE",
+            }
+
+            // Set the players sides to the players.
+            this.left.player.is = this.left;
+            this.right.player.is = this.right;
+
         }
-        
-        // Set the players sides to the players.
-        this.left.player.is = this.left;
-        this.right.player.is = this.right;
-
-        // Init ball.
-		this.ball = {
-			x: this.canvas.width/2,
-			y: this.canvas.height/2,
-			radius: 10,
-			speed: 8,
-			velocityX: 5,
-			velocityY: 0,
-			color: "WHITE",
+        else if (this.connection_type == "reconnection")
+        {
+            this.ftsocket.sendMessage({ 
+                action: "to_broadcast", 
+                infos: { 
+                    message: "need_infos",
+                    content: { sender: this.player_info.id }
+            }}, true, true);
         }
         
         // Init net.

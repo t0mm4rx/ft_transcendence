@@ -10,9 +10,7 @@ class Relation < ApplicationRecord
   def friends?
     status == 1
   end
-  def blocked?
-    status == 2
-  end
+
 
   # def self.create_reciprocal_for_ids(user_id, other_id)
   #   user_friendship = Relation.create(user_id: user_id, other_id: other_id)

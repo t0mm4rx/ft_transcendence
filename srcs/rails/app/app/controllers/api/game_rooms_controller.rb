@@ -29,6 +29,7 @@ module Api
             game_room = GameRoom.find(params[:id])
             game_room.update_attribute(:player, params[:player])
             game_room.update_attribute(:opponent, params[:opponent])
+            game_room.update_attribute(:status, params[:status])
         end
 
         def first_no_oppenent
@@ -36,10 +37,14 @@ module Api
             render json: game_room
         end
 
-        # def end_game
-        #     game_room = GameRoom.find(params[:id])
-        #     game_room.stop
-        # end
+        def is_diconnected
+            game_room = GameRoom.where(
+                "opponent = ? AND status = ?", params[:player], "active").or(GameRoom.where(
+                    "player = ? AND status = ?", params[:player], "active")).or(GameRoom.where(
+                        "opponent = ? AND status = ?", params[:player], "notstarted")).or(GameRoom.where(
+                            "player = ? AND status = ?", params[:player], "notstarted"))
+            render json: game_room.first
+        end
 
         private
 
@@ -48,7 +53,7 @@ module Api
 
             # require() : mark required parameter
             # permit() : set the autorized parameter
-            params.require(:game_room).permit(:player, :opponent, :status)
+            params.require(:game_room).permit(:player, :opponent, :status, :number_player)
         end
     end
 end

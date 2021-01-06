@@ -29,31 +29,31 @@ window.currentUser = new User({
 
 window.friends = new Friends();
 window.friends.add(new User({
-	login: 'tmarx',
+	login: 'emacron',
 	displayName: 'Manu',
 	avatar: 'https://randomuser.me/api/portraits/men/8.jpg',
 	status: 'online'
 }));
 window.friends.add(new User({
-	login: 'tmarx',
+	login: 'magrosje',
 	displayName: 'Mathis',
 	avatar: 'https://randomuser.me/api/portraits/men/9.jpg',
 	status: 'online'
 }));
 window.friends.add(new User({
-	login: 'tmarx',
+	login: 'ljames',
 	displayName: 'Lebron',
 	avatar: 'https://randomuser.me/api/portraits/men/10.jpg',
 	status: 'online - in game'
 }));
 window.friends.add(new User({
-	login: 'tmarx',
+	login: 'frlindh',
 	displayName: 'Fredrika',
 	avatar: 'https://randomuser.me/api/portraits/women/3.jpg',
 	status: 'offline'
 }));
 window.friends.add(new User({
-	login: 'tmarx',
+	login: 'rchallie',
 	displayName: 'Romain',
 	avatar: 'https://randomuser.me/api/portraits/men/11.jpg',
 	status: 'offline'
