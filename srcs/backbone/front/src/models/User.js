@@ -1,6 +1,7 @@
 /* The model representing a user. */
 import Backbone from 'backbone';
 import $ from 'jquery';
+import {logout} from '../utils/globals';
 
 const User = Backbone.Model.extend({
 	url: "http://localhost:3000/api/users/",
@@ -9,9 +10,11 @@ const User = Backbone.Model.extend({
 		$.ajax({
 			url: `http://localhost:3000/api/users/${window.currentUser.get('id')}/`,
 			type: 'PUT',
-			data: `${key}=${value}`
+			data: `${key}=${value}`,
+			success: () => {
+				window.currentUser.set(key, value);
+			}
 		});
-		window.currentUser.set(key, value);
 	},
 	parse: function(data) {
 		return data[0];

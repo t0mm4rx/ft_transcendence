@@ -1,4 +1,3 @@
-import { User } from '../models/User';
 import Cookies from 'js-cookie';
 
 const loadCurrentUser = () => {
@@ -6,4 +5,9 @@ const loadCurrentUser = () => {
 		window.currentUser.fetch();
 }
 
-export {loadCurrentUser};
+const logout = () => {
+	Cookies.remove('user');
+	window.location.reload();
+}
+
+export {loadCurrentUser, logout};
