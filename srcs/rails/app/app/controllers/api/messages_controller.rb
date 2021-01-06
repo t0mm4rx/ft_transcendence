@@ -8,7 +8,8 @@ module Api
 
 	def create
 		@message = @channel.messages.create(message_params)
-		MessageChannel.broadcast_to @channel, message: params['body']['date'], login: current_user['username']
+		# MessageChannel.broadcast_to @channel, message: params['body'], login: current_user['username']
+		MessageChannel.broadcast_to @channel, message: params['body'], date: @message.date, login: current_user['username']
 		#message: message_params['body']['username']
 	#	UnreadsChannel.broadcast_to @channel, {} #ping to say that we received a non read message, so in the front add when data is received set up title as bold or red notif
 		if @message.save

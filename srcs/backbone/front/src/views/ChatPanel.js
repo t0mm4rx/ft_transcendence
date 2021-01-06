@@ -6,13 +6,18 @@ import $ from "jquery";
 
 export default Backbone.View.extend({
   initialize: function () {
+    this.currentChannelId = 3;
     this.currentChat = this.model.models[0];
     this.currentMessages = window.currentMessages;
     this.listenTo(this.model, "add", this.renderChannels);
     this.listenTo(this.currentChat, "change", this.renderChat);
     this.listenTo(this.currentMessages, "change", this.renderMessages);
     this.model.on("sync", () => this.render(), this);
-    this.ftsocket = new FtSocket({ id: 1, channel: "MessageChannel" });
+
+    this.ftsocket = new FtSocket({
+      id: this.currentChannelId,
+      channel: "MessageChannel",
+    });
     this.ftsocket.socket.onmessage = (event) => {
       const event_res = event.data;
       const msg = JSON.parse(event_res);
@@ -23,6 +28,7 @@ export default Backbone.View.extend({
         this.currentMessages.add({
           username: msg.message.login,
           body: msg.message.message,
+          date: msg.message.date,
         });
         this.renderMessages();
       }
@@ -42,10 +48,10 @@ export default Backbone.View.extend({
         if (item.attributes.name === el.target.innerText) find = item;
       });
       this.currentChat = find;
-      const channelId = this.currentChat.attributes.id;
+      // const channelId = this.currentChat.attributes.id;
       // this.currentMessages.attributes.channel_id = channelId;
-      console.log("CURRENT MESSAGES:", this.currentMessages);
-      console.log("CHANNEL ID:", channelId);
+      // console.log("CURRENT MESSAGES:", this.currentMessages);
+      // console.log("CHANNEL ID:", channelId);
 
       // console.log("log: ", this.currentMessages);
       this.currentMessages.fetch({
@@ -59,13 +65,11 @@ export default Backbone.View.extend({
       const input = $("#chat-input").val();
       console.log("INPUT: ", input);
       console.log("current chat: ", this.currentMessages);
-      const message = this.currentMessages.add({
-        body: input,
-        username: window.currentUser.attributes.username,
+      $.ajax({
+        url: `http://localhost:3000/api/channels/${this.currentChannelId}/messages/`,
+        type: "POST",
+        data: `body=${input}`,
       });
-      //   this.ftsocket.socket.onmessage();
-      console.log("current chat: ", this.currentMessages);
-      message.save();
     },
   },
   render: function () {

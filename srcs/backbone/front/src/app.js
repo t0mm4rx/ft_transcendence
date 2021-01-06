@@ -121,73 +121,73 @@ window.liveGames.add(
 window.currentMessages = new ChannelMessages({});
 window.currentMessages.fetch({});
 window.chat = new Chat();
-window.chat.add(
-  new Channel({
-    name: "Magrosje",
-    avatar: "https://randomuser.me/api/portraits/men/11.jpg",
-    messages: [
-      { from: "magrosje", date: new Date().getTime() - 60, message: "Hello" },
-      { from: "tmarx", date: new Date().getTime() - 23, message: "Yo" },
-      {
-        from: "tmarx",
-        date: new Date().getTime() - 12,
-        message: "Dis-moi quand tu veux jouer",
-      },
-      {
-        from: "magrosje",
-        date: new Date().getTime() - 6,
-        message: "Dans 5 minutes",
-      },
-      { from: "magrosje", date: new Date().getTime() - 2, message: "*10" },
-    ],
-  })
-);
-window.chat.add(
-  new Channel({
-    name: "International killer team",
-    avatar: null,
-    messages: [
-      {
-        from: "magrosje",
-        date: new Date().getTime() - 60,
-        message: "Hello to the team",
-      },
-      { from: "frlindh", date: new Date().getTime() - 23, message: "🔥" },
-      {
-        from: "rchallie",
-        date: new Date().getTime() - 12,
-        message: "Has the tournament started yet?",
-      },
-      { from: "tmarx", date: new Date().getTime() - 2, message: "Nop" },
-      { from: "tmarx", date: new Date().getTime() - 2, message: "Test" },
-      {
-        from: "frlindh",
-        date: new Date().getTime() - 2,
-        message: "To get the scroll",
-      },
-      {
-        from: "frlindh",
-        date: new Date().getTime() - 2,
-        message: "To get the scroll",
-      },
-      {
-        from: "frlindh",
-        date: new Date().getTime() - 2,
-        message: "To get the scroll",
-      },
-      {
-        from: "frlindh",
-        date: new Date().getTime() - 2,
-        message: "To get the scroll",
-      },
-      {
-        from: "frlindh",
-        date: new Date().getTime() - 2,
-        message: "To get the scroll",
-      },
-    ],
-  })
-);
+// window.chat.add(
+//   new Channel({
+//     name: "Magrosje",
+//     avatar: "https://randomuser.me/api/portraits/men/11.jpg",
+//     messages: [
+//       { from: "magrosje", date: new Date().getTime() - 60, message: "Hello" },
+//       { from: "tmarx", date: new Date().getTime() - 23, message: "Yo" },
+//       {
+//         from: "tmarx",
+//         date: new Date().getTime() - 12,
+//         message: "Dis-moi quand tu veux jouer",
+//       },
+//       {
+//         from: "magrosje",
+//         date: new Date().getTime() - 6,
+//         message: "Dans 5 minutes",
+//       },
+//       { from: "magrosje", date: new Date().getTime() - 2, message: "*10" },
+//     ],
+//   })
+// );
+// window.chat.add(
+//   new Channel({
+//     name: "International killer team",
+//     avatar: null,
+//     messages: [
+//       {
+//         from: "magrosje",
+//         date: new Date().getTime() - 60,
+//         message: "Hello to the team",
+//       },
+//       { from: "frlindh", date: new Date().getTime() - 23, message: "🔥" },
+//       {
+//         from: "rchallie",
+//         date: new Date().getTime() - 12,
+//         message: "Has the tournament started yet?",
+//       },
+//       { from: "tmarx", date: new Date().getTime() - 2, message: "Nop" },
+//       { from: "tmarx", date: new Date().getTime() - 2, message: "Test" },
+//       {
+//         from: "frlindh",
+//         date: new Date().getTime() - 2,
+//         message: "To get the scroll",
+//       },
+//       {
+//         from: "frlindh",
+//         date: new Date().getTime() - 2,
+//         message: "To get the scroll",
+//       },
+//       {
+//         from: "frlindh",
+//         date: new Date().getTime() - 2,
+//         message: "To get the scroll",
+//       },
+//       {
+//         from: "frlindh",
+//         date: new Date().getTime() - 2,
+//         message: "To get the scroll",
+//       },
+//       {
+//         from: "frlindh",
+//         date: new Date().getTime() - 2,
+//         message: "To get the scroll",
+//       },
+//     ],
+//   })
+// );
 
 window.chat.fetch({});
 
