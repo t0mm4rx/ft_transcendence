@@ -21,6 +21,21 @@
 	max-width: 800px;
 	margin-top: 50px;
 	position: relative;
+	.user-friend-badge {
+		position: absolute;
+		background-color: $blue;
+		top: 0;
+		right: 0;
+		transform: translate(50%, -50%);
+		padding: 10px;
+		border-radius: 10px;
+		display: flex;
+		flex-direction: row !important;
+		align-items: center !important;
+		> svg {
+			margin: 5px;
+		}
+	}
 	#top-panel-container {
 		display: flex;
 		align-items: center;

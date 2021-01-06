@@ -5,9 +5,14 @@ const loadCurrentUser = () => {
 		window.currentUser.fetch();
 }
 
+const loadUsers = () => {
+	if (window.users.status !== 200 && !!Cookies.get('user'))
+		window.users.fetch();
+}
+
 const logout = () => {
 	Cookies.remove('user');
 	window.location.reload();
 }
 
-export {loadCurrentUser, logout};
+export {loadCurrentUser, loadUsers, logout};
