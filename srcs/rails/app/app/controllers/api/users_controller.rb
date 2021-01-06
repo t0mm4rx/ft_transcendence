@@ -38,7 +38,9 @@ module Api
     end
 
     def show
-      user = User.find(params[:id])
+      id = params[:id]
+      id = current_user.id if id == "me"
+      user = User.find(id)
 
       render json: user, relation: get_relation_to(user)
     end
