@@ -6,7 +6,7 @@ Every global objects are stored in window (the default browser scope).
 import Router from './Router';
 import PageLayout from './pages/PageLayout';
 import UserMenu from './views/UserMenu';
-import {User, Friends} from './models/User';
+import {User, Friends, Users} from './models/User';
 import NotificationsPanel from './views/NotificationsPanel';
 import {Notification, NotificationCollection} from './models/Notification';
 import {Game, GameCollection} from './models/Game';
@@ -14,7 +14,7 @@ import ChatPanel from './views/ChatPanel';
 import {Chat, Channel} from './models/Channels';
 import $ from 'jquery';
 import Cookies from 'js-cookie';
-import { loadCurrentUser } from './utils/globals';
+import { loadCurrentUser, loadUsers } from './utils/globals';
 
 // Temp game server
 // import express from 'express';
@@ -38,9 +38,13 @@ $(document).on("token_changed", function () {
 // We create the router, the part of the app which will change the page content according to the URL
 window.router = new Router();
 
-// If we are already conncted we load the current user
+// The current user
 window.currentUser = new User({id: 'me'});
 loadCurrentUser();
+
+// Every users
+window.users = new Users();
+loadUsers();
 
 // We create our global models
 // window.currentUser = new User({
