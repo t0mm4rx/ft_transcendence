@@ -3,10 +3,13 @@ import Backbone from 'backbone';
 import Cookies from 'js-cookie';
 import $ from 'jquery';
 import toasts from '../utils/toasts';
+import { User } from '../models/User';
+import { loadCurrentUser } from '../utils/globals';
 
 export default Backbone.View.extend({
 	initialize: function () {
 		this.isAuthOpen = false;
+		this.token = null;
 	},
 	el: "#page",
 	events: {
@@ -19,16 +22,12 @@ export default Backbone.View.extend({
 				toasts.notifyError("The display name can't be empty");
 			} else {
 				toasts.notifySuccess("Your account has been created");
-				Cookies.set('user', 'test');
-				$(document).trigger("token_changed");
-				window.location.hash = "/";
+				this.login(this.token);
 			}
 		},
 		'click #auth-2fa-button': function () {
 			// Here we check if the 2fa is good
-			Cookies.set('user', 'test');
-			$(document).trigger("token_changed");
-			window.location.hash = "/";
+			this.login(this.token);
 		}
 	},
 	render: function () {
@@ -127,12 +126,16 @@ export default Backbone.View.extend({
 				
 				// Scenario 3: the user is already known and has no 2FA -> direct login
 				if (!creation) {
-					Cookies.set('user', token);
-					$(document).trigger("token_changed");
-					window.location.hash = "/";
+					this.login(token);
 				}
 
 			}
 		}, 100);
+	},
+	login: function (token) {
+		Cookies.set('user', token);
+		$(document).trigger("token_changed");
+		loadCurrentUser();
+		window.location.hash = "/";
 	}
 });
