@@ -20,12 +20,14 @@ export default Backbone.View.extend({
 			} else {
 				toasts.notifySuccess("Your account has been created");
 				Cookies.set('user', 'test');
+				$(document).trigger("token_changed");
 				window.location.hash = "/";
 			}
 		},
 		'click #auth-2fa-button': function () {
 			// Here we check if the 2fa is good
 			Cookies.set('user', 'test');
+			$(document).trigger("token_changed");
 			window.location.hash = "/";
 		}
 	},
@@ -94,7 +96,6 @@ export default Backbone.View.extend({
 		const w = window.open("http://0.0.0.0:3000/api/logintra", "_blank", "width=500px,height=500px");
 		window.addEventListener('message', event => {
 			w.close();
-			console.log(event.data.params);
 			const params = new URLSearchParams("?" + event.data.params);
 			if (!params.get("token") || !params.get("creation")) {
 				toasts.notifyError("Cannot get the 42 API token");
@@ -127,6 +128,7 @@ export default Backbone.View.extend({
 				// Scenario 3: the user is already known and has no 2FA -> direct login
 				if (!creation) {
 					Cookies.set('user', token);
+					$(document).trigger("token_changed");
 					window.location.hash = "/";
 				}
 

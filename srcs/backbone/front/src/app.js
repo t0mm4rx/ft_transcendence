@@ -12,12 +12,26 @@ import {Notification, NotificationCollection} from './models/Notification';
 import {Game, GameCollection} from './models/Game';
 import ChatPanel from './views/ChatPanel';
 import {Chat, Channel} from './models/Channels';
+import $ from 'jquery';
+import Cookies from 'js-cookie';
 
 // Temp game server
 // import express from 'express';
 
+$(document).on("token_changed", function () {
+	console.log("User token changed, we refresh the Ajax headers.");
+	const token = Cookies.get("user");
+	$.ajaxSetup({
+		headers: { 'Authorization' :`Bearer ${token}` }
+	});
+})
+
 // We create the router, the part of the app which will change the page content according to the URL
 window.router = new Router();
+
+const test = new User({id: 'me'});
+test.fetch();
+console.log(test);
 
 // We create our global models
 window.currentUser = new User({
