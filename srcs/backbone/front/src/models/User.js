@@ -41,6 +41,20 @@ const User = Backbone.Model.extend({
 				console.log(err);
 			}
 		});
+	},
+	acceptFriend: function () {
+		$.ajax({
+			url: `http://localhost:3000/api/friends/${this.get('id')}/`,
+			type: 'PUT',
+			success: () => {
+				this.set('relation_to_user', 'eifjeis');
+				toasts.notifySuccess(`${this.get('login')} is now your friend.`);
+			},
+			error: err => {
+				console.log(err);
+				toasts.notifyError("An error occured.");
+			}
+		});
 	}
 });
 
