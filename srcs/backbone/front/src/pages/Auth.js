@@ -109,6 +109,11 @@ export default Backbone.View.extend({
 				this.toggleAuth();
 				clearInterval(check);
 
+				if (!token) {
+					toasts.notifyError("The authentification process hasn't been completed");
+					return;
+				}
+
 				// Scenario 1: first user connection, we show the register panel
 				if (creation) {
 					$("#auth-panel").addClass("auth-panel-open");
