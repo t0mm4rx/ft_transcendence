@@ -6,32 +6,34 @@ import $ from "jquery";
 
 export default Backbone.View.extend({
   initialize: function () {
-    this.currentChannelId = 3;
-    this.currentChat = this.model.models[0];
     this.currentMessages = window.currentMessages;
     this.listenTo(this.model, "add", this.renderChannels);
     this.listenTo(this.currentChat, "change", this.renderChat);
     this.listenTo(this.currentMessages, "change", this.renderMessages);
     this.model.on("sync", () => this.render(), this);
+    this.currentMessages.on("sync", () => this.renderMessages(), this);
 
-    this.ftsocket = new FtSocket({
-      id: this.currentChannelId,
-      channel: "MessageChannel",
-    });
-    this.ftsocket.socket.onmessage = (event) => {
-      const event_res = event.data;
-      const msg = JSON.parse(event_res);
-      // Ignores pings.
-      if (msg.type === "ping") return;
-      if (msg.message) {
-        console.log(msg.message);
-        this.currentMessages.add({
-          username: msg.message.login,
-          body: msg.message.message,
-          date: msg.message.date,
-        });
-        this.renderMessages();
-      }
+    this.newSocket = (channel_id) => {
+      const ftsocket = new FtSocket({
+        id: channel_id,
+        channel: "MessageChannel",
+      });
+      ftsocket.socket.onmessage = (event) => {
+        const event_res = event.data;
+        const msg = JSON.parse(event_res);
+        // Ignores pings.
+        if (msg.type === "ping") return;
+        if (msg.message) {
+          console.log(msg.message);
+          this.currentMessages.add({
+            username: msg.message.login,
+            body: msg.message.message,
+            date: msg.message.date,
+          });
+          this.renderMessages();
+        }
+      };
+      return ftsocket;
     };
   },
   el: "#chat-container",
@@ -48,17 +50,9 @@ export default Backbone.View.extend({
         if (item.attributes.name === el.target.innerText) find = item;
       });
       this.currentChat = find;
-      // const channelId = this.currentChat.attributes.id;
-      // this.currentMessages.attributes.channel_id = channelId;
-      // console.log("CURRENT MESSAGES:", this.currentMessages);
-      // console.log("CHANNEL ID:", channelId);
-
-      // console.log("log: ", this.currentMessages);
-      this.currentMessages.fetch({
-        success: this.renderMessages(),
-        failure: console.log("FAILED TO FETCH"),
-        headers: window.apiheaders,
-      });
+      this.currentMessages.channel_id = this.currentChannelId = find.id;
+      this.ftsocket = this.newSocket(this.currentChannelId);
+      this.currentMessages.fetch();
       this.renderChannels();
     },
     "click #submitButton": function (e) {
