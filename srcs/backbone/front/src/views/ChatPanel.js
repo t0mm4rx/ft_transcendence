@@ -13,13 +13,18 @@ export default Backbone.View.extend({
     this.listenTo(this.currentMessages, "change", this.renderMessages);
     this.model.on("sync", () => this.render(), this);
     this.ftsocket = new FtSocket({ id: 1, channel: "MessageChannel" });
-    this.ftsocket.socket.onmessage = function (event) {
+    this.ftsocket.socket.onmessage = (event) => {
       const event_res = event.data;
       const msg = JSON.parse(event_res);
       // Ignores pings.
       if (msg.type === "ping") return;
       if (msg.message) {
-        this.currentMessages.add(msg.message);
+        console.log(msg.message);
+        this.currentMessages.add({
+          username: msg.message.login,
+          body: msg.message.message,
+        });
+        this.renderMessages();
       }
     };
   },
