@@ -1,15 +1,16 @@
 <div id="user-page-container">
 	<div class="panel" id="top-panel">
-		<img src="https://randomuser.me/api/portraits/men/9.jpg">
+		<img src="<%= data.avatar_url || "" %>">
 		<div id="top-panel-container">
+			<% if (data.relation_to_user === "friends") { %><div class="user-friend-badge"><i class="fas fa-user-friends"></i> Friend</div><% } %>
 			<div id="user-ladder">
 				<span>#2</span>
 				<span>on the ladder</span>
 			</div>
 			<div id="user-name-container">
-				<span>Romain</span>
+				<span><%= data.username || "" %></span>
 				<div id="user-name-buttons">
-					<div class="button-icon"><i class="fas fa-user-plus"></i></div>
+					<% if (data.relation_to_user !== "friends") { %><div class="button-icon"><i class="fas fa-user-plus"></i></div> <% } %>
 					<div class="button-icon"><i class="fas fa-gamepad"></i></div>
 					<div class="button-icon"><i class="far fa-comment"></i></div>
 				</div>
@@ -17,7 +18,7 @@
 			<div id="user-name-infos">
 				<div class="user-info">
 					<span>Guild</span>
-					<span>International killers</span>
+					<span><%= data.guild || "None" %></span>
 				</div>
 				<div class="user-info">
 					<span># of tournaments</span>
@@ -25,18 +26,18 @@
 				</div>
 				<div class="user-info">
 					<span>Login</span>
-					<span>rchallie</span>
+					<span><%= data.login || "..." %></span>
 				</div>
 			</div>
 		</div>
 		<div id="user-level-container">
-			<span>75% winrate</span>
+			<span><%= !(data.wins + data.losses) ? "50" : Math.round(data.wins / (data.wins + data.losses) * 100) %>% winrate</span>
 			<div id="user-progress-container">
-				<div id="user-progress-container-fill" style="width: 75%;">
-					<span>3 wins</span>
+				<div id="user-progress-container-fill" style="width: <%= !(data.wins + data.losses) ? "50" : Math.round(data.wins / (data.wins + data.losses) * 100) %>%;<%= !data.wins && data.losses ? "display: none;" : ""%>">
+					<span><%= data.wins %> wins</span>
 				</div>
-				<div id="user-progress-container-free-space">
-					<span>1 loss</span>
+				<div id="user-progress-container-free-space" style="<%= !data.losses && data.wins ? "display: none;" : ""%>">
+					<span><%= data.losses %> loss</span>
 				</div>
 			</div>
 		</div>
@@ -66,7 +67,7 @@
 		<div class="panel" id="friends-panel">
 			<div class="panel-header"><span>Friends</span></div>
 			<div id="friends-panel-content">
-				<div class="friend-item">
+				<!-- <div class="friend-item">
 					<img src="https://randomuser.me/api/portraits/men/8.jpg" onclick="window.location.hash='user/emacron/'"/>
 					<b class="friend-name" onclick="window.location.hash='user/emacron/'">Manu</b>
 					<span class="friend-status friend-status-online">online</span>
@@ -77,7 +78,7 @@
 					<img src="https://randomuser.me/api/portraits/men/18.jpg" onclick="window.location.hash='user/rchallie/'"/>
 					<b class="friend-name" onclick="window.location.hash='user/rchallie/'">Romain</b>
 					<span class="friend-status">offline</span>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	</div>

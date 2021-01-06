@@ -3,7 +3,7 @@ import Backbone from 'backbone';
 import $ from 'jquery';
 
 const User = Backbone.Model.extend({
-	url: "http://localhost:3000/api/users/me",
+	urlRoot: `http://localhost:3000/api/users/`,
 	save: function (key, value) {
 		console.log("Url", `http://localhost:3000/api/users/${window.currentUser.get('id')}/`);
 		$.ajax({
