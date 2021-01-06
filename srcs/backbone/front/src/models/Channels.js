@@ -4,7 +4,7 @@ import Backbone from "backbone";
 
 const Channel = Backbone.Model.extend({
   initialize: function () {
-    this.channel_id = 1;
+    this.channel_id = 3;
   },
   url: function () {
     // return `http://localhost:3000/api/channels/2/messages`;
@@ -21,7 +21,7 @@ const Message = Backbone.Model.extend({});
 
 const ChannelMessages = Backbone.Collection.extend({
   initialize: function () {
-    this.channel_id = 1;
+    this.channel_id = 3;
   },
   model: Message,
   url: function () {
