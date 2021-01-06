@@ -8,29 +8,35 @@ export default Backbone.View.extend({
 	render: function () {
 		this.$el.html(template);
 		this.renderGameList();
+		this.renderFriendsList();
+		this.listenTo(window.currentUser, 'change', this.renderFriendsList);
 	},
 	renderGameList: function () {
 		const games = $("#live-game-list");
-		const friends = $("#live-friends-list");
 		games.html("");
-		friends.html("");
 		window.liveGames.forEach(game => {
 			games.append(
 				`<div class="game-item">
 					<span><b>${game.attributes.player1}</b> vs. <b>${game.attributes.player2}</b></span>
 					<span>${game.attributes.type}</span>
-					<a class="button-icon button-icon-accent"><i class="fas fa-tv"></i></a>
+					<a class="button-icon button-icon-accent" onclick="window.location.hash='livestream/42/'"><i class="fas fa-tv"></i></a>
 				</div>`
 			);
 		});
-		window.friends.forEach(friend => {
+	},
+	renderFriendsList: function () {
+		if (!window.currentUser.get('friends'))
+			return;
+		const friends = $("#live-friends-list");
+		friends.html("");
+		window.currentUser.get('friends').forEach(friend => {
 			friends.append(
 				`<div class="friend-item">
-					<img src="${friend.attributes.avatar}" alt="${friend.attributes.login}'s profile picture" onclick="window.location.hash='user/${friend.attributes.login}/'"/>
-					<b class="friend-name" onclick="window.location.hash='user/${friend.attributes.login}/'">${friend.attributes.displayName}</b>
-					<span class="friend-status${friend.attributes.status.indexOf("online") >= 0 ? " friend-status-online" : ""}">${friend.attributes.status}</span>
+					<img src="${friend.avatar_url}" onclick="window.location.hash='user/${friend.login}/'"/>
+					<b class="friend-name" onclick="window.location.hash='user/${friend.login}/'">${friend.username}</b>
+					<span class="friend-status${friend.online ? " friend-status-online" : ""}">${friend.online ? "Online" : "Offline"}</span>
 					<span class="button-icon"><i class="far fa-comment"></i></span>
-					${friend.attributes.status === "online" ? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}
+					${friend.online ? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}
 				</div>`
 			);
 		});

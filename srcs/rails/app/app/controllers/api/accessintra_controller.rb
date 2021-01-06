@@ -14,9 +14,17 @@ module Api
 			#get request with header access token
 			info = HTTParty.get("https://api.intra.42.fr/v2/me", headers: {Authorization: "Bearer #{token["access_token"]}"})
 
+			if user = User.find_by_login(info["login"])
+				creation = false
+			end
+
 			#method to create a new user and token based on 42 infos
 			api_token = Accessintra.create_user(info)
-			render json: api_token, status: :created
+			if creation == false
+				redirect_to "http://localhost:8080/#token/?token=#{api_token["auth_token"]}&creation=false"
+			else
+				redirect_to "http://localhost:8080/#token/?token=#{api_token["auth_token"]}&creation=true"
+			end
 		end
 	end
 end
