@@ -13,6 +13,15 @@ export default Backbone.View.extend({
     this.listenTo(this.currentMessages, "change", this.renderMessages);
     this.model.on("sync", () => this.render(), this);
     this.ftsocket = new FtSocket({ id: 1, channel: "MessageChannel" });
+    this.ftsocket.socket.onmessage = function (event) {
+      const event_res = event.data;
+      const msg = JSON.parse(event_res);
+      // Ignores pings.
+      if (msg.type === "ping") return;
+      if (msg.message) {
+        this.currentMessages.add(msg.message);
+      }
+    };
   },
   el: "#chat-container",
   events: {
@@ -53,18 +62,6 @@ export default Backbone.View.extend({
       console.log("current chat: ", this.currentMessages);
       message.save();
     },
-    // this.ftsocket.socket.onmessage = function(event)
-    //     {
-    //     const event_res = event.data;
-    //     const msg = JSON.parse(event_res);
-    //     // Ignores pings.
-    //     if (msg.type === "ping")
-    //         return;
-    //     if (msg.message)
-    //     {
-    //         console.log(msg.message);
-    //     };
-    // };
   },
   render: function () {
     this.$el.html(template);

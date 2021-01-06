@@ -31,8 +31,6 @@ const FtSocket = Backbone.Model.extend({
 
     // A message is received from the server. (Can be overloaded !)
     this.socket.onmessage = function (event) {
-      console.log("HELLOOOOOOOOOOO");
-
       const response = event.data;
       const msg = JSON.parse(response);
 
