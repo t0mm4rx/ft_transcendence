@@ -11,7 +11,6 @@ export default Backbone.View.extend({
     this.listenTo(this.currentChat, "change", this.renderChat);
     this.listenTo(this.currentMessages, "change", this.renderMessages);
     this.model.on("sync", this.renderChannels, this);
-    // this.model.on("sync", () => this.render(), this);
     this.currentMessages.on("sync", () => this.renderMessages(), this);
 
     this.newSocket = (channel_id) => {
@@ -45,16 +44,11 @@ export default Backbone.View.extend({
     "click #chat-icon": function () {
       $("#chat-panel").addClass("chat-panel-open");
     },
-    "click .chat-channel": function (el) {
-      let find = null;
-      this.model.forEach((item) => {
-        if (item.attributes.name === el.target.innerText) find = item;
-      });
-      this.currentChat = find;
-      this.currentMessages.channel_id = this.currentChannelId = find.id;
+    "click .chat-channel": function (e) {
+      this.currentChat = window.chat.get(e.target.id);
+      this.currentMessages.channel_id = this.currentChannelId = e.target.id;
       this.ftsocket = this.newSocket(this.currentChannelId);
       this.currentMessages.fetch();
-      this.renderChannels();
     },
     "keyup #chat-input": "keyPressEventHandler",
     "keyup #channel-input": "keyPressEventHandler",
@@ -73,7 +67,7 @@ export default Backbone.View.extend({
       $("#chat-channels").append(
         `<span class="chat-channel${
           this.currentChat === channel ? " channel-current" : ""
-        }">${channel.attributes.name}</span>`
+        }" id="${channel.id}">${channel.attributes.name}</span>`
       );
     });
   },
