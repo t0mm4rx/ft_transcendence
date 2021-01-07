@@ -44,7 +44,7 @@ const User = Backbone.Model.extend({
 	},
 	acceptFriend: function () {
 		$.ajax({
-			url: `http://localhost:3000/api/friends/${this.get('id')}/`,
+			url: `http://localhost:3000/api/friends/${this.get('id')}`,
 			type: 'PUT',
 			success: () => {
 				this.set('relation_to_user', 'eifjeis');
