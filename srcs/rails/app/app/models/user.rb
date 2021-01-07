@@ -23,7 +23,7 @@ class User < ApplicationRecord
 	end
 
 	def friends
-		friendships_.filter_map do |friendship|  
+		friendships_.filter_map do |friendship|
 			if friendship.accepted
 				friendship.user_id == id ? friendship.friend : friendship.user
 			end
