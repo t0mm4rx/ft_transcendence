@@ -7,7 +7,7 @@ class ChannelUsersController < ApplicationController
 	end
 
 	def create
-		@channel_user = ChannelUser.create(user_id: current_user.id, channel_id: params[:channel_id], owner: params[:owner], admin: params[:admin], ban_date: params[:ban_date]);
+		@channel_user = ChannelUser.new(user_id: current_user.id, channel_id: params[:channel_id], owner: params[:owner], admin: params[:admin], ban_date: params[:ban_date]);
 		if @channel_user.save
 			render json: @channel_user, status: :created
 		else

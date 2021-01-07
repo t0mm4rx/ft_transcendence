@@ -5,8 +5,7 @@ class Channel < ApplicationRecord
 
 	validates :name, presence: true #make sure channel have name
 
-	def self.channel_creation (channel_params, current_user)
-		ChannelUser.create(user: current_user, channel_id: channel_params[:id], owner: true, admin: true)
-		return true
+	def self.channel_user_creation (channel_id, current_user)
+		cu = ChannelUser.create(user_id: current_user, channel_id: channel_id, owner: true, admin: true, ban_date: nil)
 	end
 end

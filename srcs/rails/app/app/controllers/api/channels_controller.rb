@@ -16,18 +16,14 @@ module Api
 
 	# POST /channels
 	def create
-		if Channel.channel_creation(channel_params, current_user_channel)
-			@channel = Channel.new(channel_params)
-		else
-			render json: @channel.errors, status: :unprocessable_entity
-		end
+		@channel = Channel.new(channel_params)
 	if @channel.save
+		Channel.channel_user_creation(@channel.id, current_user)
 		render json: @channel, status: :created
 	else
 		render json: @channel.errors, status: :unprocessable_entity
 		end
 	end
-
 
 	# PATCH/PUT /channels/1
 	def update
@@ -50,9 +46,6 @@ module Api
 		# Only allow a list of trusted parameters through.
 		def channel_params
 			params.permit(:name, :public, :private, :password, :direct)
-		end
-		def current_user_channel
-			current_user
 		end
 end
 end
