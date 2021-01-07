@@ -1,7 +1,19 @@
 /* The ftsocket model and collection. */
-import Backbone from 'backbone';
+import Backbone from "backbone";
 
 const FtSocket = Backbone.Model.extend({
+  /**
+   * Create a new socket between frontend (this)
+   * and the backend (rails).
+   *
+   * @param {*} identifier the identifier parameters of the socket.
+   * Need a 'channel' part at least.
+   * (Used to setup the socket if the socket doesn"t exist).
+   * (Exemple : {id: 33, channel: 'GameRoomChannel'} )
+   */
+  initialize: function (identifier) {
+    var self = this;
+    this.identifier = identifier;
 
     /**
      * Create a new socket between frontend (this)
@@ -17,10 +29,19 @@ const FtSocket = Backbone.Model.extend({
         var self = this;
         this.cansend = false;
         this.identifier = identifier;
+    // Init a new socket to backend.
+    // URL NEED TO BE CHANGED BY THE ACTUAL
+    this.socket = new WebSocket("ws://0.0.0.0:3000/cable");
 
-        // Init a new socket to backend.
-        // URL NEED TO BE CHANGED BY THE ACTUAL
-		this.socket = new WebSocket('ws://0.0.0.0:3000/cable');
+    // Connect client to identifier. (Please no overload)
+    this.socket.onopen = function (event) {
+      console.log("[FTS] Socket to " + identifier.channel + " is connected.");
+      const msg = {
+        command: "subscribe",
+        identifier: JSON.stringify(identifier),
+      };
+      self.socket.send(JSON.stringify(msg));
+    };
 
         // Connect client to identifier. (Please no overload)
         this.socket.onopen = function(event) {
@@ -57,12 +78,6 @@ const FtSocket = Backbone.Model.extend({
 
 			console.log('[FTS] Socket to ' + identifier.channel + ' is disconnected.');
 		};
-
-        // Error appear. (Can be overloaded !)
-        this.socket.onerror = function(error) {
-			console.log('[FTS] Error from ' + identifier.channel + ':' + error);
-        };
-    },
 
     /**
      * Send a command of type 'message' to the backend
@@ -119,8 +134,7 @@ const FtSocket = Backbone.Model.extend({
     
             }, 5); // wait 5 milisecond for the connection...
     }
-});
 
 const FtSocketCollection = Backbone.Collection.extend({});
 
-export {FtSocket, FtSocketCollection};
+export { FtSocket, FtSocketCollection };

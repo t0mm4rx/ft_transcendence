@@ -7,6 +7,16 @@ import _ from 'underscore';
 
 export default Backbone.View.extend({
 	el: "#page",
+	events: {
+		'click #user-friend-badge': function () {
+			if (confirm(`Are your sure you want to unfriend ${this.user.get('username')} ?`)) {
+				this.user.unfriend();
+			}
+		},
+		'click #user-add-friend': function () {
+			this.user.askFriend();
+		}
+	},
 	initialize: function (options) {
 		this.login = options.login;
 		this.user = new User();

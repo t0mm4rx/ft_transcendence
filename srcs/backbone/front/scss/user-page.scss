@@ -21,7 +21,7 @@
 	max-width: 800px;
 	margin-top: 50px;
 	position: relative;
-	.user-friend-badge {
+	#user-friend-badge {
 		position: absolute;
 		background-color: $blue;
 		top: 0;
@@ -32,8 +32,31 @@
 		display: flex;
 		flex-direction: row !important;
 		align-items: center !important;
+		overflow: hidden;
+		cursor: pointer;
 		> svg {
 			margin: 5px;
+		}
+		.user-friend-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: $red;
+			transform: scale(0);
+			opacity: 0;
+			transition: .3s ease all;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 10px;
+		}
+	}
+	#user-friend-badge:hover {
+		.user-friend-overlay {
+			transform: scale(1);
+			opacity: 1;
 		}
 	}
 	#top-panel-container {

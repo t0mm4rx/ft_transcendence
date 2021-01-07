@@ -2,7 +2,8 @@
 	<div class="panel" id="top-panel">
 		<img src="<%= data.avatar_url || "" %>">
 		<div id="top-panel-container">
-			<% if (data.relation_to_user === "friends") { %><div class="user-friend-badge"><i class="fas fa-user-friends"></i> Friend</div><% } %>
+			<% if (data.relation_to_user === "friends") { %><div id="user-friend-badge"><div class="user-friend-overlay"><i class="fas fa-users-slash"></i></div><i class="fas fa-user-friends"></i> Friend</div><% } %>
+			<% if (data.relation_to_user === "request sent") { %><div id="user-friend-badge"><div class="user-friend-overlay"><i class="fas fa-users-slash"></i></div><i class="fas fa-hourglass-start"></i> Friend request sent</div><% } %>
 			<div id="user-ladder">
 				<span>#2</span>
 				<span>on the ladder</span>
@@ -10,7 +11,7 @@
 			<div id="user-name-container">
 				<span><%= data.username || "" %></span>
 				<div id="user-name-buttons">
-					<% if (data.relation_to_user !== "friends") { %><div class="button-icon"><i class="fas fa-user-plus"></i></div> <% } %>
+					<% if (!data.relation_to_user) { %><div id="user-add-friend" class="button-icon"><i class="fas fa-user-plus"></i></div> <% } %>
 					<div class="button-icon"><i class="fas fa-gamepad"></i></div>
 					<div class="button-icon"><i class="far fa-comment"></i></div>
 				</div>

@@ -193,6 +193,7 @@ GEM
 PLATFORMS
   ruby
   x86_64-darwin-17
+  x86_64-darwin-20
   x86_64-linux-musl
 
 DEPENDENCIES
@@ -215,9 +216,6 @@ DEPENDENCIES
   spring
   spring-watcher-listen (~> 2.0.0)
   tzinfo-data
-
-RUBY VERSION
-   ruby 2.7.1p83
 
 BUNDLED WITH
    2.2.2
