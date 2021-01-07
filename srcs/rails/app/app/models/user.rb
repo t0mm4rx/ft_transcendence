@@ -5,8 +5,8 @@ class User < ApplicationRecord
 	has_many :pending_requests, -> {where accepted: false}, class_name: 'Friendship', foreign_key: "friend_id", dependent: :delete_all
 	has_many :friendships, dependent: :delete_all
 
-	has_many :channels_users, dependent: :destroy
-	has_many :channels, through: :channels_users
+	has_many :channel_users, dependent: :destroy
+	has_many :channels, through: :channel_users
 	has_many :messages, dependent: :destroy
 
 	belongs_to :guild, optional: true
@@ -22,7 +22,7 @@ class User < ApplicationRecord
 	end
 
 	def friends
-		friendships_.filter_map do |friendship|  
+		friendships_.filter_map do |friendship|
 			if friendship.accepted
 				friendship.user_id == id ? friendship.friend : friendship.user
 			end
