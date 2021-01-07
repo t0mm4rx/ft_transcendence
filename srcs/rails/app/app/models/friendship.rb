@@ -28,7 +28,7 @@ class Friendship < ApplicationRecord
   end
 
   validate :not_the_same_as_user
-  validate :unique_combination
+  validate :unique_combination, :on => :create
 
   private
 
@@ -38,7 +38,7 @@ class Friendship < ApplicationRecord
 
   def unique_combination
     if Friendship.exists?(friend_id, user_id)
-      errors.add(:friend_id, "combination already exists")
+      errors.add(:friend_id, "friendship already exists")
     end
   end
 
