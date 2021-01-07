@@ -21,7 +21,7 @@ module Api
     end
 
     def update
-      friendship = Friendship.find_by(user_id: params[:id],friend_id: current_user.id)
+      friendship = Friendship.find_by(user_id: params[:id], friend_id: current_user.id)
       if !friendship
         return { error: "no existing request from user"}, status: :not_found
       end
