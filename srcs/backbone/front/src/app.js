@@ -120,9 +120,7 @@ window.liveGames.add(
 );
 
 window.currentMessages = new ChannelMessages();
-// window.currentMessages.fetch({});
 window.chat = new Chat();
-
 window.chat.fetch();
 
 window.notifications = new NotificationCollection();
