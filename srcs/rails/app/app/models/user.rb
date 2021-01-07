@@ -1,12 +1,13 @@
 class User < ApplicationRecord
 	has_secure_password
 
-	has_many :pending_friends, -> {where accepted: false}, class_name: 'Friendship', dependent: :delete_all
-	has_many :pending_requests, -> {where accepted: false}, class_name: 'Friendship', foreign_key: "friend_id", dependent: :delete_all
-	has_many :friendships, dependent: :delete_all
+	has_many :pending_friends, -> {where accepted: false}, class_name: 'Friendship'
+	has_many :pending_requests, -> {where accepted: false}, class_name: 'Friendship', foreign_key: "friend_id"
+	has_many :friendships_user, class_name: 'Friendship', dependent: :destroy
+	has_many :friendships_friend, class_name: 'Friendship', foreign_key: "friend_id", dependent: :destroy
 
-	has_many :channels_users, dependent: :destroy
-	has_many :channels, through: :channels_users
+	has_many :channel_users, dependent: :destroy
+	has_many :channels, through: :channel_users
 	has_many :messages, dependent: :destroy
 
 	belongs_to :guild, optional: true
