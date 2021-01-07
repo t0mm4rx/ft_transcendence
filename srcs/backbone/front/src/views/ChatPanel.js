@@ -10,7 +10,8 @@ export default Backbone.View.extend({
     this.listenTo(this.model, "add", this.renderChannels);
     this.listenTo(this.currentChat, "change", this.renderChat);
     this.listenTo(this.currentMessages, "change", this.renderMessages);
-    this.model.on("sync", () => this.render(), this);
+    this.model.on("sync", this.renderChannels, this);
+    // this.model.on("sync", () => this.render(), this);
     this.currentMessages.on("sync", () => this.renderMessages(), this);
 
     this.newSocket = (channel_id) => {
@@ -55,24 +56,19 @@ export default Backbone.View.extend({
       this.currentMessages.fetch();
       this.renderChannels();
     },
-    "click #submitButton": function (e) {
-      const input = $("#chat-input").val();
-      console.log("INPUT: ", input);
-      console.log("current chat: ", this.currentMessages);
-      $.ajax({
-        url: `http://localhost:3000/api/channels/${this.currentChannelId}/messages/`,
-        type: "POST",
-        data: `body=${input}`,
-      });
-    },
+    "keyup #chat-input": "keyPressEventHandler",
+    "keyup #channel-input": "keyPressEventHandler",
   },
   render: function () {
     this.$el.html(template);
     this.renderChannels();
     this.renderMessages();
   },
+
   renderChannels: function () {
-    $("#chat-channels").html("");
+    $("#chat-channels").html(
+      `<input type="text" id="channel-input" placeholder="Add channel" />`
+    );
     this.model.forEach((channel) => {
       $("#chat-channels").append(
         `<span class="chat-channel${
@@ -96,7 +92,6 @@ export default Backbone.View.extend({
 				<div id="chat-messages"></div>
         <div class="chat-input">
             <input type="text" id="chat-input" placeholder="Send something"/>
-            <input id="submitButton" type="button" value="Send" />
 				</div>`
       );
       this.renderChat();
@@ -127,5 +122,43 @@ export default Backbone.View.extend({
     document.querySelector("#chat-messages").scrollTop = document.querySelector(
       "#chat-messages"
     ).scrollHeight;
+  },
+  keyPressEventHandler: function (event) {
+    if (event.keyCode == 13) {
+      if (event.target.id == "chat-input") this.newMessage();
+      if (event.target.id == "channel-input") this.newChannel();
+    }
+  },
+  newMessage() {
+    const input = $("#chat-input").val();
+    if (input == "") return;
+    console.log("INPUT: ", input);
+    console.log("current chat: ", this.currentMessages);
+    $.ajax({
+      url: `http://localhost:3000/api/channels/${this.currentChannelId}/messages/`,
+      type: "POST",
+      data: `body=${input}`,
+    });
+  },
+  newChannel() {
+    const input = $("#channel-input").val();
+    if (input == "") return;
+    $("#channel-input").val("");
+    // console.log("INPUT: ", input);
+    // console.log(window.chat);
+    // const channel = window.chat.add({ name: input });
+    // console.log("NEW CHANNEL", channel);
+
+    // channel.save();
+    // window.chat.fetch();
+
+    const request = $.ajax({
+      url: `http://localhost:3000/api/channels/`,
+      type: "POST",
+      data: `name=${input}`,
+    });
+    request.done(function (data) {
+      window.chat.fetch();
+    });
   },
 });

@@ -123,7 +123,7 @@ window.currentMessages = new ChannelMessages();
 // window.currentMessages.fetch({});
 window.chat = new Chat();
 
-window.chat.fetch({});
+window.chat.fetch();
 
 window.notifications = new NotificationCollection();
 window.notifications.add(
