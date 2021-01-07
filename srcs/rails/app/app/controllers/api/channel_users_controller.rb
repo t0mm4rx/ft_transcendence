@@ -8,9 +8,6 @@ class ChannelUsersController < ApplicationController
 
 	def create
 		@channel_user = ChannelUser.create(user_id: current_user.id, channel_id: params[:channel_id], owner: params[:owner], admin: params[:admin], ban_date: params[:ban_date]);
-		# @channel.channel_users.where(user: current_user, owner: params[:owner]).first_or_create
-	#	@channel.channel_users.where(channel_id: params[:channel_id], user_id: params[:user_id], owner: params[:owner], admin: params[:admin], ban_date: params[:ban_date]).create
-		# @cu = ChannelUser.new(cu_params)
 		if @channel_user.save
 			render json: @channel_user, status: :created
 		else
@@ -29,7 +26,6 @@ class ChannelUsersController < ApplicationController
 	end
 
 	def cu_params
-		#params.permit(:channel_id, :user_id, :owner, :admin, :ban_date)
 		params.permit(:channel_id, :user_id, :owner, :admin, :ban_date)
 	end
 end
