@@ -12,6 +12,8 @@ module Api
     end
 
     def create
+      puts "########################"
+      p params
       request = Friendship.new(user: current_user, friend_id: params[:id])
       if request.save
         render json: request, status: :created
@@ -23,11 +25,11 @@ module Api
     def update
       friendship = Friendship.find_by(user_id: params[:id], friend_id: current_user.id)
       if !friendship
-        return { error: "no existing request from user"}, status: :not_found
+        return render json: { error: "no existing request from user"}, status: :not_found
       end
       friendship.update(accepted: true)
       if friendship.save
-        render json: friendship
+        render json: friendship, status: :created
       else
         render json: friendship.errors, status: :unprocessable_entity # 422
       end
@@ -44,7 +46,7 @@ module Api
       if friendship.destroy
         render json: {}, status: :ok
       elsif
-        render json: friendship.errors, status: :forbidden
+        render json: friendship.errors, status: :unprocessable_entity
       end
     end
 

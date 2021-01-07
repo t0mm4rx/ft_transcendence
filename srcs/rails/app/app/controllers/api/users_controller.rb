@@ -24,6 +24,9 @@ module Api
       if !user
         return render json: { error: "no such user" }, status: :not_found 
       end
+      unless user === current_user || current_user.admin
+        return render json: {}, status: :forbidden
+      end
       user.update(user_params_change)
       if user.save
         render json: user
