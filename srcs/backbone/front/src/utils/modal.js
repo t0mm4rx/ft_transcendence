@@ -2,6 +2,9 @@ import $ from 'jquery';
 
 const showModal = (title, content, onAccept, onDismiss) => {
 	const close = () => {
+		$(document).off("click", "#modal-cancel");
+		$(document).off("click", "#modal-ok");
+		$(document).off("click", ".modal-close > svg");
 		$(".modal-overlay").remove();
 	}
 	const modal = `<div class="modal-overlay">

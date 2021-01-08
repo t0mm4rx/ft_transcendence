@@ -110,7 +110,7 @@ export default Backbone.View.extend({
 
   renderChannels: function () {
     $("#chat-channels").html(
-      `<div id="input-container"><div id="icon-container"><i class="fas fa-search"></i></div><div><input type="text" id="channel-input" placeholder="Add channel" /></div>`
+      `<div id="input-container"><div id="icon-container"><i class="fas fa-search"></i></div><input type="text" id="channel-input" placeholder="Add channel" /></div>`
 	);
 	let list = "";
 	list += "<div id=\"channels-list\">";
@@ -139,6 +139,8 @@ export default Backbone.View.extend({
               : ""
           }
 					<span id="chat-title">${this.currentChat.attributes.name}</span>
+					${!!avatar ? `<div class="button-icon"><i class="fas fa-gamepad"></i></div>
+					<div class="button-icon"><i class="fas fa-ban"></i></div>` : ""}
 				</div>
 				<div id="chat-messages"></div>
         <div class="chat-input">

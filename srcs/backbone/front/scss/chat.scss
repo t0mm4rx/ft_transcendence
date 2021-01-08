@@ -129,6 +129,9 @@
 					font-weight: 800;
 					margin: 10px;
 				}
+				.button-icon {
+					margin: 5px;
+				}
 				#chat-title, #chat-avatar {
 					cursor: pointer;
 				}
@@ -175,6 +178,7 @@
 				}
 			}
 			#chat-input {
+				flex: 1;
 				width: 100%;
 				background: none;
 				padding: 20px;
