@@ -8,6 +8,7 @@
 @import './auth.scss';
 @import './user-page.scss';
 @import './livestream-page.scss';
+@import './modal.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html, body {
@@ -111,6 +112,10 @@ a {
 		width: auto;
 		margin-right: 10px;
 	}
+}
+
+.button-grey {
+	background: none;
 }
 
 .button:hover {
@@ -256,7 +261,7 @@ a {
 	margin-bottom: 10px;
 }
 
-input[type="text"] {
+input[type="text"], input[type="password"] {
 	padding: 10px;
 	background-color: $grey_dark_light;
 	border-radius: 10px;
@@ -280,7 +285,7 @@ input[type="text"] {
 	font-size: $m;
 	img {
 		height: 70px;
-		width: auto;
+		width: 70px;
 	}
 	span, b {
 		margin: 10px;

@@ -1,6 +1,6 @@
 <div id="user-page-container">
 	<div class="panel" id="top-panel">
-		<img src="<%= data.avatar_url || "" %>">
+		<img <%= data.avatar_url ? `src="${data.avatar_url}"` : "" %>>
 		<div id="top-panel-container">
 			<% if (data.relation_to_user === "friends") { %><div id="user-friend-badge"><div class="user-friend-overlay"><i class="fas fa-users-slash"></i></div><i class="fas fa-user-friends"></i> Friend</div><% } %>
 			<% if (data.relation_to_user === "request sent") { %><div id="user-friend-badge"><div class="user-friend-overlay"><i class="fas fa-users-slash"></i></div><i class="fas fa-hourglass-start"></i> Friend request sent</div><% } %>
@@ -9,11 +9,11 @@
 				<span>on the ladder</span>
 			</div>
 			<div id="user-name-container">
-				<span><%= data.username || "" %></span>
+				<span><%= data.username || "..." %></span>
 				<div id="user-name-buttons">
 					<% if (!data.relation_to_user) { %><div id="user-add-friend" class="button-icon"><i class="fas fa-user-plus"></i></div> <% } %>
 					<div class="button-icon"><i class="fas fa-gamepad"></i></div>
-					<div class="button-icon"><i class="far fa-comment"></i></div>
+					<div class="button-icon message-button" id="message-<%= data.login %>"><i class="far fa-comment"></i></div>
 				</div>
 			</div>
 			<div id="user-name-infos">
