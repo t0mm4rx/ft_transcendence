@@ -136,9 +136,14 @@ export default Backbone.View.extend({
     if (event.keyCode == 13) {
       if (event.target.id == "chat-input") this.newMessage();
 	}
+	console.log(event.keyCode);
 	if (event.target.id == "channel-input") {
-		this.autocomplete();
-	  };
+		if (event.keyCode === 27) {
+			this.closeAutocomplete();
+		} else {
+			this.autocomplete();
+		}
+	};
   },
   newMessage() {
     const input = $("#chat-input").val();
@@ -152,6 +157,10 @@ export default Backbone.View.extend({
     });
   },
   newChannel(input) {
+	if (window.chat.find(a => a.get('name') === input)) {
+		this.selectChannel(input);
+		return;
+	}
     // const input = $("#channel-input").val();
     if (input == "") return;
     $("#channel-input").val("");
@@ -170,7 +179,7 @@ export default Backbone.View.extend({
     });
     request.done(data => {
 	  window.chat.fetch();
-	  setTimeout(() => this.selectChannel(input), 500);
+	  setTimeout(() => this.selectChannel(input), 200);
     });
   },
   autocomplete () {
