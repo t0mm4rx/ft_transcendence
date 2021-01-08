@@ -95,7 +95,9 @@ export default Backbone.View.extend({
 				toasts.notifyError("Channel name can't be empty!");
 				return false;
 			}
-			this.newChannel(name);
+			this.newChannel(name, () => {
+				toasts.notifySuccess("The channel has been created.");
+			});
 			return true;
 		}, () => {});
 	}
@@ -195,7 +197,7 @@ export default Backbone.View.extend({
       data: `body=${input}`,
     });
   },
-  newChannel(name) {
+  newChannel(name, onSuccess = () => {}) {
 	if (window.chat.find(a => a.get('name') === name)) {
 		this.selectChannel(name);
 		return;
@@ -218,7 +220,10 @@ export default Backbone.View.extend({
     });
     request.done(data => {
 	  window.chat.fetch();
-	  setTimeout(() => this.selectChannel(name), 200);
+	  setTimeout(() => {
+		  this.selectChannel(name);
+		  onSuccess();
+	  }, 200);
     });
   },
   autocomplete () {
