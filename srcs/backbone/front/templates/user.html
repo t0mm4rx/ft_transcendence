@@ -13,7 +13,7 @@
 				<div id="user-name-buttons">
 					<% if (!data.relation_to_user) { %><div id="user-add-friend" class="button-icon"><i class="fas fa-user-plus"></i></div> <% } %>
 					<div class="button-icon"><i class="fas fa-gamepad"></i></div>
-					<div class="button-icon"><i class="far fa-comment"></i></div>
+					<div class="button-icon message-button" id="message-<%= data.login %>"><i class="far fa-comment"></i></div>
 				</div>
 			</div>
 			<div id="user-name-infos">
