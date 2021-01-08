@@ -8,7 +8,6 @@ Rails.application.routes.draw do
     resources :users do
       resources :friends, controller: 'friendships', only: :index
     end
-
     resources :friends, controller: 'friendships', only: [:create, :update, :destroy]
 
     resources :logintra, only: :index

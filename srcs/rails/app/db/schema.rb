@@ -53,6 +53,8 @@ ActiveRecord::Schema.define(version: 2021_01_08_214149) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "player"
     t.string "opponent"
+    t.string "status"
+    t.integer "number_player"
   end
 
   create_table "guilds", force: :cascade do |t|

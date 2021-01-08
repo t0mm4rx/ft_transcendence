@@ -10,7 +10,7 @@ import { User, Friends, Users } from "./models/User";
 import NotificationsPanel from "./views/NotificationsPanel";
 import { Notification, NotificationCollection } from "./models/Notification";
 import { Game, GameCollection } from "./models/Game";
-import ChatPanel from "./views/ChatPanel";
+import ChatPanel from "./views/Chat";
 import { Chat, Channel, ChannelMessages, Message } from "./models/Channels";
 import $ from "jquery";
 import Cookies from "js-cookie";
@@ -119,9 +119,7 @@ window.liveGames.add(
   })
 );
 
-window.currentMessages = new ChannelMessages();
 window.chat = new Chat();
-window.chat.fetch();
 
 window.notifications = new NotificationCollection();
 window.notifications.add(
