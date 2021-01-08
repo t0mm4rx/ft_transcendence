@@ -73,6 +73,9 @@ export default Backbone.View.extend({
 			window.location.hash = `user/${login}/`;
 		}
 	},
+	"click .fa-search": function () {
+		$("#channel-input").trigger("focus");
+	}
   },
   render: function () {
     this.$el.html(template);
@@ -82,7 +85,7 @@ export default Backbone.View.extend({
 
   renderChannels: function () {
     $("#chat-channels").html(
-      `<div id="input-container"><input type="text" id="channel-input" placeholder="Add channel" /><div id="autocomplete-container"></div></div>`
+      `<div id="input-container"><div id="icon-container"><i class="fas fa-search"></i></div><div><input type="text" id="channel-input" placeholder="Add channel" /></div>`
 	);
 	let list = "";
 	list += "<div id=\"channels-list\">";
@@ -92,6 +95,7 @@ export default Backbone.View.extend({
           this.currentChat === channel ? " channel-current" : ""
         }">${channel.attributes.name}</span>`;
 	});
+	list += `<div id="autocomplete-container"></div>`;
 	list += "</div>";
 	$("#chat-channels").append(list);
 	$("#chat-channels").append(`<div id="new-channel-button"><i class="far fa-comments"></i><span>New channel</span></div>`);
@@ -151,7 +155,7 @@ export default Backbone.View.extend({
 	}
 	if (event.target.id == "channel-input") {
 		if (event.keyCode === 27) {
-			this.closeAutocomplete();
+			event.target.blur();
 		} else {
 			this.autocomplete();
 		}
@@ -209,9 +213,13 @@ export default Backbone.View.extend({
 		$("#autocomplete-container").append(`<div id="autocomplete-no-result">No result found</div>`);
 	}
 	$("#autocomplete-container").show();
+	$("#input-container .fa-search").addClass('fa-times');
   },
   closeAutocomplete() {
-	setTimeout(() => $("#autocomplete-container").hide(), 100);
+	setTimeout(() => {
+		$("#autocomplete-container").hide();
+		$("#input-container .fa-times").addClass('fa-search');
+	}, 100);
   },
   selectChannel(channel) {
 	let find = null;
