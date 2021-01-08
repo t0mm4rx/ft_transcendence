@@ -44,8 +44,9 @@ export default Backbone.Router.extend({
 		this.showLayout();
 		if (window.currentView)
 		{
-			window.currentView.remove();
+			window.currentView.undelegateEvents();
 			window.currentView.unbind();
+			window.currentView.stopListening();
 		}
 		window.currentView = new Home()
 		window.currentView.render();
@@ -57,9 +58,9 @@ export default Backbone.Router.extend({
 		console.log(window.currentView);
 		if (window.currentView)
 		{
-			console.log("Unbind");
-			// window.currentView.remove();
+			window.currentView.undelegateEvents();
 			window.currentView.unbind();
+			window.currentView.stopListening();
 		}
 		console.log("Draw");
 		window.currentView = new User({login: id});
@@ -70,8 +71,9 @@ export default Backbone.Router.extend({
 		this.showLayout();
 		if (window.currentView)
 		{
-			window.currentView.remove();
+			window.currentView.undelegateEvents();
 			window.currentView.unbind();
+			window.currentView.stopListening();
 		}
 		window.currentView = new Guilds();
 		window.currentView.render();
@@ -81,8 +83,9 @@ export default Backbone.Router.extend({
 		this.showLayout();
 		if (window.currentView)
 		{
-			window.currentView.remove();
+			window.currentView.undelegateEvents();
 			window.currentView.unbind();
+			window.currentView.stopListening();
 		}
 		window.currentView = new Game();
 		window.currentView.render();
@@ -92,8 +95,9 @@ export default Backbone.Router.extend({
 		this.showLayout();
 		if (window.currentView)
 		{
-			window.currentView.remove();
+			window.currentView.undelegateEvents();
 			window.currentView.unbind();
+			window.currentView.stopListening();
 		}
 		window.currentView = new Livestream();
 		window.currentView.render();
@@ -103,8 +107,9 @@ export default Backbone.Router.extend({
 		this.showLayout();
 		if (window.currentView)
 		{
-			window.currentView.remove();
+			window.currentView.undelegateEvents();
 			window.currentView.unbind();
+			window.currentView.stopListening();
 		}
 		window.currentView = new Tournaments();
 		window.currentView.render();
@@ -114,8 +119,9 @@ export default Backbone.Router.extend({
 		this.showLayout();
 		if (window.currentView)
 		{
-			window.currentView.remove();
+			window.currentView.undelegateEvents();
 			window.currentView.unbind();
+			window.currentView.stopListening();
 		}
 		window.currentView = new Test();
 		window.currentView.render();
@@ -127,8 +133,9 @@ export default Backbone.Router.extend({
 			this.hideLayout();
 			if (window.currentView)
 			{
-				window.currentView.remove();
+				window.currentView.undelegateEvents();
 				window.currentView.unbind();
+				window.currentView.stopListening();
 			}
 			window.currentView = new Auth();
 			window.currentView.render();
