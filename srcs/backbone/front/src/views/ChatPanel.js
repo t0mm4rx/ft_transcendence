@@ -13,7 +13,6 @@ export default Backbone.View.extend({
     this.listenTo(this.currentChat, "change", this.renderChat);
     this.listenTo(this.currentMessages, "change", this.renderMessages);
     this.model.on("sync", this.renderChannels, this);
-    // this.model.on("sync", () => this.render(), this);
     this.currentMessages.on("sync", () => this.renderMessages(), this);
 
     this.newSocket = (channel_id) => {
@@ -36,8 +35,12 @@ export default Backbone.View.extend({
           this.renderMessages();
         }
       };
-      return ftsocket;
+	  return ftsocket;
     };
+	$(document).on('chat', (_, {chat}) => {
+		$("#chat-panel").addClass("chat-panel-open");
+		this.newChannel(chat);
+	});
   },
   el: "#chat-container",
   events: {
