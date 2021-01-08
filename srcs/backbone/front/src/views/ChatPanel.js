@@ -2,6 +2,8 @@
 import Backbone from "backbone";
 import template from "../../templates/chat.html";
 import { FtSocket, FtSocketCollection } from "../models/FtSocket";
+import {showModal} from '../utils/modal';
+import toasts from '../utils/toasts';
 import $ from "jquery";
 
 export default Backbone.View.extend({
@@ -75,6 +77,27 @@ export default Backbone.View.extend({
 	},
 	"click .fa-search": function () {
 		$("#channel-input").trigger("focus");
+	},
+	"click #new-channel-button": function () {
+		showModal("Create a new channel", `<div id="form-new-channel">
+		<div class="input-wrapper">
+			<span>Name</span>
+			<input type="text" placeholder="Channel name" id="new-channel-name" />
+		</div>
+		<div class="input-wrapper">
+			<span>Password (empty for no password)</span>
+			<input type="password" placeholder="Password" id="new-channel-password" />
+		</div>
+		</div>`, () => {
+			const name = $("#new-channel-name").val();
+			const password = $("#new-channel-password").val();
+			if (!name.length) {
+				toasts.notifyError("Channel name can't be empty!");
+				return false;
+			}
+			this.newChannel(name);
+			return true;
+		}, () => {});
 	}
   },
   render: function () {
@@ -172,13 +195,13 @@ export default Backbone.View.extend({
       data: `body=${input}`,
     });
   },
-  newChannel(input) {
-	if (window.chat.find(a => a.get('name') === input)) {
-		this.selectChannel(input);
+  newChannel(name) {
+	if (window.chat.find(a => a.get('name') === name)) {
+		this.selectChannel(name);
 		return;
 	}
     // const input = $("#channel-input").val();
-    if (input == "") return;
+    if (name == "") return;
     $("#channel-input").val("");
     // console.log("INPUT: ", input);
     // console.log(window.chat);
@@ -191,11 +214,11 @@ export default Backbone.View.extend({
     const request = $.ajax({
       url: `http://localhost:3000/api/channels/`,
       type: "POST",
-      data: `name=${input}`,
+      data: `name=${name}`,
     });
     request.done(data => {
 	  window.chat.fetch();
-	  setTimeout(() => this.selectChannel(input), 200);
+	  setTimeout(() => this.selectChannel(name), 200);
     });
   },
   autocomplete () {
