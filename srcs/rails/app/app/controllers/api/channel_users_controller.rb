@@ -26,7 +26,8 @@ class ChannelUsersController < ApplicationController
 	#http://localhost:3000/api/channels/:channel_id/channel_users/?add_admin=user_id
 	def update
         @admin = ChannelUser.find_by(user_id: current_user.id)
-        if params.has_key?(:add_admin)
+
+		if params.has_key?(:add_admin)
             @target = ChannelUser.find_by(user_id: params[:add_admin])
             if @target != nil && @admin != nil && @admin.owner == true
                 @target.admin = true
@@ -34,21 +35,25 @@ class ChannelUsersController < ApplicationController
             else
                 error = "Only channel's owner can add admin"
             end
-        elsif params.has_key?(:mute)
+
+		#format param date = (yyyymmdd)
+		elsif params.has_key?(:mute)
             @target = ChannelUser.find_by(user_id: params[:mute])
             if @target != nil && @admin != nil && @admin.admin == true
-                @target.mute_date = null
+				@target.mute_date = params[:end]
             else
                 error = "Only channel's admin can mute someone"
             end
-        elsif params.has_key?(:ban)
+
+		elsif params.has_key?(:ban)
             @target = ChannelUser.find_by(user_id: params[:ban])
             if @target != nil && @admin != nil && @admin.admin == true
-                @target.ban_date = params([:end])
+                @target.ban_date = params[:end]
             else
                 error = "Only channel's admin can ban someone"
             end
-        end
+		end
+
         if error
             render json: error = {error: error}.to_json, status: :unprocessable_entity
         else
