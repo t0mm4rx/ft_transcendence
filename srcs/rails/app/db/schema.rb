@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_04_183046) do
+ActiveRecord::Schema.define(version: 2021_01_06_212146) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,6 +20,9 @@ ActiveRecord::Schema.define(version: 2021_01_04_183046) do
     t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "owner"
+    t.boolean "admin"
+    t.datetime "ban_date"
     t.index ["channel_id"], name: "index_channel_users_on_channel_id"
     t.index ["user_id"], name: "index_channel_users_on_user_id"
   end
@@ -28,6 +31,10 @@ ActiveRecord::Schema.define(version: 2021_01_04_183046) do
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "public"
+    t.boolean "private"
+    t.string "password"
+    t.boolean "direct"
   end
 
   create_table "friendships", force: :cascade do |t|
@@ -37,7 +44,6 @@ ActiveRecord::Schema.define(version: 2021_01_04_183046) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["friend_id"], name: "index_friendships_on_friend_id"
-    t.index ["user_id", "friend_id"], name: "index_friendships_on_user_id_and_friend_id", unique: true
     t.index ["user_id"], name: "index_friendships_on_user_id"
   end
 
@@ -46,6 +52,8 @@ ActiveRecord::Schema.define(version: 2021_01_04_183046) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "player"
     t.string "opponent"
+    t.string "status"
+    t.integer "number_player"
   end
 
   create_table "guilds", force: :cascade do |t|
