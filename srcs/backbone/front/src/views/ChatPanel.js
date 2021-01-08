@@ -65,7 +65,14 @@ export default Backbone.View.extend({
 		if (window.users.find(a => a.get("login") === login)) {
 			window.location.hash = `user/${login}/`;
 		}
-	}
+	},
+	"click #chat-avatar": function () {
+		const login = this.currentChat.get("name");
+		console.log(login);
+		if (window.users.find(a => a.get("login") === login)) {
+			window.location.hash = `user/${login}/`;
+		}
+	},
   },
   render: function () {
     this.$el.html(template);
@@ -76,24 +83,30 @@ export default Backbone.View.extend({
   renderChannels: function () {
     $("#chat-channels").html(
       `<div id="input-container"><input type="text" id="channel-input" placeholder="Add channel" /><div id="autocomplete-container"></div></div>`
-    );
+	);
+	let list = "";
+	list += "<div id=\"channels-list\">";
     this.model.forEach((channel) => {
-      $("#chat-channels").append(
+      list += 
         `<span class="chat-channel${
           this.currentChat === channel ? " channel-current" : ""
-        }">${channel.attributes.name}</span>`
-      );
+        }">${channel.attributes.name}</span>`;
 	});
+	list += "</div>";
+	$("#chat-channels").append(list);
+	$("#chat-channels").append(`<div id="new-channel-button"><i class="far fa-comments"></i><span>New channel</span></div>`);
 	$("#autocomplete-container").hide();
   },
   renderMessages: function () {
+	const user = window.users.find(a => a.get('login') === this.currentChat.get('name'));
+	const avatar = !!user ? user.get('avatar_url') : null;
     $("#chat-chat").html("");
     if (this.currentChat && this.currentMessages) {
       $("#chat-chat").append(
         `<div class="chat-header">
 					${
-            !!this.currentChat.attributes.avatar
-              ? `<img src=\"${this.currentChat.attributes.avatar}\" />`
+            !!avatar
+              ? `<img id="chat-avatar" src=\"${avatar}\" />`
               : ""
           }
 					<span id="chat-title">${this.currentChat.attributes.name}</span>
@@ -136,7 +149,6 @@ export default Backbone.View.extend({
     if (event.keyCode == 13) {
       if (event.target.id == "chat-input") this.newMessage();
 	}
-	console.log(event.keyCode);
 	if (event.target.id == "channel-input") {
 		if (event.keyCode === 27) {
 			this.closeAutocomplete();
