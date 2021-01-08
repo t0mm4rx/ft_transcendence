@@ -3,7 +3,7 @@ import Backbone from "backbone";
 import template from "../../templates/chat.html";
 import { FtSocket, FtSocketCollection } from "../models/FtSocket";
 import $ from "jquery";
-import * as _ from "underscore";
+import _ from "underscore";
 import { ChannelMessages } from "../models/Channels";
 
 export default Backbone.View.extend({
@@ -72,6 +72,7 @@ export default Backbone.View.extend({
       // Ignores pings.
       if (msg.type === "ping") return;
       if (msg.message) {
+        console.log(msg.message);
         this.model.add({
           username: msg.message.login,
           body: msg.message.message,

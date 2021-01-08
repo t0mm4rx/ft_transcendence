@@ -3,7 +3,7 @@ import Backbone from "backbone";
 import template from "../../templates/chat.html";
 import { FtSocket, FtSocketCollection } from "../models/FtSocket";
 import $ from "jquery";
-import * as _ from "underscore";
+import _ from "underscore";
 import ChannelView from "./Channel";
 import { ChannelMessages } from "../models/Channels";
 import { showModal } from "../utils/modal";
@@ -18,10 +18,16 @@ export default Backbone.View.extend({
       this.newChannel(chat);
     });
   },
+
   el: "#chat-container",
   events: {
-    "click #chat-panel-close": "close",
-    "click #chat-icon": "open",
+    "click #chat-panel-close": function () {
+      $("#chat-panel").removeClass("chat-panel-open");
+    },
+    "click #chat-icon": function () {
+      this.model.fetch();
+      $("#chat-panel").addClass("chat-panel-open");
+    },
     "click .chat-channel": function (e) {
       this.changeChannel(e.target.id);
     },
@@ -43,7 +49,6 @@ export default Backbone.View.extend({
       console.log(login);
       if (window.users.find((a) => a.get("login") === login)) {
         window.location.hash = `user/${login}/`;
-        this.close();
       }
     },
     "click .fa-search": function () {
@@ -95,13 +100,6 @@ export default Backbone.View.extend({
       chatJson.avatar = !!avatar ? avatar : "";
       $("#chat-chat").append(template(chatJson));
     }
-  },
-  close() {
-    $("#chat-panel").removeClass("chat-panel-open");
-  },
-  open() {
-    this.model.fetch();
-    $("#chat-panel").addClass("chat-panel-open");
   },
   changeChannel(id) {
     const newChannel = this.model.get(id);

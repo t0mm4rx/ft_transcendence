@@ -1,0 +1,49 @@
+.modal-overlay {
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.8);
+	z-index: 20;
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	animation: modal-animation .3s ease;
+}
+
+@keyframes modal-animation {
+	from {
+		transform: scale(0);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+.modal {
+	.modal-close {
+		display: flex;
+		width: 100%;
+		justify-content: flex-end;
+		padding: 20px 20px 0px 0px;
+		box-sizing: border-box;
+		font-size: $xl;
+		i, svg {
+			cursor: pointer;
+		}
+	}
+	.modal-controls {
+		box-sizing: border-box;
+		width: 100%;
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		padding: 10px;
+		> div {
+			margin: 5px;
+		}
+	}
+}
