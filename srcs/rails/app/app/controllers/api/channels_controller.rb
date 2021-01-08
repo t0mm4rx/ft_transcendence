@@ -3,10 +3,9 @@ module Api
 	before_action :set_channel, only: [:show, :update, :destroy]
 	# GET /channels
 	def index
-	#	@channels = Channel.all
-		#Channel.cu_channels(current_user)
 		render json: current_user.channels
 	end
+
 	# GET /channels/1
 	def show
 		render json: @channel
@@ -19,7 +18,7 @@ module Api
 	def create
 		@channel = Channel.new(channel_params)
 		if User.where(login: params[:name])
-			#@channel.direct = true
+			@channel.direct = true
 			@channel.name = "DM:#{params[:name]}:#{current_user.login}"
 		elsif @channel.password.empty?
 			@channel.private = false
