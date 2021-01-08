@@ -42,44 +42,103 @@ export default Backbone.Router.extend({
 	home: function () {
 		this.checkLogged();
 		this.showLayout();
-		new Home().render();
+		if (window.currentView)
+		{
+			window.currentView.undelegateEvents();
+			window.currentView.unbind();
+			window.currentView.stopListening();
+		}
+		window.currentView = new Home()
+		window.currentView.render();
 	},
 	user: function (id) {
 		this.checkLogged();
 		this.showLayout();
-		new User({login: id}).render();
+		console.log("Here");
+		console.log(window.currentView);
+		if (window.currentView)
+		{
+			window.currentView.undelegateEvents();
+			window.currentView.unbind();
+			window.currentView.stopListening();
+		}
+		console.log("Draw");
+		window.currentView = new User({login: id});
+		window.currentView.render();
 	},
 	guilds: function () {
 		this.checkLogged();
 		this.showLayout();
-		new Guilds().render();
+		if (window.currentView)
+		{
+			window.currentView.undelegateEvents();
+			window.currentView.unbind();
+			window.currentView.stopListening();
+		}
+		window.currentView = new Guilds();
+		window.currentView.render();
 	},
 	game: function () {
 		this.checkLogged();
 		this.showLayout();
-		new Game().render();
+		if (window.currentView)
+		{
+			window.currentView.undelegateEvents();
+			window.currentView.unbind();
+			window.currentView.stopListening();
+		}
+		window.currentView = new Game();
+		window.currentView.render();
 	},
 	livestream: function () {
 		this.checkLogged();
 		this.showLayout();
-		new Livestream().render();
+		if (window.currentView)
+		{
+			window.currentView.undelegateEvents();
+			window.currentView.unbind();
+			window.currentView.stopListening();
+		}
+		window.currentView = new Livestream();
+		window.currentView.render();
 	},
 	tournaments: function () {
 		this.checkLogged();
 		this.showLayout();
-		new Tournaments().render();
+		if (window.currentView)
+		{
+			window.currentView.undelegateEvents();
+			window.currentView.unbind();
+			window.currentView.stopListening();
+		}
+		window.currentView = new Tournaments();
+		window.currentView.render();
 	},
 	test: function () {
 		this.checkLogged();
 		this.showLayout();
-		new Test().render();
+		if (window.currentView)
+		{
+			window.currentView.undelegateEvents();
+			window.currentView.unbind();
+			window.currentView.stopListening();
+		}
+		window.currentView = new Test();
+		window.currentView.render();
 	},
 	auth: function () {
 		if (!!Cookies.get('user')) {
 			window.location.hash = "/";
 		} else {
 			this.hideLayout();
-			new Auth().render();
+			if (window.currentView)
+			{
+				window.currentView.undelegateEvents();
+				window.currentView.unbind();
+				window.currentView.stopListening();
+			}
+			window.currentView = new Auth();
+			window.currentView.render();
 		}
 	},
 	token: function () {
