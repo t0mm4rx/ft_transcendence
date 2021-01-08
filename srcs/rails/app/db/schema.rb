@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_07_093122) do
+ActiveRecord::Schema.define(version: 2021_01_08_132811) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 2021_01_07_093122) do
     t.boolean "owner"
     t.boolean "admin"
     t.datetime "ban_date"
+    t.datetime "mute_date"
     t.index ["channel_id"], name: "index_channel_users_on_channel_id"
     t.index ["user_id"], name: "index_channel_users_on_user_id"
   end
@@ -52,8 +53,6 @@ ActiveRecord::Schema.define(version: 2021_01_07_093122) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "player"
     t.string "opponent"
-    t.string "status"
-    t.integer "number_player"
   end
 
   create_table "guilds", force: :cascade do |t|

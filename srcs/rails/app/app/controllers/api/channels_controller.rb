@@ -1,6 +1,5 @@
 module Api
 	class ChannelsController < ApplicationController
-
 	before_action :set_channel, only: [:show, :update, :destroy]
 	# GET /channels
 	def index
@@ -15,10 +14,11 @@ module Api
 
 
 	# POST /channels
+	#if channel name == login name then its a direct channel
 	def create
 		@channel = Channel.new(channel_params)
 	if @channel.save
-		Channel.channel_user_creation(@channel.id, current_user)
+		Channel.channel_user_creation(@channel.id, current_user.id)
 		render json: @channel, status: :created
 	else
 		render json: @channel.errors, status: :unprocessable_entity
@@ -26,13 +26,40 @@ module Api
 	end
 
 	# PATCH/PUT /channels/1
+	# you should say in params if you want to
+	#- change password: http://localhost:3000/api/channels/?new_password=password
+	#- remove password: api/channels/?remove_password
+	#- add password: api/channels/?add_change_password=password
+
+	# PATCH/PUT /channels/1
 	def update
-	if @channel.update(channel_params[:id])
-		render json: @channel
-	  else
-		render json: @channel.errors, status: :unprocessable_entity
+		@cu = ChannelUser.find_by(user_id: current_user.id)
+		if params.has_key?(:remove_password)
+			if @cu != nil && @cu.owner == true
+				@channel.public = true
+				@channel.private = false
+				@channel.password = nil
+				@channel.save
+			else
+				error = "Only channel's owner can remove password"
+			end
+		elsif params.has_key?(:add_change_password)
+			if @cu != nil && @cu.owner == true
+				@channel.password = params[:add_change_password]
+				@channel.private = true;
+				@channel.public = false;
+				@channel.save
+			else
+				error = "Only channel's owner can add or change password"
+			end
+		end
+		if error
+			render json: error = {error: error}.to_json, status: :unprocessable_entity
+		else
+			render json: @channel
 		end
 	end
+
 	# DELETE /channels/1
 	def destroy
 		@channel.destroy
