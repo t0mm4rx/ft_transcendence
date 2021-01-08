@@ -4,4 +4,8 @@ class Channel < ApplicationRecord
 	has_many :messages, dependent: :destroy #if user delete account all messages are deleted
 
 	validates :name, presence: true #make sure channel have name
+
+	def self.channel_user_creation (channel_id, current_user)
+		cu = ChannelUser.create(user_id: current_user, channel_id: channel_id, owner: true, admin: true, ban_date: nil)
+	end
 end
