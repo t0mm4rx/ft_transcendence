@@ -57,7 +57,16 @@ export default Backbone.View.extend({
       this.renderChannels();
     },
     "keyup #chat-input": "keyPressEventHandler",
-    "keyup #channel-input": "keyPressEventHandler",
+	"keyup #channel-input": "keyPressEventHandler",
+	"focus #channel-input": function () {
+		this.autocomplete();
+	},
+	"blur #channel-input": function () {
+		this.closeAutocomplete();
+	},
+	"click .autocomplete-item": function (event) {
+		this.newChannel(event.currentTarget.innerText);
+	}
   },
   render: function () {
     this.$el.html(template);
@@ -67,7 +76,7 @@ export default Backbone.View.extend({
 
   renderChannels: function () {
     $("#chat-channels").html(
-      `<input type="text" id="channel-input" placeholder="Add channel" />`
+      `<div id="input-container"><input type="text" id="channel-input" placeholder="Add channel" /><div id="autocomplete-container"></div></div>`
     );
     this.model.forEach((channel) => {
       $("#chat-channels").append(
@@ -75,7 +84,8 @@ export default Backbone.View.extend({
           this.currentChat === channel ? " channel-current" : ""
         }">${channel.attributes.name}</span>`
       );
-    });
+	});
+	$("#autocomplete-container").hide();
   },
   renderMessages: function () {
     $("#chat-chat").html("");
@@ -126,8 +136,11 @@ export default Backbone.View.extend({
   keyPressEventHandler: function (event) {
     if (event.keyCode == 13) {
       if (event.target.id == "chat-input") this.newMessage();
-      if (event.target.id == "channel-input") this.newChannel();
-    }
+	}
+	if (event.target.id == "channel-input") {
+		//   this.newChannel()
+		this.autocomplete();
+	  };
   },
   newMessage() {
     const input = $("#chat-input").val();
@@ -140,8 +153,8 @@ export default Backbone.View.extend({
       data: `body=${input}`,
     });
   },
-  newChannel() {
-    const input = $("#channel-input").val();
+  newChannel(input) {
+    // const input = $("#channel-input").val();
     if (input == "") return;
     $("#channel-input").val("");
     // console.log("INPUT: ", input);
@@ -161,4 +174,23 @@ export default Backbone.View.extend({
       window.chat.fetch();
     });
   },
+  autocomplete () {
+	const query = $("#channel-input").val();
+	let result = false;
+	$("#autocomplete-container").html("");
+	window.users.forEach(user => {
+		if (query.length === 0 || user.get('login').indexOf(query) !== -1)
+		{
+			$("#autocomplete-container").append(`<span class="autocomplete-item">${user.get('login')}</span>`);
+			result = true;
+		}
+	});
+	if (!result) {
+		$("#autocomplete-container").append(`<div id="autocomplete-no-result">No result found</div>`);
+	}
+	$("#autocomplete-container").show();
+  },
+  closeAutocomplete() {
+	// $("#autocomplete-container").hide();
+  }
 });
