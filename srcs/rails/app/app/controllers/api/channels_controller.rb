@@ -19,9 +19,9 @@ module Api
 	def create
 		@channel = Channel.new(channel_params)
 		if User.where(login: params[:name])
-			@channel.direct = true
-		end
-		if @channel.password.empty?
+			#@channel.direct = true
+			@channel.name = "DM:#{params[:name]}:#{current_user.login}"
+		elsif @channel.password.empty?
 			@channel.private = false
 			@channel.public = true
 			@channel.direct = false
