@@ -10,7 +10,6 @@ export default Backbone.View.extend({
   initialize() {
     this.listenTo(this.model, "sync", this.render);
     this.listenTo(this.model, "add", this.render);
-    this.listenTo(this.model, "change", this.setChannel);
     this.newSocket(this.model.channel_id);
     this.model.fetch();
   },
@@ -53,8 +52,6 @@ export default Backbone.View.extend({
     }
   },
   newMessage() {
-    console.log("NEW MESSAGE ", this.model.channel_id);
-
     const input = $("#chat-input").val();
     if (input == "") return;
     $("#chat-input").val("");
@@ -65,8 +62,6 @@ export default Backbone.View.extend({
     });
   },
   newSocket(channel_id) {
-    console.log("OPENING SOCKET FOR CHANNEL ", channel_id);
-
     this.ftsocket = new FtSocket({
       id: channel_id,
       channel: "MessageChannel",

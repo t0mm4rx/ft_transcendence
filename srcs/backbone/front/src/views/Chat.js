@@ -11,46 +11,50 @@ import toasts from "../utils/toasts";
 
 export default Backbone.View.extend({
   initialize() {
-    this.model.on("add", this.renderChannelList, this);
-    this.model.on("sync", this.renderChannelList, this);
+    this.listenTo(this.model, "sync", this.renderChannelList);
+    this.listenTo(this.model, "add", this.renderChannelList);
+    $(document).on("chat", (_, { chat }) => {
+      $("#chat-panel").addClass("chat-panel-open");
+      this.newChannel(chat);
+    });
   },
 
   el: "#chat-container",
   events: {
-    "click #chat-panel-close"() {
+    "click #chat-panel-close": function () {
       $("#chat-panel").removeClass("chat-panel-open");
     },
-    "click #chat-icon"() {
+    "click #chat-icon": function () {
       this.model.fetch();
       $("#chat-panel").addClass("chat-panel-open");
     },
-    "click .chat-channel"(e) {
+    "click .chat-channel": function (e) {
       this.changeChannel(e.target.id);
     },
     "keyup #channel-input": "keyPressEventHandler",
     "focus #channel-input": "autocomplete",
     "blur #channel-input": "closeAutocomplete",
-    "click .autocomplete-item"(event) {
+    "click .autocomplete-item": function (event) {
       this.newChannel(event.currentTarget.innerText);
     },
-    "click #chat-title"() {
+    "click #chat-title": function () {
       const login = this.currentChat.get("name");
       console.log(login);
       if (window.users.find((a) => a.get("login") === login)) {
         window.location.hash = `user/${login}/`;
       }
     },
-    "click #chat-avatar"() {
+    "click #chat-avatar": function () {
       const login = this.currentChat.get("name");
       console.log(login);
       if (window.users.find((a) => a.get("login") === login)) {
         window.location.hash = `user/${login}/`;
       }
     },
-    "click .fa-search"() {
+    "click .fa-search": function () {
       $("#channel-input").trigger("focus");
     },
-    "click #new-channel-button"() {
+    "click #new-channel-button": function () {
       showModal(
         "Create a new channel",
         $("#create-channel-form").html(),
@@ -61,9 +65,7 @@ export default Backbone.View.extend({
             toasts.notifyError("Channel name can't be empty!");
             return false;
           }
-          this.newChannel(name, () => {
-            toasts.notifySuccess("The channel has been created.");
-          });
+          this.newChannel(name);
           return true;
         },
         () => {}
@@ -126,16 +128,23 @@ export default Backbone.View.extend({
     }
   },
 
-  newChannel(name, onSuccess = () => {}) {
+  newChannel(name) {
     const existing = this.model.find((a) => a.get("name") === name);
     if (existing) {
       this.changeChannel(existing.get("id"));
     } else {
       const channel = this.model.add({ name: name });
-      channel.save();
+      channel.save(null, {
+        success() {
+          toasts.notifySuccess("The channel has been created.");
+        },
+        error(model, response) {
+          toasts.notifyError("Channel could not be created.");
+          console.log(model, response);
+        },
+      });
     }
   },
-
   autocomplete() {
     const query = $("#channel-input").val();
     let result = false;
