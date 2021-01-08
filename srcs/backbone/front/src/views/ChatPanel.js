@@ -66,6 +66,13 @@ export default Backbone.View.extend({
 	},
 	"click .autocomplete-item": function (event) {
 		this.newChannel(event.currentTarget.innerText);
+	},
+	"click #chat-title": function () {
+		const login = this.currentChat.get("name");
+		console.log(login);
+		if (window.users.find(a => a.get("login") === login)) {
+			window.location.hash = `user/${login}/`;
+		}
 	}
   },
   render: function () {
@@ -97,7 +104,7 @@ export default Backbone.View.extend({
               ? `<img src=\"${this.currentChat.attributes.avatar}\" />`
               : ""
           }
-					<span>${this.currentChat.attributes.name}</span>
+					<span id="chat-title">${this.currentChat.attributes.name}</span>
 				</div>
 				<div id="chat-messages"></div>
         <div class="chat-input">
@@ -138,7 +145,6 @@ export default Backbone.View.extend({
       if (event.target.id == "chat-input") this.newMessage();
 	}
 	if (event.target.id == "channel-input") {
-		//   this.newChannel()
 		this.autocomplete();
 	  };
   },
@@ -191,6 +197,6 @@ export default Backbone.View.extend({
 	$("#autocomplete-container").show();
   },
   closeAutocomplete() {
-	// $("#autocomplete-container").hide();
+	setTimeout(() => $("#autocomplete-container").hide(), 100);
   }
 });
