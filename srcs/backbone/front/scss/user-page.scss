@@ -17,7 +17,7 @@
 	padding: 20px;
 	padding-top: 40px;
 	overflow: visible !important;
-	width: 80%;
+	width: 60%;
 	max-width: 800px;
 	margin-top: 50px;
 	position: relative;
@@ -157,6 +157,8 @@
 	#history-panel-container, #friends-panel-content {
 		display: flex;
 		flex-direction: column;
+		overflow: auto;
+		max-height: 100%;
 	}
 	.history-item {
 		background-color: $grey_dark_light;

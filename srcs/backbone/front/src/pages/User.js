@@ -20,6 +20,7 @@ export default Backbone.View.extend({
 	initialize: function (options) {
 		this.login = options.login;
 		this.user = new User();
+		this.listenTo(window.currentUser, 'change', this.fetchUser);
 		this.listenTo(window.users, 'add', this.fetchUser);
 		this.listenTo(this.user, 'change', this.render);
 		this.fetchUser();

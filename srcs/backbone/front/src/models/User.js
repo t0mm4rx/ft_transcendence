@@ -35,7 +35,12 @@ const User = Backbone.Model.extend({
 			url: `http://localhost:3000/api/friends/${this.get('id')}/`,
 			type: 'DELETE',
 			success: () => {
-				this.set('relation_to_user', 'eifjeis');
+				this.set('relation_to_user', null);
+				if (this.get('login'))
+					toasts.notifySuccess(`${this.get('login')} is not your friend anymore.`);
+				else
+					toasts.notifySuccess(`You're not friends anymore.`);
+				window.currentUser.fetch();
 			},
 			error: err => {
 				console.log(err);
@@ -47,8 +52,12 @@ const User = Backbone.Model.extend({
 			url: `http://localhost:3000/api/friends/${this.get('id')}`,
 			type: 'PUT',
 			success: () => {
-				this.set('relation_to_user', 'eifjeis');
-				toasts.notifySuccess(`${this.get('login')} is now your friend.`);
+				this.set('relation_to_user', 'friends');
+				if (this.get('login'))
+					toasts.notifySuccess(`${this.get('login')} is now your friend.`);
+				else
+					toasts.notifySuccess(`You have a new friend!`);
+				window.currentUser.fetch();
 			},
 			error: err => {
 				console.log(err);
