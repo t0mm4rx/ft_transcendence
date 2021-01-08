@@ -119,9 +119,9 @@ window.liveGames.add(
   })
 );
 
-window.currentMessages = new ChannelMessages();
+// window.currentMessages = new ChannelMessages({ channel_id: 1 });
 window.chat = new Chat();
-window.chat.fetch();
+// window.chat.fetch();
 
 window.notifications = new NotificationCollection();
 window.notifications.add(

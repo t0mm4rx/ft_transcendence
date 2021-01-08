@@ -2,17 +2,12 @@
 Chat is the collection of all the channels of the user. */
 import Backbone from "backbone";
 
-const Channel = Backbone.Model.extend({
-  initialize: function () {
-    this.channel_id = 3;
-  },
-  url: function () {
-    // return `http://localhost:3000/api/channels/2/messages`;
-    return `http://localhost:3000/api/channels/${this.channel_id}/messages`;
-  },
-});
+const Channel = Backbone.Model.extend({});
 
 const Chat = Backbone.Collection.extend({
+  initialize() {
+    this.fetch();
+  },
   model: Channel,
   url: "http://localhost:3000/api/channels/",
 });
@@ -20,11 +15,11 @@ const Chat = Backbone.Collection.extend({
 const Message = Backbone.Model.extend({});
 
 const ChannelMessages = Backbone.Collection.extend({
-  initialize: function () {
-    this.channel_id = 3;
+  initialize(props) {
+    this.channel_id = props.channel_id;
   },
   model: Message,
-  url: function () {
+  url() {
     return `http://localhost:3000/api/channels/${this.channel_id}/messages`;
   },
 });
