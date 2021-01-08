@@ -46,15 +46,7 @@ export default Backbone.View.extend({
       $("#chat-panel").addClass("chat-panel-open");
     },
     "click .chat-channel": function (el) {
-      let find = null;
-      this.model.forEach((item) => {
-        if (item.attributes.name === el.target.innerText) find = item;
-      });
-      this.currentChat = find;
-      this.currentMessages.channel_id = this.currentChannelId = find.id;
-      this.ftsocket = this.newSocket(this.currentChannelId);
-      this.currentMessages.fetch();
-      this.renderChannels();
+      this.selectChannel(el.currentTarget.innerText);
     },
     "keyup #chat-input": "keyPressEventHandler",
 	"keyup #channel-input": "keyPressEventHandler",
@@ -176,8 +168,9 @@ export default Backbone.View.extend({
       type: "POST",
       data: `name=${input}`,
     });
-    request.done(function (data) {
-      window.chat.fetch();
+    request.done(data => {
+	  window.chat.fetch();
+	  setTimeout(() => this.selectChannel(input), 500);
     });
   },
   autocomplete () {
@@ -198,5 +191,18 @@ export default Backbone.View.extend({
   },
   closeAutocomplete() {
 	setTimeout(() => $("#autocomplete-container").hide(), 100);
+  },
+  selectChannel(channel) {
+	let find = null;
+	this.model.forEach((item) => {
+	  if (item.attributes.name === channel) find = item;
+	});
+	if (!find)
+		return;
+	this.currentChat = find;
+	this.currentMessages.channel_id = this.currentChannelId = find.id;
+	this.ftsocket = this.newSocket(this.currentChannelId);
+	this.currentMessages.fetch();
+	this.renderChannels();
   }
 });
