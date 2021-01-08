@@ -7,8 +7,9 @@ module Api
 		#Channel.cu_channels(current_user)
 		@channels = current_user.channels.order(:direct);
 
-		render json: {}, status: :created
+		render json: @channels 
 	end
+
 	# GET /channels/1
 	def show
 		render json: @channel
@@ -20,8 +21,8 @@ module Api
 		@channel = Channel.new(channel_params)
 		if User.where(login: params[:name])
 			@channel.direct = true
-		end
-		if @channel.password.empty?
+			@channel.name = "DM:#{params[:name]}:#{current_user.login}"
+		elsif @channel.password.empty?
 			@channel.private = false
 			@channel.public = true
 			@channel.direct = false
