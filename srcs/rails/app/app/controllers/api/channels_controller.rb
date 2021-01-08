@@ -5,14 +5,14 @@ module Api
 	def index
 	#	@channels = Channel.all
 		#Channel.cu_channels(current_user)
-		render json: current_user.channels
+		@channels = current_user.channels.order(:direct);
+
+		render json: {}, status: :created
 	end
 	# GET /channels/1
 	def show
 		render json: @channel
 	end
-
-
 
 	# POST /channels
 	#if channel name == login name then its a direct channel
@@ -68,7 +68,7 @@ module Api
 		end
 
 		if error
-			render json: error = {error: error}.to_json, status: :unprocessable_entity
+			render json: { error: error }, status: :unprocessable_entity
 		else
 			render json: @channel
 		end
@@ -76,7 +76,12 @@ module Api
 
 	# DELETE /channels/1
 	def destroy
-		@channel.destroy
+		# @channel = Channel.find(params[:id])
+		# if @channel.destroy
+		# 	render json: {}
+		# else
+		# 	render json: { @channel.errore }
+		# end
 	end
 
 	private
