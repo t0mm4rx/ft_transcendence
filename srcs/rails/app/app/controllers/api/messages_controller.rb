@@ -43,7 +43,6 @@ module Api
 
 	def check_ban
 		@cu = @channel.channel_users.find_by(user_id: current_user.id) rescue nil
-		p @cu
 		if @cu.ban_date != nil && @cu != nil
 			if @cu.ban_date > DateTime.now
 				return render json: error = {error: "You are ban until #{@cu.ban_date}"}.to_json, status: :forbidden
