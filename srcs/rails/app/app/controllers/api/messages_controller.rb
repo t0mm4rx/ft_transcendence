@@ -4,9 +4,6 @@ module Api
 	before_action :validate_user
 
 	def index
-		unless @channel.users.find(current_user.id) 
-			return render json: {}, status: :unauthorized
-		end
 		render json: @channel.messages
 	end
 
@@ -30,14 +27,16 @@ module Api
 
 	def validate_user
 		password = params.fetch('password', "")
-		puts "VALIDATE USER"
-		p password 
-		p @channel.password
-		if !@channel.private || @channel.password == password
-			Channel.channel_user_creation(@channel.id, current_user.id)
+		user_registered = @channel.users.find(current_user.id) rescue nil
+		unless user_registered 
+			if !@channel.private || @channel.password == password
+				Channel.channel_user_creation(@channel.id, current_user.id)
+			else
+				return render json: {}, status: :unauthorized
+			end
 		end
 	end
-
+	
 	def message_params
 		params.permit(:body).merge(user: current_user) #force the user to be the current user to avoid using other account to send messages
 	end

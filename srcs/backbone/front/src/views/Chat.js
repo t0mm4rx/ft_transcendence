@@ -111,6 +111,23 @@ export default Backbone.View.extend({
       $("#chat-chat").append(template(chatJson));
     }
   },
+  // changeChannel(id) {
+  //   const prevId = this.currentChat.id;
+  //   const newChannel = this.model.get(id);
+  //   if (newChannel === this.currentChat) return;
+  //   if (this.currentChat) {
+  //     $(`#${this.currentChat.id}.chat-channel`).removeClass("channel-current");
+  //   }
+  //   $(`#${id}.chat-channel`).addClass("channel-current");
+  //   this.currentChat = this.model.get(id);
+  //   this.renderChannel();
+  //   this.currentMessages = new ChannelMessages({ channel_id: id });
+  //   if (!this.channelView) {
+  //     this.channelView = new ChannelView({ model: this.currentMessages });
+  //   } else if (!this.channelView.changeChannel(id) && prevId) {
+  //     this.channelView.changeChannel(prevId);
+  //   }
+  // },
   changeChannel(id) {
     const newChannel = this.model.get(id);
     if (newChannel === this.currentChat) return;
@@ -143,16 +160,18 @@ export default Backbone.View.extend({
     if (existing) {
       this.changeChannel(existing.get("id"));
     } else {
-      const channel = this.model.add({ name: name, password: password });
-      channel.save(null, {
-        success() {
+      const request = $.ajax({
+        url: `http://localhost:3000/api/channels/`,
+        type: "POST",
+        data: `name=${name}&password=${password}`,
+      });
+      request.done((data) => {
+        console.log("REQUEST DATA", data);
+        window.chat.fetch();
+        setTimeout(() => {
+          this.changeChannel(data.id);
           toasts.notifySuccess("The channel has been created.");
-          this.model.fetch();
-        },
-        error(model, response) {
-          toasts.notifyError("Channel could not be created.");
-          console.log(model, response);
-        },
+        }, 200);
       });
     }
   },

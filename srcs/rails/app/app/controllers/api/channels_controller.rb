@@ -6,7 +6,7 @@ module Api
 		# @channels = Channel.all.order(:direct);
 		@public = Channel.where(public: true, direct: false);
 		@private = Channel.where(public: false, direct: false);
-		@dms = Channel.where(direct: true);
+		@dms = current_user.channels.where(direct: true);
 		@channels =  @public +  @private + @dms 
 
 		# @channels = {

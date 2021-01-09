@@ -6,6 +6,7 @@ import $ from "jquery";
 import _ from "underscore";
 import { showModal } from "../utils/modal";
 import { ChannelMessages } from "../models/Channels";
+import toasts from "../utils/toasts";
 
 export default Backbone.View.extend({
   initialize() {
@@ -22,6 +23,7 @@ export default Backbone.View.extend({
       data: { password: password },
       success: () => {
         this.newSocket(this.model.channel_id);
+        // return true;
       },
       error: () => {
         showModal(
@@ -30,10 +32,13 @@ export default Backbone.View.extend({
           () => {
             const password = $("#new-channel-password").val();
             this.listenOnChannel(password);
+            // if (!password && !this.listenOnChannel(password))
+            //   toasts.notifyError("Bad password");
             return true;
           },
           () => {}
         );
+        // return false;
       },
     });
   },
@@ -78,7 +83,7 @@ export default Backbone.View.extend({
       url: `http://localhost:3000/api/channels/${this.model.channel_id}/messages/`,
       type: "POST",
       data: `body=${input}`,
-    });
+    }).fail(() => toasts.notifyError("Message could not be sent"));
   },
   newSocket(channel_id) {
     this.ftsocket = new FtSocket({

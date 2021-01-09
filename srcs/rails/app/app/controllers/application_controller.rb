@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::API
-	rescue_from ActiveRecord::RecordNotFound, with: :not_found
-	rescue_from ActiveRecord::RecordNotDestroyed, with: :not_destroyed
-	rescue_from ActiveRecord::RecordNotUnique, with: :not_unique
+	# rescue_from ActiveRecord::RecordNotFound, with: :not_found
+	# rescue_from ActiveRecord::RecordNotDestroyed, with: :not_destroyed
+	# rescue_from ActiveRecord::RecordNotUnique, with: :not_unique
 
 	before_action :authenticate_request
 	attr_reader :current_user
