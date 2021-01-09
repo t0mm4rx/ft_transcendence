@@ -39,15 +39,19 @@ class ChannelUsersController < ApplicationController
 		#format param date = (yyyymmdd)
 		elsif params.has_key?(:mute)
             @target = ChannelUser.find_by(user_id: params[:mute])
-            if @target != nil && @admin != nil && @admin.admin == true
+			if @target != nil && @target.owner == true
+				error = "Slow down bro, you cannot mute the owner"
+			elsif @target != nil && @admin != nil && @admin.admin == true
 				@target.mute_date = params[:end]
             else
                 error = "Only channel's admin can mute someone"
             end
 
 		elsif params.has_key?(:ban)
-            @target = ChannelUser.find_by(user_id: params[:ban])
-            if @target != nil && @admin != nil && @admin.admin == true
+			@target = ChannelUser.find_by(user_id: params[:ban])
+			if @target != nil && @target.owner == true
+				error = "Slow down bro, you cannot ban the owner"
+            elsif @target != nil && @admin != nil && @admin.admin == true
                 @target.ban_date = params[:end]
             else
                 error = "Only channel's admin can ban someone"

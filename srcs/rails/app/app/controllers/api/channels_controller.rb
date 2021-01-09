@@ -7,10 +7,10 @@ module Api
 		@public = Channel.where(public: true, direct: false);
 		@private = Channel.where(public: false, direct: false);
 		@dms = current_user.channels.where(direct: true);
-		@channels =  @public +  @private + @dms 
+		@channels =  @public +  @private + @dms
 
 		# @channels = {
-		# 	@channels = ActiveModelSerializers::SerializableResource.new(@public, 
+		# 	@channels = ActiveModelSerializers::SerializableResource.new(@public,
 		# 		{serializer: ChannelSerializer}).as_json;
 		# 	private: render json: @private, current_user: current_user.login,
 		# 	dms: render json: @dms, current_user: current_user.login
@@ -21,8 +21,12 @@ module Api
 
 	# GET /channels/1
 	def show
-		render json: @channel
+		@channel_user = current_user.channel_users.find_by(channel: @channel)
+		render json:@channel_user
 	end
+
+	#in the front add :
+	#if @last_read_at is present && message.created_at > @last_read_at create a red line
 
 	# POST /channels
 	#if channel name == login name then its a direct channel
