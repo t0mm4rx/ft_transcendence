@@ -1,8 +1,12 @@
 module Api
 	class MessagesController < ApplicationController
 	before_action :set_channel
+	before_action :validate_user
 
 	def index
+		unless @channel.users.find(current_user.id) 
+			return render json: {}, status: :unauthorized
+		end
 		render json: @channel.messages
 	end
 
@@ -22,6 +26,16 @@ module Api
 	private
 	def set_channel
 		@channel = Channel.find(params[:channel_id])  #maybe add some check like "channel = current_user.channels.find(params[:channel_id])" so only member of channel can post messages
+	end
+
+	def validate_user
+		password = params.fetch('password', "")
+		puts "VALIDATE USER"
+		p password 
+		p @channel.password
+		if !@channel.private || @channel.password == password
+			Channel.channel_user_creation(@channel.id, current_user.id)
+		end
 	end
 
 	def message_params

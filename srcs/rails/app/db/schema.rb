@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_08_132811) do
+ActiveRecord::Schema.define(version: 2021_01_08_214149) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 2021_01_08_132811) do
     t.boolean "public"
     t.boolean "private"
     t.string "password"
-    t.boolean "direct"
+    t.boolean "direct", default: false
   end
 
   create_table "friendships", force: :cascade do |t|
@@ -53,8 +53,6 @@ ActiveRecord::Schema.define(version: 2021_01_08_132811) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "player"
     t.string "opponent"
-    t.string "status"
-    t.integer "number_player"
   end
 
   create_table "guilds", force: :cascade do |t|

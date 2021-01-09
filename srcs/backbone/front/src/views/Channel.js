@@ -4,19 +4,38 @@ import template from "../../templates/chat.html";
 import { FtSocket, FtSocketCollection } from "../models/FtSocket";
 import $ from "jquery";
 import _ from "underscore";
+import { showModal } from "../utils/modal";
 import { ChannelMessages } from "../models/Channels";
 
 export default Backbone.View.extend({
   initialize() {
     this.listenTo(this.model, "sync", this.render);
     this.listenTo(this.model, "add", this.render);
-    this.newSocket(this.model.channel_id);
-    this.model.fetch();
+    this.listenOnChannel();
   },
   changeChannel(id) {
     this.model.channel_id = id;
-    this.newSocket(this.model.channel_id);
-    this.model.fetch();
+    this.listenOnChannel();
+  },
+  listenOnChannel(password) {
+    this.model.fetch({
+      data: { password: password },
+      success: () => {
+        this.newSocket(this.model.channel_id);
+      },
+      error: () => {
+        showModal(
+          "Enter password",
+          $("#channel-password-form").html(),
+          () => {
+            const password = $("#new-channel-password").val();
+            this.listenOnChannel(password);
+            return true;
+          },
+          () => {}
+        );
+      },
+    });
   },
   el: "#chat-chat",
   events: {

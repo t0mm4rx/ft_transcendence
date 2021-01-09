@@ -3,11 +3,20 @@ module Api
 	before_action :set_channel, only: [:show, :update, :destroy]
 	# GET /channels
 	def index
-	#	@channels = Channel.all
-		#Channel.cu_channels(current_user)
-		@channels = current_user.channels.order(:direct);
+		# @channels = Channel.all.order(:direct);
+		@public = Channel.where(public: true, direct: false);
+		@private = Channel.where(public: false, direct: false);
+		@dms = Channel.where(direct: true);
+		@channels =  @public +  @private + @dms 
 
-		render json: @channels 
+		# @channels = {
+		# 	@channels = ActiveModelSerializers::SerializableResource.new(@public, 
+		# 		{serializer: ChannelSerializer}).as_json;
+		# 	private: render json: @private, current_user: current_user.login,
+		# 	dms: render json: @dms, current_user: current_user.login
+		# }
+
+		render json: @channels, current_user: current_user.login
 	end
 
 	# GET /channels/1
@@ -19,20 +28,25 @@ module Api
 	#if channel name == login name then its a direct channel
 	def create
 		@channel = Channel.new(channel_params)
-		if User.where(login: params[:name])
+		if @other_user = User.find_by(login: params[:name])
 			@channel.direct = true
-			@channel.name = "DM:#{params[:name]}:#{current_user.login}"
+			@channel.name = "DM:#{@other_user.login}:#{current_user.login}"
 		elsif @channel.password.empty?
-			@channel.private = false
+			# @channel.private = false
 			@channel.public = true
-			@channel.direct = false
+			# @channel.direct = false
 		else
 			@channel.private = true
 			@channel.public = false
-			@channel.direct = false
+		# 	@channel.direct = false
 		end
+		puts "CREATE CHANNEL ###########"
+		p @channel
 	if @channel.save
 		Channel.channel_user_creation(@channel.id, current_user.id)
+		if @channel.direct
+			Channel.channel_user_creation(@channel.id, @other_user.id)
+		end
 		render json: @channel, status: :created
 	else
 		render json: @channel.errors, status: :unprocessable_entity
@@ -77,12 +91,12 @@ module Api
 
 	# DELETE /channels/1
 	def destroy
-		# @channel = Channel.find(params[:id])
-		# if @channel.destroy
-		# 	render json: {}
-		# else
-		# 	render json: { @channel.errore }
-		# end
+		@channel = Channel.find(params[:id])
+		if @channel.destroy
+			render json: {}
+		else
+			render json: { error: @channel.errors }
+		end
 	end
 
 	private

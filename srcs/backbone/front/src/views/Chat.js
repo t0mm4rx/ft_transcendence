@@ -35,7 +35,7 @@ export default Backbone.View.extend({
     "focus #channel-input": "autocomplete",
     "blur #channel-input": "closeAutocomplete",
     "click .autocomplete-item": function (event) {
-      this.newChannel(event.currentTarget.innerText);
+      this.newChannel(event.currentTarget.innerText, "");
     },
     "click #chat-title": function () {
       const login = this.currentChat.get("name");
@@ -65,7 +65,7 @@ export default Backbone.View.extend({
             toasts.notifyError("Channel name can't be empty!");
             return false;
           }
-          this.newChannel(name);
+          this.newChannel(name, password);
           return true;
         },
         () => {}
@@ -78,8 +78,18 @@ export default Backbone.View.extend({
   },
   renderChannelList() {
     const template = _.template($("#tpl-channel-list").html());
-    let channelList = "";
+    let div = `<label class="chat-channel-label">Public</label>`;
+    let channelList = ``;
+    let current = "public";
     this.model.forEach((channel) => {
+      if (channel.attributes.private && current === "public") {
+        channelList += `<hr class="chat-channel-divider">`;
+        current = "private";
+      }
+      if (channel.attributes.direct && current !== "direct") {
+        channelList += `<hr class="chat-channel-divider">`;
+        current = "direct";
+      }
       channelList += `<span class="chat-channel${
         this.currentChat === channel ? " channel-current" : ""
       }" id="${channel.id}">${channel.attributes.name}</span>`;
@@ -128,15 +138,16 @@ export default Backbone.View.extend({
     }
   },
 
-  newChannel(name) {
+  newChannel(name, password) {
     const existing = this.model.find((a) => a.get("name") === name);
     if (existing) {
       this.changeChannel(existing.get("id"));
     } else {
-      const channel = this.model.add({ name: name });
+      const channel = this.model.add({ name: name, password: password });
       channel.save(null, {
         success() {
           toasts.notifySuccess("The channel has been created.");
+          this.model.fetch();
         },
         error(model, response) {
           toasts.notifyError("Channel could not be created.");

@@ -9,6 +9,7 @@ class Channel < ApplicationRecord
 		cu = ChannelUser.create(user_id: current_user, channel_id: channel_id, owner: true, admin: true, ban_date: nil)
 	end
 
+	after_initialize :set_defaults
 	# def self.cu_channels(current_user)
 	# 	Channel.where(user_id: current_user.id)
 	# end
@@ -20,5 +21,16 @@ class Channel < ApplicationRecord
 
 	# def dm
 	# end
+
+
+
+	private
+
+    def set_defaults
+		self.direct ||= false
+		self.private ||= false
+		self.public ||= true
+		self.password ||= ""
+	end
 
 end
