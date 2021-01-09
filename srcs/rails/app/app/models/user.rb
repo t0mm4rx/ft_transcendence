@@ -34,7 +34,8 @@ class User < ApplicationRecord
 		Friendship.accepted_record?(id, user.id)
 	end
 
-	def friendship_status(user)
+	def relation_to(user)
+		return "current_user" if id == user.id
 		friendship = Friendship.find_record(id, user.id)
 		return nil if !friendship
 		return "friends" if friendship.accepted

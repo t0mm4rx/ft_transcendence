@@ -16,7 +16,7 @@ module Api
 		# 	dms: render json: @dms, current_user: current_user.login
 		# }
 
-		render json: @channels, current_user: current_user.login
+		render json: @channels
 	end
 
 	# GET /channels/1

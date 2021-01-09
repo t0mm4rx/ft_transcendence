@@ -34,7 +34,9 @@
     <% if (avatar != "") { %>
     <div class="button-icon"><i class="fas fa-gamepad"></i></div>
     <div class="button-icon"><i class="fas fa-ban"></i></div>
-    <% } %>
+    <% } else if (admin) { %>
+      <div class="button-icon"><i class="fas fa-cog"></i></div>
+     <% } %>
   </div>
   <div id="chat-messages"></div>
   <div class="chat-input">
@@ -58,6 +60,26 @@
   </div>
 </script>
 
+<script type="text/template" id="tpl-channel-form">
+  <div id="form-new-channel">
+    <% if (name) { %>
+    <div class="input-wrapper">
+      <label for="new-channel-name">Name</label>
+      <input type="text" placeholder="Channel name" id="new-channel-name" />
+    </div>
+    <% } %>
+    <div class="input-wrapper">
+      <label for="new-channel-password"><%= password %></label>
+      <input type="password" placeholder="Password" id="new-channel-password" />
+    </div>
+    <% if (checkbox) { %>
+      <div class="input-wrapper">
+        <label for="no-password">No password</label>
+        <input type="checkbox" id="no-password" />
+      </div>
+      <% } %>
+  </div>
+</script>
 <script type="text/html" id="create-channel-form">
   <div id="form-new-channel">
     <div class="input-wrapper">

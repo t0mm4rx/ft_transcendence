@@ -27,8 +27,12 @@ export default Backbone.View.extend({
       },
       error: () => {
         showModal(
-          "Enter password",
-          $("#channel-password-form").html(),
+          `Join channel`,
+          _.template($("#tpl-channel-form").html())({
+            name: "",
+            password: "Enter password",
+            checkbox: false,
+          }),
           () => {
             const password = $("#new-channel-password").val();
             this.listenOnChannel(password);

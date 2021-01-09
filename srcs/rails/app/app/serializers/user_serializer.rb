@@ -5,6 +5,6 @@ class UserSerializer < ActiveModel::Serializer
   has_many :pending_friends
   has_many :pending_requests
   def relation_to_user
-    @instance_options[:relation]
+    current_user.relation_to(self.object)
   end
 end

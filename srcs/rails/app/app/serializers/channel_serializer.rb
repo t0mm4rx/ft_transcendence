@@ -1,10 +1,12 @@
 class ChannelSerializer < ActiveModel::Serializer
-	attributes :id, :name, :private, :direct, :password #,:interlocutor
+	attributes :id, :name, :private, :direct, :password, :admin
 
+	def admin
+		current_user.admin || self.object.channel_users.find_by(user: current_user, admin: true) != nil
+	end
 	def name
 		return self.object.name unless self.object.direct
 		arr = self.object.name.split(':')
-		login = @instance_options[:current_user]
-		arr[1] === login ? arr[2] : arr[1]
+		arr[1] === current_user.login ? arr[2] : arr[1]
 	end
 end

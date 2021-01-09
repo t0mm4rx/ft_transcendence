@@ -55,7 +55,7 @@ module Api
       id = current_user.id if id == "me"
       user = User.find(id)
 
-      render json: user, relation: get_relation_to(user)
+      render json: user
     end
 
     private
@@ -74,11 +74,6 @@ module Api
         params.fetch(:limit, LIMIT_PAGINATION_MAX).to_i,
         LIMIT_PAGINATION_MAX
       ].min
-    end
-
-    def get_relation_to(user)
-      return "current_user" if user === current_user 
-      current_user.friendship_status(user)
     end
   end
 end

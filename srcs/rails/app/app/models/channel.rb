@@ -8,21 +8,15 @@ class Channel < ApplicationRecord
 	def self.channel_user_creation (channel_id, current_user)
 		cu = ChannelUser.create(user_id: current_user, channel_id: channel_id, owner: true, admin: true, ban_date: nil)
 	end
+	def self.channel_user_add (channel_id, current_user)
+		cu = ChannelUser.create(user_id: current_user, channel_id: channel_id, owner: false, admin: false, ban_date: nil)
+	end
 
 	after_initialize :set_defaults
-	# def self.cu_channels(current_user)
-	# 	Channel.where(user_id: current_user.id)
-	# end
-	# def public
-	# end
 
-	# def private
-	# end
-
-	# def dm
-	# end
-
-
+	def admins
+		users.where(admin: true)
+	end
 
 	private
 

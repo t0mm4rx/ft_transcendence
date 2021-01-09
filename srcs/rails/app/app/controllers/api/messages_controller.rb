@@ -30,7 +30,7 @@ module Api
 		user_registered = @channel.users.find(current_user.id) rescue nil
 		unless user_registered 
 			if !@channel.private || @channel.password == password
-				Channel.channel_user_creation(@channel.id, current_user.id)
+				Channel.channel_user_add(@channel.id, current_user.id)
 			else
 				return render json: {}, status: :unauthorized
 			end

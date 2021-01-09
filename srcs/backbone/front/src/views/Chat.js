@@ -31,6 +31,44 @@ export default Backbone.View.extend({
     "click .chat-channel": function (e) {
       this.changeChannel(e.target.id);
     },
+    "click .fa-cog": function () {
+      showModal(
+        "Edit channel",
+        _.template($("#tpl-channel-form").html())({
+          name: "",
+          password: "Enter new password",
+          checkbox: true,
+        }),
+        () => {
+          const password = $("#new-channel-password").val();
+          const no_pass = $("#no-password:checked").length > 0;
+          if (this.currentChat.get("private") == false && no_pass) return true;
+          if (password.length == 0 && !no_pass) {
+            toasts.notifyError("Enter a password or check the box");
+            return false;
+          }
+          const data = no_pass
+            ? `remove_password=${true}`
+            : `add_change_password=${password}`;
+          $.ajax({
+            url: `http://localhost:3000/api/channels/${this.currentChat.id}`,
+            type: "PUT",
+            data: data,
+          })
+            .done(() => {
+              toasts.notifySuccess(
+                `Password ${no_pass ? "removed" : "changed"}`
+              );
+              this.model.fetch();
+            })
+            .fail(() => {
+              toasts.notifyError("Failed to change password");
+            });
+          return true;
+        },
+        () => {}
+      );
+    },
     "keyup #channel-input": "keyPressEventHandler",
     "focus #channel-input": "autocomplete",
     "blur #channel-input": "closeAutocomplete",
@@ -57,10 +95,15 @@ export default Backbone.View.extend({
     "click #new-channel-button": function () {
       showModal(
         "Create a new channel",
-        $("#create-channel-form").html(),
+        _.template($("#tpl-channel-form").html())({
+          name: "Name",
+          password: "Password (empty for no password)",
+          checkbox: false,
+        }),
         () => {
           const name = $("#new-channel-name").val();
           const password = $("#new-channel-password").val();
+
           if (!name.length) {
             toasts.notifyError("Channel name can't be empty!");
             return false;
@@ -111,23 +154,6 @@ export default Backbone.View.extend({
       $("#chat-chat").append(template(chatJson));
     }
   },
-  // changeChannel(id) {
-  //   const prevId = this.currentChat.id;
-  //   const newChannel = this.model.get(id);
-  //   if (newChannel === this.currentChat) return;
-  //   if (this.currentChat) {
-  //     $(`#${this.currentChat.id}.chat-channel`).removeClass("channel-current");
-  //   }
-  //   $(`#${id}.chat-channel`).addClass("channel-current");
-  //   this.currentChat = this.model.get(id);
-  //   this.renderChannel();
-  //   this.currentMessages = new ChannelMessages({ channel_id: id });
-  //   if (!this.channelView) {
-  //     this.channelView = new ChannelView({ model: this.currentMessages });
-  //   } else if (!this.channelView.changeChannel(id) && prevId) {
-  //     this.channelView.changeChannel(prevId);
-  //   }
-  // },
   changeChannel(id) {
     const newChannel = this.model.get(id);
     if (newChannel === this.currentChat) return;
@@ -160,12 +186,11 @@ export default Backbone.View.extend({
     if (existing) {
       this.changeChannel(existing.get("id"));
     } else {
-      const request = $.ajax({
+      $.ajax({
         url: `http://localhost:3000/api/channels/`,
         type: "POST",
         data: `name=${name}&password=${password}`,
-      });
-      request.done((data) => {
+      }).done((data) => {
         console.log("REQUEST DATA", data);
         window.chat.fetch();
         setTimeout(() => {
