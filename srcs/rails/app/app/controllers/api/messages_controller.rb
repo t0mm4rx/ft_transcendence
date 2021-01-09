@@ -36,12 +36,17 @@ module Api
 
 	def validate_user
 		password = params.fetch('password', "")
+		join = params.fetch('join', false)
 		user_registered = @channel.users.find(current_user.id) rescue nil
 		unless user_registered
-			if !@channel.private || @channel.password == password
+			if join && (!@channel.private || @channel.password == password)
 				Channel.channel_user_add(@channel.id, current_user.id)
 			else
-				return render json: {}, status: :unauthorized
+				puts "JOIN #############################"
+				p join
+				message = "password"
+				message = "join" if join === true;
+				return render json: message, status: :unauthorized
 			end
 		end
 	end

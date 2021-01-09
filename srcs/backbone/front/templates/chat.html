@@ -67,11 +67,12 @@
       <label for="new-channel-name">Name</label>
       <input type="text" placeholder="Channel name" id="new-channel-name" />
     </div>
-    <% } %>
+    <% } if (password != "") { %>
     <div class="input-wrapper">
       <label for="new-channel-password"><%= password %></label>
       <input type="password" placeholder="Password" id="new-channel-password" />
     </div>
+    <% } %>
     <% if (checkbox) { %>
       <div class="input-wrapper">
         <label for="no-password">No password</label>

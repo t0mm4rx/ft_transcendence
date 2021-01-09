@@ -18,34 +18,32 @@ export default Backbone.View.extend({
     this.model.channel_id = id;
     this.listenOnChannel();
   },
-  listenOnChannel(password) {
+  listenOnChannel(data) {
     this.model.fetch({
-      data: { password: password },
+      data: data,
       success: () => {
         this.newSocket(this.model.channel_id);
-        // return true;
       },
-      error: (data, status) => {
-        if (status == 401) {
+      error: (data, state) => {
+        // if (!data.password) toasts.notifyError("Bad password");
+        console.log("ERROR: ", data, state);
+
+        if (state.status == 401) {
           showModal(
             `Join channel`,
             _.template($("#tpl-channel-form").html())({
               name: "",
-              password: "Enter password",
+              password: state.responseText == "join" ? "" : "Enter password",
               checkbox: false,
             }),
             () => {
               const password = $("#new-channel-password").val();
-              this.listenOnChannel(password);
-              // if (!password && !this.listenOnChannel(password))
-              //   toasts.notifyError("Bad password");
+              this.listenOnChannel({ password: password, join: true });
               return true;
             },
             () => {}
           );
-          // return false;
         } else {
-          toasts.notifyError(data.error);
         }
       },
     });
