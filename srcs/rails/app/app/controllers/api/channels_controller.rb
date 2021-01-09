@@ -65,7 +65,7 @@ module Api
 
 	# PATCH/PUT /channels/1
 	def update
-		@cu = ChannelUser.find_by(user_id: current_user.id)
+		@cu = @channel.channel_users.find_by(user_id: current_user.id)
 		if params.has_key?(:remove_password)
 			if @cu != nil && @cu.owner == true
 				@channel.public = true
