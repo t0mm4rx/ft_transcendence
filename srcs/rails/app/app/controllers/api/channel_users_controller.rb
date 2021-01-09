@@ -25,10 +25,10 @@ class ChannelUsersController < ApplicationController
 	# PATCH/PUT /channels/:channel_id/:user_id
 	#http://localhost:3000/api/channels/:channel_id/channel_users/?add_admin=user_id
 	def update
-        @admin = ChannelUser.find_by(user_id: current_user.id)
-
+		@admin = @channel.channel_users.find_by(user_id: current_user.id)
+		
 		if params.has_key?(:add_admin)
-            @target = ChannelUser.find_by(user_id: params[:add_admin])
+            @target = @channel.channel_users.find_by(user_id: params[:add_admin])
             if @target != nil && @admin != nil && @admin.owner == true
                 @target.admin = true
                 @target.save
@@ -38,7 +38,7 @@ class ChannelUsersController < ApplicationController
 
 		#format param date = (yyyymmdd)
 		elsif params.has_key?(:mute)
-            @target = ChannelUser.find_by(user_id: params[:mute])
+            @target = @channel.channel_users.find_by(user_id: params[:mute])
 			if @target != nil && @target.owner == true
 				error = "Slow down bro, you cannot mute the owner"
 			elsif @target != nil && @admin != nil && @admin.admin == true
@@ -48,7 +48,7 @@ class ChannelUsersController < ApplicationController
             end
 
 		elsif params.has_key?(:ban)
-			@target = ChannelUser.find_by(user_id: params[:ban])
+			@target = @channel.channel_users.find_by(user_id: params[:ban])
 			if @target != nil && @target.owner == true
 				error = "Slow down bro, you cannot ban the owner"
             elsif @target != nil && @admin != nil && @admin.admin == true

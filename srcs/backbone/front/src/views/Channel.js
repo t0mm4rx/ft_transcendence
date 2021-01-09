@@ -25,24 +25,28 @@ export default Backbone.View.extend({
         this.newSocket(this.model.channel_id);
         // return true;
       },
-      error: () => {
-        showModal(
-          `Join channel`,
-          _.template($("#tpl-channel-form").html())({
-            name: "",
-            password: "Enter password",
-            checkbox: false,
-          }),
-          () => {
-            const password = $("#new-channel-password").val();
-            this.listenOnChannel(password);
-            // if (!password && !this.listenOnChannel(password))
-            //   toasts.notifyError("Bad password");
-            return true;
-          },
-          () => {}
-        );
-        // return false;
+      error: (data, status) => {
+        if (status == 401) {
+          showModal(
+            `Join channel`,
+            _.template($("#tpl-channel-form").html())({
+              name: "",
+              password: "Enter password",
+              checkbox: false,
+            }),
+            () => {
+              const password = $("#new-channel-password").val();
+              this.listenOnChannel(password);
+              // if (!password && !this.listenOnChannel(password))
+              //   toasts.notifyError("Bad password");
+              return true;
+            },
+            () => {}
+          );
+          // return false;
+        } else {
+          toasts.notifyError(data.error);
+        }
       },
     });
   },
