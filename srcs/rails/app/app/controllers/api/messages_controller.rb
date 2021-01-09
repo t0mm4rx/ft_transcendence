@@ -1,6 +1,7 @@
 module Api
 	class MessagesController < ApplicationController
 	before_action :set_channel
+	#before_action :check_ban
 	before_action :validate_user
 
 	def index
@@ -9,7 +10,8 @@ module Api
 
 	def create
 		#Channel.channel_user_creatio(@channel.id, current_user.id)
-		@cu = ChannelUser.find_by(user_id: current_user.id)
+		#@cu = ChannelUser.find_by(user_id: current_user.id)
+		@cu = @channel.channel_users.find_by(user_id: current_user.id)
 		if @cu.mute_date != nil && @cu != nil
 			if @cu.mute_date > DateTime.now
 				return render json: error = {error: "You are mute until #{@cu.mute_date}"}.to_json
@@ -40,6 +42,16 @@ module Api
 				Channel.channel_user_add(@channel.id, current_user.id)
 			else
 				return render json: {}, status: :unauthorized
+			end
+		end
+	end
+
+	def check_ban
+		@cu = @channel.channel_users.find_by(current_user.id) rescue nil
+		p @cu
+		if @cu.ban_date != nil && @cu != nil
+			if @cu.ban_date > DateTime.now
+				return render json: error = {error: "You are ban until #{@cu.ban_date}"}.to_json, status: :forbidden
 			end
 		end
 	end
