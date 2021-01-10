@@ -10,6 +10,8 @@ class User < ApplicationRecord
 	has_many :channels, through: :channel_users
 	has_many :messages, dependent: :destroy
 
+	has_many :blocked_users, dependent: :destroy
+
 	belongs_to :guild, optional: true
 
 	validates :username, presence: true, length: { minimum:2, maximum: 30}, uniqueness: { case_sensitive: false }
