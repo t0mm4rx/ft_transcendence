@@ -1,8 +1,9 @@
 module Api
 	class BlockedUsersController < ApplicationController
 		def index
-			@blocked_list = BlockedUser.where("user_id = ?", current_user.id).and(BlockedUser.where.not(target_id: nil))
-			render json: @blocked_list
+			# @blocked_list = BlockedUser.cu_blocked_list(current_user)
+			# render json: @blocked_list
+			render json: current_user.blocked_ids
 		end
 
 		def create

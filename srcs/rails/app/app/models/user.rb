@@ -10,7 +10,7 @@ class User < ApplicationRecord
 	has_many :channels, through: :channel_users
 	has_many :messages, dependent: :destroy
 
-	has_many :blocked_users, dependent: :destroy
+	has_many :blocked, class_name: 'BlockedUser', dependent: :destroy
 
 	belongs_to :guild, optional: true
 

@@ -5,7 +5,18 @@ module Api
 	before_action :validate_user
 
 	def index
-		render json: @channel.messages
+		@blocked_list = BlockedUser.cu_blocked_list(current_user)
+		puts "LIST BLOCKED LIST IN MESSAGE INDEX ##############################################################"
+		current_user.blocked_ids
+		# @msgs = @channel.messages
+		# @msg_clean = @msgs.select { |msg| msg.user_id != current_user.blocked_ids }
+		# #p @msgs.user_id
+		# p @messages.user_id
+		puts "LIST BLOCKED  =======================##############################################################"
+		p current_user.blocked_ids
+		p @new_msg = Message.where.not(user_id: current_user.blocked_ids)
+		#render json: @channel.messages
+		render json: @new_msg
 	end
 
 	def create
@@ -58,6 +69,5 @@ module Api
 	def message_params
 		params.permit(:body, :channel_id).merge(user: current_user) #force the user to be the current user to avoid using other account to send messages
 	end
-
-	end
+end
 end
