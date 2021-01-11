@@ -10,10 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_08_214149) do
+ActiveRecord::Schema.define(version: 2021_01_10_120701) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "blocked_users", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "target_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_blocked_users_on_user_id"
+  end
 
   create_table "channel_users", force: :cascade do |t|
     t.bigint "channel_id", null: false
@@ -90,6 +98,7 @@ ActiveRecord::Schema.define(version: 2021_01_08_214149) do
     t.index ["guild_id"], name: "index_users_on_guild_id"
   end
 
+  add_foreign_key "blocked_users", "users"
   add_foreign_key "channel_users", "channels"
   add_foreign_key "channel_users", "users"
   add_foreign_key "friendships", "users"

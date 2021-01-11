@@ -8,8 +8,8 @@ Rails.application.routes.draw do
     resources :users do
       resources :friends, controller: 'friendships', only: :index
     end
+    resources :blocked, controller: 'blocked_users'#, only: [:index, :create, :destroy]
     resources :friends, controller: 'friendships', only: [:create, :update, :destroy]
-
     resources :logintra, only: :index
     resources :accessintra, only: :index
     post 'authenticate', to: 'authentication#authenticate'
