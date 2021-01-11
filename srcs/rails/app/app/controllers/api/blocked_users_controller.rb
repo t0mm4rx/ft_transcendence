@@ -1,9 +1,8 @@
 module Api
 	class BlockedUsersController < ApplicationController
 		def index
-			# @blocked_list = BlockedUser.cu_blocked_list(current_user)
-			# render json: @blocked_list
-			render json: current_user.blocked_ids
+			targets = BlockedUser.blocked_list(current_user)
+			render json: targets
 		end
 
 		def create
