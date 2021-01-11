@@ -31,6 +31,12 @@ gem 'active_model_serializers'
 #easier library to handle than the included one
 gem 'httparty'
 
+# Two Factor Authentication (TFA) made simple
+gem 'active_model_otp'
+
+#The Ruby One Time Password Library
+gem 'rotp'
+
 #easy way to create service
 gem 'simple_command'
 
