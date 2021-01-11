@@ -9,7 +9,7 @@
 				<span>on the ladder</span>
 			</div>
 			<div id="user-name-container">
-				<span><%= data.username || "..." %></span>
+				<span <%= data.relation_to_user === "current_user" ? "class=\"user-editable-field\"" : "" %>><%= data.username || "..." %><%= data.relation_to_user === "current_user" ? "<div class=\"button-icon\" id=\"edit-username\"><i class=\"fas fa-user-edit\"></i></div>" : "" %></span>
 				<div id="user-name-buttons">
 					<% if (!data.relation_to_user) { %><div id="user-add-friend" class="button-icon"><i class="fas fa-user-plus"></i></div> <% } %>
 					<div class="button-icon"><i class="fas fa-gamepad"></i></div>

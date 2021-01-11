@@ -4,20 +4,41 @@ import $ from 'jquery';
 import template from '../../templates/user.html';
 import { User } from '../models/User';
 import _ from 'underscore';
+import {showModal} from '../utils/modal';
+import toasts from '../utils/toasts';
 
 export default Backbone.View.extend({
 	el: "#page",
 	events: {
 		'click #user-friend-badge': function () {
-			if (confirm(`Are your sure you want to unfriend ${this.user.get('username')} ?`)) {
+			showModal(`Are your sure you want to unfriend ${this.user.get('username')} ?`, "", () => {
 				this.user.unfriend();
-			}
+				return true;
+			}, () => {});
 		},
 		'click #user-add-friend': function () {
 			this.user.askFriend();
 		},
 		'click .message-button': function (event) {
 			$(document).trigger('chat', {chat: event.currentTarget.id.split('-')[1]});
+		},
+		'click #edit-username': function () {
+			showModal(`Edit your display name`, 
+			`<div id="user-modal-edit"><div class="input-wrapper">
+				<span>Display name</span>
+				<input type="text" placeholder="AwesomeBob" id="display-name-input" value="${this.user.get('username')}" />
+			</div></div>`, () => {
+				const value = $("#display-name-input").val();
+				if (value.length === 0) {
+					toasts.notifyError("The display name cannot be empty.");
+					return false;
+				}
+				if (value === this.user.get("username")) {
+					return true;
+				}
+				this.user.save('username', value);
+				return true;
+			}, () => {});
 		}
 	},
 	initialize: function (options) {

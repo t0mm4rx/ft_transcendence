@@ -146,6 +146,24 @@
 			}
 		}
 	}
+	.user-editable-field {
+		position: relative;
+		cursor: pointer;
+		> .button-icon {
+			position: absolute;
+			left: 0px;
+			top: 50%;
+			transform: translate(0px, -50%) scale(0);
+			opacity: 0;
+			transition: .3s all ease;
+		}
+	}
+	.user-editable-field:hover {
+		> .button-icon {
+			transform: translate(-120%, -50%) scale(1);
+			opacity: 1;
+		}
+	}
 }
 
 #user-page-bottom-container {
@@ -178,6 +196,10 @@
 			color: $red;
 		}
 	}
+}
+
+#user-modal-edit {
+	padding: 20px;
 }
 
 @keyframes avatar-animation {
