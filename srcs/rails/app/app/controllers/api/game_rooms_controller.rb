@@ -46,6 +46,12 @@ module Api
             render json: game_room.first
         end
 
+        def tmp_last_game
+            # add check if not ended
+            game_room = GameRoom.last
+            render json: game_room
+        end
+
         private
 
         # Set GameRoom param
@@ -55,5 +61,6 @@ module Api
             # permit() : set the autorized parameter
             params.require(:game_room).permit(:player, :opponent, :status, :number_player)
         end
+
     end
 end

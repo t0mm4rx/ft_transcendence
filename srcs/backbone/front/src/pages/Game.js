@@ -7,6 +7,7 @@ import p5 from 'p5';
 import {Game, GameCollection} from '../models/Game';
 import GameCanvas from '../views/GameCanvas';
 import {FtSocket, FtSocketCollection} from '../models/FtSocket'
+import { generateUUID } from '../utils/uuid'
 
 export default Backbone.View.extend({
 	el: "#page",
@@ -27,7 +28,7 @@ export default Backbone.View.extend({
 	 */
 	initialize: function()
 	{
-		this.self = this;
+		this.listenTo(window.currentUser, 'change', this.render);
 	},
 
 	/**
@@ -44,8 +45,7 @@ export default Backbone.View.extend({
 			this.findNormal();
 		},
 		'click #change-user' : function() {
-			window.currentUser.attributes.id = 589;
-			window.currentUser.attributes.displayName = "Mathis";
+			window.currentUser.set({id: 589, username: 'Mathis'});
 		},
 		'end_game' : function(event, info)
 		{
@@ -188,13 +188,17 @@ export default Backbone.View.extend({
 	waitOpponent: function(self, panel, game_infos)
 	{
 		// Create new socket between frontend and backend
-		self.ftsocket = new FtSocket({id: game_infos.id, channel: 'GameRoomChannel'});
+		self.ftsocket = new FtSocket({
+			id: game_infos.id,
+			channel: 'GameRoomChannel',
+			connect_type: 'normal'
+		});
 
 		self.ftsocket.sendMessage({
 			action: "whoami",
 			infos: {
-				player_id: window.currentUser.attributes.id,
-				display_name: window.currentUser.attributes.displayName
+				player_id: window.currentUser.get('id'),
+				display_name: window.currentUser.get('username')
 		}}, true, true);
 
 		/* 
@@ -210,13 +214,55 @@ export default Backbone.View.extend({
 			if (msg.type === "ping")
 				return;
 			
-			if (msg.message && msg.message.message == "everyone_ready")
+			if (msg.type === "confirm_subscription"
+				|| msg.type === "welcome")
 			{
-				// Get opponent informations
-				self.gameinfos.opponent = msg.message.content;
+				self.ftsocket.sendMessage({
+					action: "to_broadcast",
+					infos: {
+						sender: {
+							id: window.currentUser.get('id'),
+							name: window.currentUser.get('username'),
+							connection_type: "normal",
+							uuid: self.uuid
+						},
+						message: "amipresent",
+						content: {}
+				}}, true, true);
+				return;
+			}
 
-				// "Start" the game for this client.
-				self.gameFound(panel, self);
+			console.log("Message : ", msg);
+			if (msg.message)
+			{
+				if (msg.message.message == "everyone_ready")
+				{
+					// Get opponent informations
+					self.gameinfos.opponent = msg.message.content;
+
+					// "Start" the game for this client.
+					self.gameFound(panel, self);
+				}
+				else if (msg.message.message == "amipresent")
+				{
+					if (msg.message.sender.id == window.currentUser.get('id')
+						&& msg.message.sender.connection_type != "live"
+						&& msg.message.sender.uuid != self.uuid)
+					{
+						self.ftsocket.sendMessage({
+							action: "to_broadcast",
+							infos: {
+								message: "youcantbehere",
+								content: { reply_to: msg.message.sender }
+						}}, true, true);
+					}
+				}
+				else if (msg.message.message == "youcantbehere"
+					&& msg.message.content.reply_to.uuid == self.uuid)
+				{
+					self.ftsocket.closeConnection();
+					self.$el.html(template);
+				}
 			}
 		};
 	},
@@ -245,8 +291,8 @@ export default Backbone.View.extend({
 			},
 			body: JSON.stringify({
 				player: JSON.stringify({
-					name: window.currentUser.attributes.displayName,
-					id: window.currentUser.attributes.id
+					name: window.currentUser.get('username'),
+					id: window.currentUser.get('id')
 				}),
 				opponent: "",
 				status: "notstarted",
@@ -282,8 +328,8 @@ export default Backbone.View.extend({
 		* (this client because it joining).
 		*/
 		var opponent_infos = {
-			name: window.currentUser.attributes.displayName,
-			id: window.currentUser.attributes.id
+			name: window.currentUser.get('username'),
+			id: window.currentUser.get('id')
 		}
 
 		/*
@@ -311,32 +357,46 @@ export default Backbone.View.extend({
 		// Connect this client to the "game_room" socket.
 		self.ftsocket = new FtSocket({
 			id: self.gameinfos.id,
-			channel: 'GameRoomChannel'
+			channel: 'GameRoomChannel',
+			connect_type: 'normal'
 		});
 
-		self.ftsocket.sendMessage({
-			action: "whoami",
-			infos: {
-				player_id: window.currentUser.attributes.id,
-				display_name: window.currentUser.attributes.displayName
-		}}, true, true);
+		self.ftsocket.socket.onmessage = function(event) { 
+			
+			const event_res = event.data;
+			const msg = JSON.parse(event_res);
 
-		/*
-		* Send the "everyone_ready" message to the "player" (other client).
-		* "Start" the game for this client. Executed after 2 secondes to be
-		* sure that the socket is connected (and for the show).
-		*/
-		setTimeout(function() {
+			// Ignores pings.
+			if (msg.type === "ping")
+				return;
 
-			self.ftsocket.sendMessage({
-				action: "to_broadcast",
-				infos: {
-					message: "everyone_ready",
-					content: opponent_infos
-			}});
-
-			self.gameFound(panel, self);
-		}, 2000);
+			if (msg.type === "welcome" || msg.type === "confirm_subscription")
+			{
+				self.ftsocket.sendMessage({
+					action: "whoami",
+					infos: {
+						player_id: window.currentUser.get('id'),
+						display_name: window.currentUser.get('username')
+				}}, true, true);
+		
+				/*
+				* Send the "everyone_ready" message to the "player" (other client).
+				* "Start" the game for this client. Executed after 2 secondes to be
+				* sure that the socket is connected (and for the show).
+				*/
+				setTimeout(function() {
+		
+					self.ftsocket.sendMessage({
+						action: "to_broadcast",
+						infos: {
+							message: "everyone_ready",
+							content: opponent_infos
+					}});
+		
+					self.gameFound(panel, self);
+				}, 2000);
+			}
+		}
 	},
 
 	/**
@@ -351,8 +411,8 @@ export default Backbone.View.extend({
 	{
 		// This player informations.
 		var this_player = {
-			name: window.currentUser.attributes.displayName,
-			id: window.currentUser.attributes.id
+			name: window.currentUser.get('username'),
+			id: window.currentUser.get('id')
 		}
 
 		// Return value.
@@ -395,13 +455,17 @@ export default Backbone.View.extend({
 	reconnection: function(self, panel)
 	{
 		// Create new socket between frontend and backend
-		self.ftsocket = new FtSocket({id: self.gameinfos.id, channel: 'GameRoomChannel'});
+		self.ftsocket = new FtSocket({
+			id: self.gameinfos.id,
+			channel: 'GameRoomChannel',
+			connect_type: 'normal'
+		});
 
 		self.ftsocket.sendMessage({
 			action: "whoami",
 			infos: {
-				player_id: window.currentUser.attributes.id,
-				display_name: window.currentUser.attributes.displayName
+				player_id: window.currentUser.get('id'),
+				display_name: window.currentUser.get('username')
 		}}, true, true);
 
 		setTimeout(function() {
@@ -463,6 +527,11 @@ export default Backbone.View.extend({
 	 * Render this page template.
 	 */
 	render: function () {
-		this.$el.html(template);
+		if (window.currentUser.get('login'))
+		{
+			this.self = this;
+			this.uuid = generateUUID();
+			this.$el.html(template);
+		}
 	}
 });

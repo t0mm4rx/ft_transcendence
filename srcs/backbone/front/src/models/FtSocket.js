@@ -7,7 +7,7 @@ const FtSocket = Backbone.Model.extend({
      * Create a new socket between frontend (this)
      * and the backend (rails).
      * 
-     * @param {*} identifier the identifier parameters of the socket.
+     * @param {json} identifier the identifier parameters of the socket.
      * Need a 'channel' part at least.
      * (Used to setup the socket if the socket doesn"t exist).
      * (Exemple : {id: 33, channel: 'GameRoomChannel'} )
@@ -26,7 +26,7 @@ const FtSocket = Backbone.Model.extend({
         this.socket.onopen = function(event) {
 			const msg = {
 				command: 'subscribe',
-				identifier: JSON.stringify(identifier),
+                identifier: JSON.stringify(identifier)
 			};
             self.socket.send(JSON.stringify(msg));
 			console.log('[FTS] Socket to ' + identifier.channel + ' is connected.');
@@ -108,7 +108,6 @@ const FtSocket = Backbone.Model.extend({
     {
         setTimeout(
             function () {
-                console.log("Cansend = ", self.cansend);
                 if (self.cansend == true) {
                     if (callback != null){
                     callback();

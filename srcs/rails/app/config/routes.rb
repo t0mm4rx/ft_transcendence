@@ -19,6 +19,7 @@ Rails.application.routes.draw do
     resources :game_rooms, only: [:index, :create, :show, :update]
     get '/game/match_no_opponent', to: 'game_rooms#first_no_oppenent'
     post '/game/is_disconnected', to: 'game_rooms#is_diconnected'
+    get '/game/tmp_last_game', to: 'game_rooms#tmp_last_game'
 end
 
   mount ActionCable.server => '/cable'

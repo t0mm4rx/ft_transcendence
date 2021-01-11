@@ -20,42 +20,51 @@ export default Backbone.View.extend({
      */
 	initialize: function(ftsocket, gameinfos, connection_type)
 	{
-        // Base State.
-        if (connection_type == "reconnection")
-            this.state = state_enum["DISCONNECTION"];
-        else
-            this.state = state_enum["BEGIN"];
-
-        // normal, reconnection, stream
+        // normal, reconnection, live
         this.connection_type = connection_type;
-
+        
         // Game id.
         this.game_id = gameinfos.id;
 
         // This ftsocket is the ftsocket given by "Game" view.
         this.ftsocket = ftsocket;
 
-        // Here the player is this client.
-        this.player_info = 
-            (gameinfos.player.id == window.currentUser.attributes.id) 
-                ? gameinfos.player : gameinfos.opponent;
+        if (connection_type != "live")
+        {
+            // Base State.
+            if (connection_type == "reconnection")
+                this.state = state_enum["DISCONNECTION"];
+            else
+                this.state = state_enum["BEGIN"];
 
-        // Here the opponent is the opponent client.
-        this.opponent_info = 
-            (this.player_info == gameinfos.player) 
-                ? gameinfos.opponent : gameinfos.player;
+            // Here the player is this client.
+            this.player_info = 
+                (gameinfos.player.id == window.currentUser.get('id')) 
+                    ? gameinfos.player : gameinfos.opponent;
 
-        // Begin State vars
-        this.begin_date = new Date();
-        this.prev_date = new Date();
-        this.begin_count = 3;
+            // Here the opponent is the opponent client.
+            this.opponent_info = 
+                (this.player_info == gameinfos.player) 
+                    ? gameinfos.opponent : gameinfos.player;
+
+            // Begin State vars
+            this.begin_date = new Date();
+            this.prev_date = new Date();
+            this.begin_count = 3;
+
+        }
+        else if (connection_type == "live")
+        {
+            this.player_info = gameinfos.player;
+            this.opponent_info = gameinfos.opponent;
+        }
 
         // Game loop interval
         var self = this;
         this.timer = setInterval(function(){
             self.game();
         }, 1000 / 30);
-        
+
         this.render();
     },
     
@@ -68,7 +77,7 @@ export default Backbone.View.extend({
      */
     mouseMoveHandler: function (event)
     {
-        if (self.state != state_enum["DISCONNECTION"])
+        if (self.state != state_enum["DISCONNECTION"] && this.canvas && this.connection_type != "live")
         {
             // The canvas rectangle.
             let rect = this.canvas.getBoundingClientRect();
@@ -507,7 +516,8 @@ export default Backbone.View.extend({
             
             // In game state. gameUpdate() , gameRender().
             case state_enum["INGAME"]:
-                if (this.player_info.side == "left")
+                if (window.currentUser.get('id') == this.left.player.id
+                    && this.connection_type != "live")
                     this.gameUpdate();
                 this.gameRender();
                 break;
@@ -535,11 +545,12 @@ export default Backbone.View.extend({
             const msg = JSON.parse(event_res);
 
             // Ignores pings.
-            if (msg.type === "ping")
+            if (msg.type === "ping" || self.state == state_enum["END"])
                 return;
 
             if (msg.message)
             {
+                console.log("MSG ", msg.message);
                 // Update state.
                 if (msg.message.message == "update_state")
                 {
@@ -547,6 +558,98 @@ export default Backbone.View.extend({
                     if (self.state == state_enum["BEGIN"])
                         self.begin_date = new Date();
                 }
+
+                else if (msg.message.message == "need_infos"
+                    && self.connection_type == "normal")
+                {
+                    var left_values = {
+                        player: {id: self.left.player.id, name: self.left.player.name},
+                        x: self.left.x,
+                        y: self.left.y,
+                        width: self.left.width,
+                        height: self.left.height,
+                        color: self.left.color,
+                        score: self.left.score
+                    }
+
+                    var right_values = {
+                        player: {id: self.right.player.id, name: self.right.player.name},
+                        x: self.right.x,
+                        y: self.right.y,
+                        width: self.right.width,
+                        height: self.right.height,
+                        color: self.right.color,
+                        score: self.right.score
+                    }
+
+                    var ball_values = JSON.parse(JSON.stringify(self.ball));
+
+                    self.ftsocket.sendMessage({ 
+                        action: "to_broadcast", 
+                        infos: {
+                            sender: {id: window.currentUser.get('id'), connection_type: self.connection_type},
+                            message: "force_infos", 
+                            content: {
+                                left: left_values,
+                                right: right_values,
+                                ball: ball_values,
+                                state: self.state,
+                                reply_to: msg.message.sender
+                            }
+                    }}, true, true);
+                }
+
+                else if (msg.message.message == "force_infos"
+                    && (self.connection_type == "live"
+                        || self.state == state_enum["DISCONNECTION"]))
+                {
+                    if (window.currentUser.get('id') == msg.message.content.reply_to.id)
+                    {
+                        self.left = msg.message.content.left;
+                        self.right = msg.message.content.right;
+                        self.ball = msg.message.content.ball;
+                        self.state = msg.message.content.state;
+
+                        // Set the players sides to the players.
+                        self.left.player.is = self.left;
+                        self.right.player.is = self.right;
+
+                        console.log("LEFT = ", self.left);
+                        console.log("RIGHT = ", self.right);
+
+                        if ((self.connection_type != "live"
+                            && self.left.player.id == window.currentUser.get('id'))
+                            || self.left.player.id == self.player_info.id)
+                        {
+                            self.player_info.is = self.left;
+                            self.opponent_info.is = self.right;
+                        }
+                        else if ((self.connection_type != "live"
+                            && self.right.player.id == window.currentUser.get('id'))
+                            || self.right.player.id == self.opponent_info.id)
+                        {
+                            self.player_info.is = self.right;
+                            self.opponent_info.is = self.left;
+                        }
+                    }
+
+                    if (window.currentUser.get('id') == self.left.player.id
+                        && self.connection_type != "live"
+                        &&  msg.message.content.reply_to.connection_type != "live")
+                    {
+                        self.ftsocket.sendMessage({
+                            action: "to_broadcast",
+                            infos: {
+                                message: "update_state",
+                                content: {
+                                    state: state_enum["BEGIN"]
+                        }}}, true);
+                    }
+
+                    if (self.connection_type == "reconnection")
+                        self.connection_type = "normal";
+                }
+                    
                 else if (self.state != state_enum["DISCONNECTION"])
                 {
                     // Update score.
@@ -557,66 +660,40 @@ export default Backbone.View.extend({
                         else if (msg.message.content.side == "right")
                             self.right.score = msg.message.content.score;
                     }
+
                     // Update ball position.
                     else if (msg.message.message == "update_ball"
                         && self.player_info.side != "left")
                         self.ball = msg.message.content;
+
                     // Update opponent paddle position
-                    else if (msg.message.message == "update_y"
-                        && msg.message.content.player_id == self.opponent_info.id)
+                    else if (msg.message.message == "update_y")
+                    {
+                        // It's not a livestream connection
+                        if (self.connection_type != "live"
+                            && msg.message.content.player_id == self.opponent_info.id)
                             self.opponent_info.is.y = msg.message.content.y;
+
+                        // It's a livestream connection
+                        else
+                        {
+                            if (self.left && msg.message.content.player_id == self.left.player.id)
+                                self.left.y = msg.message.content.y;
+                            else if (self.right && msg.message.content.player_id == self.right.player.id)
+                                self.right.y = msg.message.content.y;
+                        }
+                    }
+
+                    // A client leave
                     else if (msg.message.message == "client_quit")
                     {
-                        self.state = state_enum["DISCONNECTION"];
                         self.disconnect_values = JSON.parse(msg.message.content);
-                        self.messageTreatment(self);
-                    }
-                }
-                else if (self.state == state_enum["DISCONNECTION"])
-                {
-                    if (msg.message.message == "need_infos"
-                        && self.player_info
-                        && msg.message.content.sender != self.player_info.id)
-                    {
-                        self.left.player.is = null;
-                        self.right.player.is = null;
-                        self.ftsocket.sendMessage({ 
-                            action: "to_broadcast", 
-                            infos: { 
-                                message: "force_infos", 
-                                content: { left: self.left, right: self.right, ball: self.ball }
-                        }}, true, true);
-                    }
-                    else if (msg.message.message == "force_infos")
-                    {
-                        self.left = msg.message.content.left;
-                        self.right = msg.message.content.right;
-                        self.ball = msg.message.content.ball;
-
-                        // Set the players sides to the players.
-                        self.left.player.is = self.left;
-                        self.right.player.is = self.right;
-
-                        if (self.left.player.id == window.currentUser.attributes.id)
+                        console.log("Message : ", msg.message);
+                        console.log("Disco value : ", self.disconnect_values);
+                        if (self.disconnect_values.connection_type != "live")
                         {
-                            self.player_info.is = self.left;
-                            self.opponent_info.is = self.right;
-                        }
-                        else if (self.right.player.id == window.currentUser.attributes.id)
-                        {
-                            self.player_info.is = self.right;
-                            self.opponent_info.is = self.left;
-                        }
-
-                        if (self.player_info.id == self.left.player.id)
-                        {
-                            self.ftsocket.sendMessage({
-                                action: "to_broadcast",
-                                infos: {
-                                    message: "update_state",
-                                    content: {
-                                        state: state_enum["BEGIN"]
-                            }}}, true);
+                            self.state = state_enum["DISCONNECTION"];
+                            self.messageTreatment(self);
                         }
                     }
                 }
@@ -687,13 +764,14 @@ export default Backbone.View.extend({
             this.right.player.is = this.right;
 
         }
-        else if (this.connection_type == "reconnection")
+        else if (this.connection_type != "normal")
         {
             this.ftsocket.sendMessage({ 
                 action: "to_broadcast", 
-                infos: { 
+                infos: {
+                    sender: {id: window.currentUser.get('id'), connection_type: self.connection_type},
                     message: "need_infos",
-                    content: { sender: this.player_info.id }
+                    content: {}
             }}, true, true);
         }
         
