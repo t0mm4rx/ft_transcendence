@@ -1,5 +1,6 @@
 class User < ApplicationRecord
-	has_secure_password
+	has_secure_password #password encryption in DB
+	has_one_time_password #TFA
 
 	has_many :pending_friends, -> {where accepted: false}, class_name: 'Friendship'
 	has_many :pending_requests, -> {where accepted: false}, class_name: 'Friendship', foreign_key: "friend_id"
@@ -23,7 +24,7 @@ class User < ApplicationRecord
 	end
 
 	def friends
-		friendships_.filter_map do |friendship|  
+		friendships_.filter_map do |friendship|
 			if friendship.accepted
 				friendship.user_id == id ? friendship.friend : friendship.user
 			end
@@ -62,5 +63,6 @@ class User < ApplicationRecord
 		self.admin ||= false
 		self.online ||= false
 		self.avatar_url ||= "https://cdn.intra.42.fr/users/small_#{self.login}.jpg"
+		self.tfa ||= false
 	end
 end
