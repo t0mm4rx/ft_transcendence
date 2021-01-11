@@ -72,7 +72,7 @@ export default Backbone.View.extend({
 						player: searchResult.player,
 						opponent: searchResult.opponent,
 						status: "ended",
-						number_player: searchResult.number_player
+						number_player: 0
 					})
 				});
 
@@ -458,7 +458,7 @@ export default Backbone.View.extend({
 		self.ftsocket = new FtSocket({
 			id: self.gameinfos.id,
 			channel: 'GameRoomChannel',
-			connect_type: 'normal'
+			connect_type: 'reconnection'
 		});
 
 		self.ftsocket.sendMessage({
@@ -468,9 +468,69 @@ export default Backbone.View.extend({
 				display_name: window.currentUser.get('username')
 		}}, true, true);
 
-		setTimeout(function() {
+		var timeout = setTimeout(function() {
 			self.startGame(panel, self, "reconnection");
-		}, 1000);
+		}, 2000);
+
+		/* 
+		* Setup the socket to catch "everyone_ready" message to
+		* start the game.
+		*/
+		self.ftsocket.socket.onmessage = function(event) { 
+			
+			const event_res = event.data;
+			const msg = JSON.parse(event_res);
+
+			// Ignores pings.
+			if (msg.type === "ping")
+				return;
+			
+			if (msg.type === "confirm_subscription"
+				|| msg.type === "welcome")
+			{
+				self.ftsocket.sendMessage({
+					action: "to_broadcast",
+					infos: {
+						sender: {
+							id: window.currentUser.get('id'),
+							name: window.currentUser.get('username'),
+							connection_type: "normal",
+							uuid: self.uuid
+						},
+						message: "amipresent",
+						content: {}
+				}}, true, true);
+				return;
+			}
+
+			console.log("Message : ", msg);
+			if (msg.message)
+			{
+				if (msg.message.message == "amipresent")
+				{
+					if (msg.message.sender.id == window.currentUser.get('id')
+						&& msg.message.sender.connection_type != "live"
+						&& msg.message.sender.uuid != self.uuid)
+					{
+						self.ftsocket.sendMessage({
+							action: "to_broadcast",
+							infos: {
+								message: "youcantbehere",
+								content: { reply_to: msg.message.sender }
+						}}, true, true);
+					}
+				}
+				else if (msg.message.message == "youcantbehere"
+					&& msg.message.content.reply_to.uuid == self.uuid)
+				{
+					clearInterval(timeout);
+					self.ftsocket.closeConnection();
+					self.$el.html(template);
+				}
+			}
+		};
+
+
 	},
 
 	/**

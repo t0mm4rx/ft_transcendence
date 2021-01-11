@@ -559,6 +559,21 @@ export default Backbone.View.extend({
                         self.begin_date = new Date();
                 }
 
+                else  if (msg.message.message == "amipresent")
+				{
+					if (msg.message.sender.id == window.currentUser.get('id')
+						&& msg.message.sender.connection_type != "live"
+						&& msg.message.sender.uuid != self.uuid)
+					{
+						self.ftsocket.sendMessage({
+							action: "to_broadcast",
+							infos: {
+								message: "youcantbehere",
+								content: { reply_to: msg.message.sender }
+						}}, true, true);
+					}
+				}
+
                 else if (msg.message.message == "need_infos"
                     && self.connection_type == "normal")
                 {
@@ -635,7 +650,8 @@ export default Backbone.View.extend({
 
                     if (window.currentUser.get('id') == self.left.player.id
                         && self.connection_type != "live"
-                        &&  msg.message.content.reply_to.connection_type != "live")
+                        && msg.message.content.reply_to.connection_type != "live"
+                        && self.state == state_enum["DISCONNECTION"])
                     {
                         self.ftsocket.sendMessage({
                             action: "to_broadcast",
@@ -645,9 +661,15 @@ export default Backbone.View.extend({
                                     state: state_enum["BEGIN"]
                         }}}, true);
                     }
-
+                    
                     if (self.connection_type == "reconnection")
+                    {
                         self.connection_type = "normal";
+
+                        self.ftsocket.sendMessage({
+                            action: "reco_to_normal"
+                        }, true);
+                    }
                 }
                     
                 else if (self.state != state_enum["DISCONNECTION"])
@@ -690,7 +712,7 @@ export default Backbone.View.extend({
                         self.disconnect_values = JSON.parse(msg.message.content);
                         console.log("Message : ", msg.message);
                         console.log("Disco value : ", self.disconnect_values);
-                        if (self.disconnect_values.connection_type != "live")
+                        if (self.disconnect_values.connection_type == "normal")
                         {
                             self.state = state_enum["DISCONNECTION"];
                             self.messageTreatment(self);

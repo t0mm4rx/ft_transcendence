@@ -56,65 +56,63 @@ const FtSocket = Backbone.Model.extend({
             }
 
 			console.log('[FTS] Socket to ' + identifier.channel + ' is disconnected.');
-		};
+        };
+    },
 
-        console.log("[FTS] Message from server : ", msg);
-        },
+    /**
+     * Send a command of type 'message' to the backend
+     * server. 
+     * @param {json} msg_data the data of the message to send.
+     * @param {boolean} output true is print output.
+     * (Exemple: {action: "pef", content: "Hi!"}
+     *  Where : action = def "pef" in blabla_channel.rb
+     *          content = the content).
+     */
+    sendMessage: function(msg_data, output, waitco)
+    {
+        const msg = {
+            command: 'message',
+            identifier: JSON.stringify(this.identifier),
+            data: JSON.stringify(msg_data)
+        };
 
-        /**
-         * Send a command of type 'message' to the backend
-         * server. 
-         * @param {json} msg_data the data of the message to send.
-         * @param {boolean} output true is print output.
-         * (Exemple: {action: "pef", content: "Hi!"}
-         *  Where : action = def "pef" in blabla_channel.rb
-         *          content = the content).
-         */
-        sendMessage: function(msg_data, output, waitco)
+        var self = this;
+        if (waitco == true)
         {
-            const msg = {
-                command: 'message',
-                identifier: JSON.stringify(this.identifier),
-                data: JSON.stringify(msg_data)
-            };
-
-            var self = this;
-            if (waitco == true)
-            {
-                this.waitForSocketConnection(self, function()
-                    { 
-                    if (output == true)
-                        console.log("[FTS] Send message : " + JSON.stringify(msg_data));
-                        self.socket.send(JSON.stringify(msg));
-                    });
-            }
-            else
-                self.socket.send(JSON.stringify(msg));
-        },
-
-        /**
-         * Close the connection of the socket.
-         */
-        closeConnection: function()
-        {
-            console.log("[FTS] Close socket connection.");
-            this.socket.close();
-        },
-
-        waitForSocketConnection: function(self, callback)
-        {
-            setTimeout(
-                function () {
-                    if (self.cansend == true) {
-                        if (callback != null){
-                        callback();
-                        }
-                    } else {
-                        self.waitForSocketConnection(self, callback);
-                    }
-        
-                }, 5); // wait 5 milisecond for the connection...
+            this.waitForSocketConnection(self, function()
+                { 
+                if (output == true)
+                    console.log("[FTS] Send message : " + JSON.stringify(msg_data));
+                    self.socket.send(JSON.stringify(msg));
+                });
         }
+        else
+            self.socket.send(JSON.stringify(msg));
+    },
+
+    /**
+     * Close the connection of the socket.
+     */
+    closeConnection: function()
+    {
+        console.log("[FTS] Close socket connection.");
+        this.socket.close();
+    },
+
+    waitForSocketConnection: function(self, callback)
+    {
+        setTimeout(
+            function () {
+                if (self.cansend == true) {
+                    if (callback != null){
+                    callback();
+                    }
+                } else {
+                    self.waitForSocketConnection(self, callback);
+                }
+    
+            }, 5); // wait 5 milisecond for the connection...
+    }
 });
 
 const FtSocketCollection = Backbone.Collection.extend({});

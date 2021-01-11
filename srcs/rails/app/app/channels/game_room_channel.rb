@@ -1,5 +1,14 @@
 class GameRoomChannel < ApplicationCable::Channel
 
+  def reco_to_normal
+    @game_room = GameRoom.find(params[:id])
+
+    @connect_type = "normal"
+
+    last_number_player = @game_room.number_player
+    @game_room.update(number_player: last_number_player + 1)
+  end
+
   # Connect to channel
   def subscribed
     @connect_type = params[:connect_type]
@@ -8,7 +17,7 @@ class GameRoomChannel < ApplicationCable::Channel
     stream_for @game_room
 
     # use request param to know if it's player
-    if @connect_type != "live"
+    if @connect_type == "normal"
       last_number_player = @game_room.number_player
       @game_room.update(number_player: last_number_player + 1)
     end
@@ -29,11 +38,12 @@ class GameRoomChannel < ApplicationCable::Channel
     puts "AAAAAAAAAAAAAAAAAAAAAAA"
     puts "AAAAAAAAAAAAAAAAAAAAAAA"
 
-    if @connect_type != "live"
+    if @connect_type == "normal"
+
       last_number_player = @game_room.number_player
       @game_room.update(number_player: last_number_player - 1)
 
-      if @game_room.status != "notstarted" && @game_room.number_player == 0
+      if @game_room.status != "notstarted" && @game_room.number_player <= 0
         @game_room.update(status: "ended")
       end
 
