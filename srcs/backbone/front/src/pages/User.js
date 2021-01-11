@@ -4,14 +4,16 @@ import $ from 'jquery';
 import template from '../../templates/user.html';
 import { User } from '../models/User';
 import _ from 'underscore';
+import {showModal} from '../utils/modal';
 
 export default Backbone.View.extend({
 	el: "#page",
 	events: {
 		'click #user-friend-badge': function () {
-			if (confirm(`Are your sure you want to unfriend ${this.user.get('username')} ?`)) {
+			showModal(`Are your sure you want to unfriend ${this.user.get('username')} ?`, "", () => {
 				this.user.unfriend();
-			}
+				return true;
+			}, () => {});
 		},
 		'click #user-add-friend': function () {
 			this.user.askFriend();
