@@ -2,7 +2,7 @@ module Api
   class UsersController < ApplicationController
     LIMIT_PAGINATION_MAX = 20
     skip_before_action :authenticate_request, only: :create
-    
+
     def index
       # users = User.where(online: true).limit(limit).offset(params[:offset])
       # users = User.limit(limit).offset(params[:offset])
@@ -12,6 +12,7 @@ module Api
 
     def create
       user = User.new(user_params_init)
+
       if user.save
         render json: user, status: :created
       else
@@ -22,7 +23,7 @@ module Api
     def update
       user = User.find(params[:id])
       if !user
-        return render json: { error: "no such user" }, status: :not_found 
+        return render json: { error: "no such user" }, status: :not_found
       end
       unless user === current_user || current_user.admin
         return render json: {}, status: :forbidden
@@ -38,7 +39,7 @@ module Api
     def destroy
       user = User.find(params[:id])
       if !user
-        return render json: {}, status: :not_found 
+        return render json: {}, status: :not_found
       end
       unless user === current_user || current_user.admin
         return render json: {}, status: :forbidden
@@ -77,7 +78,7 @@ module Api
     end
 
     def get_relation_to(user)
-      return "current_user" if user === current_user 
+      return "current_user" if user === current_user
       current_user.friendship_status(user)
     end
   end
