@@ -47,6 +47,7 @@ const Chat = Backbone.Collection.extend({
       },
     });
   },
+  
   editChannel(data, id, success_message) {
     $.ajax({
       url: `http://localhost:3000/api/channels/${id}`,

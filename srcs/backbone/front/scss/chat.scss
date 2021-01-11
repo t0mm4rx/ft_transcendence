@@ -270,7 +270,7 @@
 
 	.autocomplete {
 		position: absolute;
-		width: auto;
+		width: 165px;
 		height: auto;
 		background-color: $grey_dark_light;
 		display: flex;
@@ -280,6 +280,10 @@
 
 		span:hover {
 			background-color: $blue;
+		}
+
+		span {
+			padding: 10px;
 		}
 	}
 

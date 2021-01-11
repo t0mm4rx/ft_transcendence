@@ -5,18 +5,18 @@ module Api
 	before_action :check_ban
 
 	def index
-		@blocked_list = BlockedUser.cu_blocked_list(current_user)
-		puts "LIST BLOCKED LIST IN MESSAGE INDEX ##############################################################"
-		current_user.blocked_ids
-		# @msgs = @channel.messages
-		# @msg_clean = @msgs.select { |msg| msg.user_id != current_user.blocked_ids }
-		# #p @msgs.user_id
-		# p @messages.user_id
-		puts "LIST BLOCKED  =======================##############################################################"
-		p current_user.blocked_ids
-		p @new_msg = Message.where.not(user_id: current_user.blocked_ids)
-		#render json: @channel.messages
-		render json: @new_msg
+		# @blocked_list = BlockedUser.cu_blocked_list(current_user)
+		# puts "LIST BLOCKED LIST IN MESSAGE INDEX ##############################################################"
+		# current_user.blocked_ids
+		# # @msgs = @channel.messages
+		# # @msg_clean = @msgs.select { |msg| msg.user_id != current_user.blocked_ids }
+		# # #p @msgs.user_id
+		# # p @messages.user_id
+		# puts "LIST BLOCKED  =======================##############################################################"
+		# p current_user.blocked_ids
+		# p @new_msg = Message.where.not(user_id: current_user.blocked_ids)
+		render json: @channel.messages
+		# render json: @new_msg
 	end
 
 	def create

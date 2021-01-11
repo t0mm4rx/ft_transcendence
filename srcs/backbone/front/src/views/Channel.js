@@ -33,7 +33,7 @@ export default Backbone.View.extend({
       messageJson.sentByLast =
         lastUser === username ? "chat-message-container-no-margin" : "";
       lastUser = username;
-      console.log(messageJson);
+      // console.log(messageJson);
 
       const html = template(messageJson);
       $("#chat-messages").append(html);

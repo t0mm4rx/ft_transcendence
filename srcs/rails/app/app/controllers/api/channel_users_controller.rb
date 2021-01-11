@@ -25,46 +25,59 @@ class ChannelUsersController < ApplicationController
 	# PATCH/PUT /channels/:channel_id/:user_id
 	#http://localhost:3000/api/channels/:channel_id/channel_users/?add_admin=user_id
 	def update
-		@admin = @channel.channel_users.find_by(user_id: current_user.id)
-		
-		if params.has_key?(:add_admin)
-            @target = @channel.channel_users.find_by(user_id: params[:add_admin])
-            if @target != nil && @admin != nil && @admin.owner == true
-                @target.admin = true
-                @target.save
-            else
-                error = "Only channel's owner can add admin"
-            end
+		@channel_user = ChannelUser.find(params[:id])
+		# @channel_user = @channel.channel_users.find_by(params[:user_id])
 
-		#format param date = (yyyymmdd)
-		elsif params.has_key?(:mute)
-            @target = @channel.channel_users.find_by(user_id: params[:mute])
-			if @target != nil && @target.owner == true
-				error = "Slow down bro, you cannot mute the owner"
-			elsif @target != nil && @admin != nil && @admin.admin == true
-				@target.mute_date = params[:end]
-            else
-                error = "Only channel's admin can mute someone"
-            end
-
-		elsif params.has_key?(:ban)
-			@target = @channel.channel_users.find_by(user_id: params[:ban])
-			if @target != nil && @target.owner == true
-				error = "Slow down bro, you cannot ban the owner"
-            elsif @target != nil && @admin != nil && @admin.admin == true
-                @target.ban_date = params[:end]
-            else
-                error = "Only channel's admin can ban someone"
-            end
+		@channel_user.update(channel_user_params)
+		if @channel_user.save
+			render json: @channel_user
+		else
+			render json: {}, status: :unprocessable_entity
 		end
-
-        if error
-            render json: error = {error: error}.to_json, status: :unprocessable_entity
-        else
-            render json: @target
-        end
-
 	end
+	# def update
+	# 	puts "UPDATE ########################################"
+	# 	p params
+	# 	@admin = @channel.channel_users.find_by(user_id: current_user.id)
+		
+	# 	if params.has_key?(:admin)
+    #         @target = @channel.channel_users.find_by(user_id: params[:admin])
+    #         if @target != nil && @admin != nil && @admin.owner == true
+    #             @target.admin = true
+    #             @target.save
+    #         else
+    #             error = "Only channel's owner can add admin"
+    #         end
+
+	# 	# format param date = (yyyymmdd)
+	# 	elsif params.has_key?(:muted)
+    #         @target = @channel.channel_users.find_by(user_id: params[:muted])
+	# 		if @target != nil && @target.owner == true
+	# 			error = "Slow down bro, you cannot mute the owner"
+	# 		elsif @target != nil && @admin != nil && @admin.admin == true
+	# 			@target.mute_date = params[:mute_date]
+    #         else
+    #             error = "Only channel's admin can mute someone"
+    #         end
+
+	# 	elsif params.has_key?(:banned)
+	# 		@target = @channel.channel_users.find_by(user_id: params[:banned])
+	# 		if @target != nil && @target.owner == true
+	# 			error = "Slow down bro, you cannot ban the owner"
+    #         elsif @target != nil && @admin != nil && @admin.admin == true
+    #             @target.ban_date = params[:mute_date]
+    #         else
+    #             error = "Only channel's admin can ban someone"
+    #         end
+	# 	end
+
+    #     if error
+    #         render json: error = {error: error}.to_json, status: :unprocessable_entity
+    #     else
+    #         render json: @target
+    #     end
+
+	# end
 
 	#add a params to delete a specific person, if its owner he's not owner anymore
 	def destroy
@@ -79,6 +92,14 @@ class ChannelUsersController < ApplicationController
 
 	def cu_params
 		params.permit(:user_id, :channel_id, :owner, :admin, :ban_date, :mute_date)
+	end
+
+	def channel_user_params
+		if @channel.channel_users.find_by(user_id: current_user.id, owner: true)
+			params.permit(:user_id, :channel_id, :owner, :admin, :ban_date, :mute_date)
+		elsif @channel.channel_users.find_by(user_id: current_user.id, admin: true)
+			params.permit(:user_id, :channel_id, :ban_date, :mute_date)
+		end
 	end
 end
 end

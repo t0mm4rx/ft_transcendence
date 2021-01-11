@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  put '/api/channels/:channel_id/channel_users/', to: 'api/channel_users#update'
   namespace :api do
     root 'users#index'
     resources :channels do
