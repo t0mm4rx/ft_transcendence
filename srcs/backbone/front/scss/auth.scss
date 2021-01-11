@@ -89,6 +89,7 @@
 	justify-content: center;
 	flex-direction: column;
 	opacity: 0;
+	overflow-y: auto;
 	#auth-register-card {
 		background-color: $grey_dark;
 		border-radius: 10px;
@@ -101,7 +102,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		img {
+		#register-avatar {
 			border-radius: 100%;
 			width: 100px;
 			height: auto;
@@ -116,12 +117,70 @@
 		.input-wrapper {
 			align-self: stretch;
 		}
+		#auth-qr-code {
+			width: 200px;
+			height: auto;
+			margin: 10px auto;
+		}
+		#auth-2fa-section {
+			position: relative;
+			margin: auto;
+			height: 0px;
+			transition: all .3s ease;
+			overflow: hidden;
+		}
+		#auth-2fa-section.qr-code-open {
+			height: auto;
+			overflow: inherit;
+		}
+		#qr-code-text {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			border-radius: 10px;
+			background-color: $blue;
+			transform: translate(90px, -50%);
+			padding: 10px;
+		}
+	}
+	#auth-2fa-inputs {
+		display: flex;
+		align-items: center;
+		> input {
+			max-width: 40px;
+			margin: 2px;
+			font-size: $xxl;
+			-webkit-appearance: none;
+			-moz-appearance: textfield;
+			text-align: center;
+		}
+		>:nth-child(3) {
+			margin-right: 30px;
+		}
+	}
+	#auth-2fa-qr-wrapper {
+		margin: 10px;
+		width: 100%;
+		display: flex;
+		justify-content: center;
 	}
 }
 
 .auth-panel-open {
 	transform: translateY(-100%);
 	opacity: 1 !important;
+}
+
+#modal-qr {
+	display: flex;
+	flex-direction: column;
+	max-width: 400px;
+	margin: auto;
+	margin: 20px 40px;
+	> img {
+		width: 400px;
+		height: 400px;
+	}
 }
 
 @keyframes bubble-animation {
