@@ -32,10 +32,12 @@
 		"js-cookie": "^2.2.1",
 		"p5": "^1.1.9",
 		"path": "^0.12.7",
+		"speakeasy": "^2.0.0",
 		"stream": "0.0.2",
 		"stream-browserify": "^3.0.0",
 		"stream-http": "^3.1.1",
 		"toastify-js": "^1.9.3",
+		"totp": "^0.0.1",
 		"underscore": "^1.12.0"
 	}
 }

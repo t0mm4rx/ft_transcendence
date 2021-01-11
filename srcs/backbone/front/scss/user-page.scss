@@ -15,13 +15,13 @@
 	display: flex;
 	flex-direction: column;
 	padding: 20px;
-	padding-top: 60px;
+	padding-top: 40px;
 	overflow: visible !important;
-	width: 80%;
+	width: 60%;
 	max-width: 800px;
 	margin-top: 50px;
 	position: relative;
-	.user-friend-badge {
+	#user-friend-badge {
 		position: absolute;
 		background-color: $blue;
 		top: 0;
@@ -32,8 +32,31 @@
 		display: flex;
 		flex-direction: row !important;
 		align-items: center !important;
+		overflow: hidden;
+		cursor: pointer;
 		> svg {
 			margin: 5px;
+		}
+		.user-friend-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: $red;
+			transform: scale(0);
+			opacity: 0;
+			transition: .3s ease all;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 10px;
+		}
+	}
+	#user-friend-badge:hover {
+		.user-friend-overlay {
+			transform: scale(1);
+			opacity: 1;
 		}
 	}
 	#top-panel-container {
@@ -83,10 +106,16 @@
 		position: absolute;
 		left: 50%;
 		top: 0;
-		transform: translate(-50%, -50%);
 		width: 100px;
 		height: 100px;
 		border-radius: 100%;
+		background-color: $grey_dark;
+		border: none;
+		transform: translate(-50%, -50%) scale(0);
+	}
+	img[src] {
+		animation: avatar-animation .3s ease;
+		transform: translate(-50%, -50%) scale(1);
 	}
 	#user-level-container {
 		width: 100%;
@@ -107,6 +136,7 @@
 				display: flex;
 				align-items: center;
 				justify-content: center;
+				transition: width .3s ease;
 			}
 			#user-progress-container-free-space {
 				flex: 1;
@@ -114,6 +144,24 @@
 				align-items: center;
 				justify-content: center;
 			}
+		}
+	}
+	.user-editable-field {
+		position: relative;
+		cursor: pointer;
+		> .button-icon {
+			position: absolute;
+			left: 0px;
+			top: 50%;
+			transform: translate(0px, -50%) scale(0);
+			opacity: 0;
+			transition: .3s all ease;
+		}
+	}
+	.user-editable-field:hover {
+		> .button-icon {
+			transform: translate(-120%, -50%) scale(1);
+			opacity: 1;
 		}
 	}
 }
@@ -127,6 +175,8 @@
 	#history-panel-container, #friends-panel-content {
 		display: flex;
 		flex-direction: column;
+		overflow: auto;
+		max-height: 100%;
 	}
 	.history-item {
 		background-color: $grey_dark_light;
@@ -145,5 +195,20 @@
 		.history-item-loss {
 			color: $red;
 		}
+	}
+}
+
+#user-modal-edit {
+	padding: 20px;
+}
+
+@keyframes avatar-animation {
+	from {
+		transform: translate(-50%, -50%) scale(0);
+		opacity: 0;
+	}
+	to {
+		transform: translate(-50%, -50%) scale(1);
+		opacity: 1;
 	}
 }

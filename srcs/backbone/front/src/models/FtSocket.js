@@ -1,5 +1,5 @@
 /* The ftsocket model and collection. */
-import Backbone from 'backbone';
+import Backbone from "backbone";
 
 const FtSocket = Backbone.Model.extend({
 
@@ -17,10 +17,10 @@ const FtSocket = Backbone.Model.extend({
         var self = this;
         this.cansend = false;
         this.identifier = identifier;
-
+        
         // Init a new socket to backend.
         // URL NEED TO BE CHANGED BY THE ACTUAL
-		this.socket = new WebSocket('ws://0.0.0.0:3000/cable');
+        this.socket = new WebSocket("ws://0.0.0.0:3000/cable");
 
         // Connect client to identifier. (Please no overload)
         this.socket.onopen = function(event) {
@@ -58,68 +58,65 @@ const FtSocket = Backbone.Model.extend({
 			console.log('[FTS] Socket to ' + identifier.channel + ' is disconnected.');
 		};
 
-        // Error appear. (Can be overloaded !)
-        this.socket.onerror = function(error) {
-			console.log('[FTS] Error from ' + identifier.channel + ':' + error);
-        };
-    },
-
-    /**
-     * Send a command of type 'message' to the backend
-     * server. 
-     * @param {json} msg_data the data of the message to send.
-     * @param {boolean} output true is print output.
-     * (Exemple: {action: "pef", content: "Hi!"}
-     *  Where : action = def "pef" in blabla_channel.rb
-     *          content = the content).
-     */
-    sendMessage: function(msg_data, output, waitco)
-    {
-        const msg = {
-            command: 'message',
-            identifier: JSON.stringify(this.identifier),
-            data: JSON.stringify(msg_data)
-        };
-
-        var self = this;
-        if (waitco == true)
-        {
-            this.waitForSocketConnection(self, function()
-                { 
-                if (output == true)
-                    console.log("[FTS] Send message : " + JSON.stringify(msg_data));
-                    self.socket.send(JSON.stringify(msg));
-                });
-        }
-        else
-            self.socket.send(JSON.stringify(msg));
+        console.log("[FTS] Message from server : ", msg);
         },
 
-    /**
-     * Close the connection of the socket.
-     */
-    closeConnection: function()
-    {
-        console.log("[FTS] Close socket connection.");
-        this.socket.close();
-    },
+        /**
+         * Send a command of type 'message' to the backend
+         * server. 
+         * @param {json} msg_data the data of the message to send.
+         * @param {boolean} output true is print output.
+         * (Exemple: {action: "pef", content: "Hi!"}
+         *  Where : action = def "pef" in blabla_channel.rb
+         *          content = the content).
+         */
+        sendMessage: function(msg_data, output, waitco)
+        {
+            const msg = {
+                command: 'message',
+                identifier: JSON.stringify(this.identifier),
+                data: JSON.stringify(msg_data)
+            };
 
-    waitForSocketConnection: function(self, callback)
-    {
-        setTimeout(
-            function () {
-                if (self.cansend == true) {
-                    if (callback != null){
-                    callback();
+            var self = this;
+            if (waitco == true)
+            {
+                this.waitForSocketConnection(self, function()
+                    { 
+                    if (output == true)
+                        console.log("[FTS] Send message : " + JSON.stringify(msg_data));
+                        self.socket.send(JSON.stringify(msg));
+                    });
+            }
+            else
+                self.socket.send(JSON.stringify(msg));
+        },
+
+        /**
+         * Close the connection of the socket.
+         */
+        closeConnection: function()
+        {
+            console.log("[FTS] Close socket connection.");
+            this.socket.close();
+        },
+
+        waitForSocketConnection: function(self, callback)
+        {
+            setTimeout(
+                function () {
+                    if (self.cansend == true) {
+                        if (callback != null){
+                        callback();
+                        }
+                    } else {
+                        self.waitForSocketConnection(self, callback);
                     }
-                } else {
-                    self.waitForSocketConnection(self, callback);
-                }
-    
-            }, 5); // wait 5 milisecond for the connection...
-    }
+        
+                }, 5); // wait 5 milisecond for the connection...
+        }
 });
 
 const FtSocketCollection = Backbone.Collection.extend({});
 
-export {FtSocket, FtSocketCollection};
+export { FtSocket, FtSocketCollection };

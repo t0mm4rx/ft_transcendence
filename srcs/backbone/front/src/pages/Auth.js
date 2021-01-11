@@ -5,11 +5,13 @@ import $ from 'jquery';
 import toasts from '../utils/toasts';
 import { User } from '../models/User';
 import { loadCurrentUser } from '../utils/globals';
+import {showModal} from '../utils/modal';
 
 export default Backbone.View.extend({
 	initialize: function () {
 		this.isAuthOpen = false;
 		this.token = null;
+		this.qr_image = "https://chart.googleapis.com/chart?cht=qr&chs=400x400&chl=otpauth://totp/Transcendence?secret=GEZDGNBVGY3TQQSYLFKA&issuer=Transcendence";
 		this.listenTo(window.currentUser, 'change', this.renderSignup);
 	},
 	el: "#page",
@@ -28,8 +30,28 @@ export default Backbone.View.extend({
 			}
 		},
 		'click #auth-2fa-button': function () {
+			this.check2fa();
 			// Here we check if the 2fa is good
-			this.login(this.token);
+			// this.login(this.token);
+		},
+		'keyup #auth-2fa-inputs > input': function (event) {
+			if ("0123456789".indexOf(event.originalEvent.key) === -1) {
+				console.log("Block");
+				event.stopPropagation();
+			} else {
+				if (event.currentTarget.nextElementSibling)
+					event.currentTarget.nextElementSibling.focus();
+			}
+		},
+		'click #auth-2fa-show-qr': function () {
+			showModal("Lost your access ?", `<div id="modal-qr"><span>Scan this qr code in Google Authenticator.</span><img src="${this.qr_image}" /></div>`, () => true, () => true);
+		},
+		'change #2fa-input': function (event) {
+			if (event.currentTarget.checked) {
+				$("#auth-2fa-section").addClass("qr-code-open");
+			} else {
+				$("#auth-2fa-section").removeClass("qr-code-open");
+			}
 		}
 	},
 	render: function () {
@@ -60,7 +82,18 @@ export default Backbone.View.extend({
 					
 				</div>
 				<div id="auth-2fa" class="auth-panel-secondary">
-					<h2>2FA process here...</h2>
+					<h2>Open the Google Authenticator app</h2>
+					<div id="auth-2fa-inputs">
+						<input type="text" id="auth-2fa-1" />
+						<input type="text" id="auth-2fa-2" />
+						<input type="text" id="auth-2fa-3" />
+						<input type="text" id="auth-2fa-4" />
+						<input type="text" id="auth-2fa-5" />
+						<input type="text" id="auth-2fa-6" />
+					</div>
+					<div id="auth-2fa-qr-wrapper">
+						<div class="button-icon" id="auth-2fa-show-qr"><i class="fas fa-qrcode"></i></div>
+					</div>
 					<span class="button" id="auth-2fa-button">Go!</span>
 				</div>
 			</div>`
@@ -71,7 +104,7 @@ export default Backbone.View.extend({
 		$("#auth-register").html(
 			`<h2>Tell us more about yourself</h2>
 			<div id="auth-register-card">
-				<img src="${window.currentUser.get('avatar_url') || ""}" />
+				<img src="${window.currentUser.get('avatar_url') || ""}" id="register-avatar"/>
 				<div class="input-wrapper">
 					<span>Display name</span>
 					<input type="text" placeholder="AwesomeBob" id="display-name-input" />
@@ -79,6 +112,10 @@ export default Backbone.View.extend({
 				<div class="checkbox-wrapper">
 					<input type="checkbox" id="2fa-input" name="2fa-input">
 					<label for="2fa-input">I want to use 2FA</label>
+				</div>
+				<div id="auth-2fa-section">
+					<img src=${this.qr_image} id="auth-qr-code" />
+					<div id="qr-code-text"><span>Scan this QR code in Google Authenticator</span></div>
 				</div>
 				<span class="button" id="auth-go-button">Go!</span>
 			</div>`
@@ -122,24 +159,29 @@ export default Backbone.View.extend({
 					return;
 				}
 
-				Cookies.set('user', token);
-				$(document).trigger('token_changed');
-				loadCurrentUser();
-
 				// Scenario 1: first user connection, we show the register panel
 				if (creation) {
+					Cookies.set('user', token);
+					$(document).trigger('token_changed');
+					loadCurrentUser();
 					$("#auth-panel").addClass("auth-panel-open");
 					$("#auth-register").addClass("auth-panel-open");
 					return;
 				}
 
 				// Scenario 2: the user is already known but has 2FA activated
-				// $("#auth-panel").addClass("auth-panel-open");
-				// $("#auth-2fa").addClass("auth-panel-open");
+				// if (!creation) {
+				// 	$("#auth-panel").addClass("auth-panel-open");
+				// 	$("#auth-2fa").addClass("auth-panel-open");
+				// }
 				
 				// Scenario 3: the user is already known and has no 2FA -> direct login
 				if (!creation) {
+					Cookies.set('user', token);
+					$(document).trigger('token_changed');
+					loadCurrentUser();
 					this.login(token);
+					return;
 				}
 
 			}
@@ -150,5 +192,14 @@ export default Backbone.View.extend({
 		$(document).trigger("token_changed");
 		loadCurrentUser();
 		window.location.hash = "/";
+	},
+	check2fa: function () {
+		let code = "";
+		for (let i = 1; i <= 6; ++i)
+			code += $(`#auth-2fa-${i}`).val();
+		if (code.length !== 6) {
+			toasts.notifyError("The code is incomplete.");
+			return;
+		}
 	}
 });

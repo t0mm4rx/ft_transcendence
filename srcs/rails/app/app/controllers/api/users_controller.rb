@@ -24,6 +24,9 @@ module Api
       if !user
         return render json: { error: "no such user" }, status: :not_found 
       end
+      unless user === current_user || current_user.admin
+        return render json: {}, status: :forbidden
+      end
       user.update(user_params_change)
       if user.save
         render json: user
@@ -33,8 +36,18 @@ module Api
     end
 
     def destroy
-      User.find(params[:id]).destroy!
-      head :no_content
+      user = User.find(params[:id])
+      if !user
+        return render json: {}, status: :not_found 
+      end
+      unless user === current_user || current_user.admin
+        return render json: {}, status: :forbidden
+      end
+      if user.destroy
+        render json: {}, status: :ok
+      elsif
+        render json: user.errors, status: :forbidden
+      end
     end
 
     def show

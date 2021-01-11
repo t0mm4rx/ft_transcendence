@@ -60,9 +60,24 @@
 	img {
 		border-radius: 100%;
 		width: 60px;
+		height: 60px;
 		margin-left: 15px;
+	}
+	img[src] {
+		animation: avatar-menu-animation .3s ease;
 	}
 	span {
 		font-size: $m;
+	}
+}
+
+@keyframes avatar-menu-animation {
+	from {
+		transform: scale(0);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1);
+		opacity: 1;
 	}
 }
