@@ -20,6 +20,8 @@ export default Backbone.View.extend({
       $("#chat-panel").addClass("chat-panel-open");
       this.newChannel(chat);
     });
+    this.currentMessages = new Channel();
+    this.channelUsers = new ChannelUsers();
   },
   model: Chat,
   el: "#chat-container",
@@ -100,13 +102,10 @@ export default Backbone.View.extend({
     this.currentChat = newChannel;
     this.renderChannel();
     if (!this.channelView) {
-      this.channelUsers = new ChannelUsers();
-      this.currentMessages = new Channel({ channel_id: id });
       this.channelView = new ChannelView({ model: this.currentMessages });
       this.editView = new EditChannelView({ model: this.channelUsers });
-    } else {
-      this.currentMessages.changeChannel(id);
     }
+    this.currentMessages.changeChannel(id);
   },
   keyPressEventHandler(event) {
     if (event.target.id == "channel-input") {
@@ -139,36 +138,16 @@ export default Backbone.View.extend({
     );
   },
   editChannel() {
-    console.log("edit channel");
-
-    this.channelUsers.loadWithId(this.currentChat.id);
-
-    // this.channel_id = props.channel_id;
-    // this.url = `http://localhost:3000/api/channels/${this.channel_id}/channel_users/`;
-    // showModal(
-    //   "Edit channel",
-    //   _.template($("#tpl-edit-channel-form").html())({
-    //     muted: "",
-    //     banned: "",
-    //   }),
-    //   () => {
-    //     const password = $("#new-channel-password").val();
-    //     const no_pass = $("#no-password:checked").length > 0;
-    //     if ((password.length > 0) ^ !no_pass) {
-    //       toasts.notifyError("Enter a password or check the box");
-    //       return false;
-    //     }
-    //     if (this.currentChat.get("private") == false && no_pass) return true;
-    //     const data = no_pass
-    //       ? `remove_password=${true}`
-    //       : `add_change_password=${password}`;
-    //     let success_message = no_pass ? "removed" : "changed";
-    //     if (this.currentChat.get("private") == false) success_message = "added";
-    //     this.model.editChannel(data, this.currentChat.id, success_message);
-    //     return true;
-    //   },
-    //   () => {}
-    // );
+    this.channelUsers.loadWithId(
+      this.currentChat.id,
+      this.currentChat.get("private")
+    );
+    this.channelUsers.fetch({
+      success: () => {
+        this.editView.render(this.currentChat.get("owner"));
+      },
+      error: () => toasts.notifyError("Failed to get channel data."),
+    });
   },
   leaveChannel() {
     if (confirm(`Are your sure you want to leave the channel?`)) {

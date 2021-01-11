@@ -5,6 +5,7 @@ import $ from "jquery";
 import toasts from "../utils/toasts";
 import { showModal } from "../utils/modal";
 import { FtSocket, FtSocketCollection } from "./FtSocket";
+import _ from "underscore";
 
 const Message = Backbone.Model.extend({});
 
@@ -13,9 +14,6 @@ const Channel = Backbone.Collection.extend({
     return `http://localhost:3000/api/channels/${this.channel_id}/messages`;
   },
   model: Message,
-  initialize(props) {
-    this.changeChannel(props.channel_id);
-  },
   changeChannel(id) {
     this.channel_id = id;
     this.load();
@@ -24,6 +22,8 @@ const Channel = Backbone.Collection.extend({
     this.fetch({
       data: auth,
       success: () => {
+        console.log("FETCHED MESSAGES FOR ", this.channel_id);
+
         this.socket(this.channel_id);
       },
       error: (data, state) => {
@@ -33,15 +33,13 @@ const Channel = Backbone.Collection.extend({
         if (state.status == 401) {
           showModal(
             `Join channel`,
-            // _.template($("#tpl-channel-form").html())({
-            //   name: "",
-            //   password: state.responseText == "join" ? "" : "Enter password",
-            //   checkbox: false,
-            // }),
-            $("#channel-password-form").html(),
+            _.template($("#tpl-join-channel-form").html())({
+              password: state.responseText == "join",
+            }),
+            // $("#channel-password-form").html(),
             () => {
               const password = $("#new-channel-password").val();
-              this.listenOnChannel({ password: password, join: true });
+              this.load({ password: password, join: true });
               return true;
             },
             () => {}

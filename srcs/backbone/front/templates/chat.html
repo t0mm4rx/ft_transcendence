@@ -86,52 +86,55 @@
 
 <script type="text/template" id="tpl-edit-channel-form">
   <div class="form-channel" id="edit">
+    <% if (owner) { %>
     <div class="input-wrapper">
       <h3>Admins</h3>
-      <div class="user-container" id="admins">
+      <div class="user-container" id="admin">
       <%= admins %>
       </div>
       <div class="input-field">
-      <input class="username-input" type="text" placeholder="Username" id="admin" />
+      <input class="username" type="text" placeholder="Username" id="admin" />
       <div class="autocomplete" id="admin"></div>
-      <div style="display: inline;" class="button" id="add-Admin">Add</div>
+      <div style="display: inline;" class="button add" id="admin">Add</div>
       </div>
     </div>
+    <% } %>
     <div class="input-wrapper">
       <h3>Muted</h3>
-      <div class="user-container">
+      <div class="user-container" id="muted">
       <%= muted %>
       </div>
       <div class="input-field">
-      <input class="username-input" type="text" placeholder="Username" id="muted" />
+      <input class="username" type="text" placeholder="Username" id="muted" />
       <div class="autocomplete" id="muted"></div>
       <label for="muted-until">until</label>
       <input type="date" id="muted-until" />
-      <div style="display: inline;" class="button" id="mute-ok">Mute</div>
+      <div style="display: inline;" class="button add" id="muted">Mute</div>
       </div>
     </div>
     <div class="input-wrapper">
       <h3>Banned</h3>
-      <div class="user-container">
+      <div class="user-container" id="banned">
       <%= banned %>
       </div>
       <div class="input-field">
-        <input class="username-input" type="text" placeholder="Username" id="banned" />
+        <input class="username" type="text" placeholder="Username" id="banned" />
         <div class="autocomplete" id="banned"></div>
         <label for="banned-until">until</label>
         <input type="date" id="banned-until" />
-        <div style="display: inline;" class="button" id="ban-ok">Ban</div>
+        <div style="display: inline;" class="button add" id="banned">Ban</div>
         </div>
     </div>
+    <% if (owner) { %>
     <div class="input-wrapper">
       <h3>Change password</h3>
       <div class="input-field">
-      <label for="new-channel-password">New password</label>
-      <input type="password" placeholder="Password" id="new-channel-password" />
+      <input type="password" placeholder="New password" id="new-channel-password" />
       <input type="checkbox" id="no-password" />
       <label for="no-password">No password</label>
       </div>
     </div>
+    <% } %>
   </div>
 </script>
 
@@ -139,7 +142,7 @@
   <div class="chat-edit user-profile" id="<%= user_id %>">
     <img id="chat-avatar" src="<%= avatar %>" />
     <span id="chat-username"><%= username %></span>
-    <div class="button-icon delete" id="<%= user_id %>"><i class="fas fa-times-circle"></i></div>
+    <div class="button-icon delete"><i class="fas fa-times-circle"></i></div>
   </div>
 </script>
 
@@ -158,11 +161,22 @@
   </div>
 </script>
 
-<script type="text/html" id="channel-password-form">
+<!-- <script type="text/html" id="channel-password-form">
   <div class="form-channel" id="enter-password">
     <div class="input-wrapper">
       <label for="new-channel-password">Password</label>
       <input type="password" placeholder="Password" id="new-channel-password" />
     </div>
+  </div>
+</script> -->
+
+<script type="text/template" id="tpl-join-channel-form">
+  <div id="form-channel">
+    <%  if (password) { %>
+    <div class="input-wrapper">
+      <label for="new-channel-password"><%= password %></label>
+      <input type="password" placeholder="Password" id="new-channel-password" />
+    </div>
+    <% } %>
   </div>
 </script>

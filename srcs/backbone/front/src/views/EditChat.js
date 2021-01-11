@@ -9,61 +9,45 @@ export default Backbone.View.extend({
   initialize() {
     this.userTemplate = _.template($("#tpl-edit-channel-form-user").html());
     this.template = _.template($("#tpl-edit-channel-form").html());
-    this.listenTo(this.model, "sync", this.render);
-    // this.listenTo(this.model, "change", this.render);
+    this.listenTo(this.model, "change", this.renderUser);
   },
   model: ChannelUsers,
   el: "body",
   events: {
-    "keyup .username-input": "keyPressEventHandler",
-    "focus .username-input": "autocomplete",
-    "blur .username-input": "closeAutocomplete",
-    "click .button#add-Admin": function () {
-      const user = this.model.addAdmin($(".username-input#admin").val());
-      $(".username-input#admin").val("");
-      $(".user-container#admins").append(this.userTemplate(user.toJSON()));
-    },
+    "keyup input.username": "keyPressEventHandler",
+    "focus input.username": "autocomplete",
+    "blur input.username": "closeAutocomplete",
     "click .autocomplete-item": function (e) {
-      const id = `.username-input#${e.target.parentNode.id}`;
+      const id = `input.username#${e.currentTarget.parentNode.id}`;
       $(id).val(e.currentTarget.innerText);
       $(id).blur();
     },
-    "click .button-icon.delete": function (e) {
-      const id = e.currentTarget.id;
-      console.log("E TARGET", e, e.currentTarget);
-
-      const type = $(e.currentTarget).parents(".user-container")[0].id;
-      this.model.remove(type, id);
-      const user = $(e.currentTarget).parents(".user-profile");
-      user.remove();
-    },
+    "click .button.add": "addToCategory",
+    "click .button-icon.delete": "removeFromCategory",
   },
-  render() {
-    const templateData = this.renderChannelUsers();
+  render(owner) {
+    const templateData = this.renderChannelUsers(owner);
     showModal(
       "Edit channel",
       this.template(templateData),
       () => {
-        const password = $("#new-channel-password").val();
-        const no_pass = $("#no-password:checked").length > 0;
-        if ((password.length > 0) ^ !no_pass) {
-          toasts.notifyError("Enter a password or check the box");
-          return false;
+        if (owner) {
+          const password = $("#new-channel-password").val();
+          const no_pass = $("#no-password:checked").length > 0;
+          if (password.length > 0 && no_pass) {
+            toasts.notifyError("Enter a password or check the box");
+            return false;
+          }
+          this.model.editPassword(password, no_pass);
         }
-        // if (this.currentChat.get("private") == false && no_pass) return true;
-        // const data = no_pass
-        //   ? `remove_password=${true}`
-        //   : `add_change_password=${password}`;
-        // let success_message = no_pass ? "removed" : "changed";
-        // if (this.currentChat.get("private") == false) success_message = "added";
-        // this.model.editChannel(data, this.currentChat.id, success_message);
+        this.model.save();
         return true;
       },
       () => {}
     );
-    $("#autocomplete-container").hide();
+    $(".autocomplete").hide();
   },
-  renderChannelUsers() {
+  renderChannelUsers(owner) {
     let htmlAdmins = "";
     this.model.where({ admin: true }).forEach((user) => {
       htmlAdmins += this.userTemplate(user.toJSON());
@@ -77,40 +61,69 @@ export default Backbone.View.extend({
       htmlBanned += this.userTemplate(user.toJSON());
     });
     return {
+      owner: owner,
       admins: htmlAdmins,
       muted: htmlMuted,
       banned: htmlBanned,
     };
   },
-  keyPressEventHandler(event) {
-    console.log("KEY EVENT");
+  renderUser(e) {
+    console.log("RENDER USER", e);
+  },
+  addToCategory(e) {
+    let date;
+    const category = e.currentTarget.id; //  admin | banned | muted
+    const username = $(`input.username#${category}`).val();
+    if (username == "") return;
+    if (category === "banned" || category === "muted") {
+      date = $(`input#${category}-until`).val();
+      $(`input#${category}-until`).val("");
+      if (!date) {
+        toasts.notifyError("Date can't be blank!");
+        return;
+      }
+    }
+    const user = this.model.addAs(category, username, date);
+    $(`input.username#${category}`).val("");
+    if (!user) {
+      toasts.notifyError("No such user");
+    } else {
+      $(`.user-container#${category}`).append(this.userTemplate(user.toJSON()));
+      console.log("EDITED USER", user);
+    }
+  },
+  removeFromCategory(e) {
+    const user = e.currentTarget.parentNode;
+    const category = $(e.currentTarget).parents(".user-container")[0].id;
+    this.model.removeAs(category, user.id);
+    user.remove(); // from DOM
+  },
 
-    // if (event.target.id == "channel-input") {
-    //   if (event.keyCode === 27) {
-    //     event.target.blur();
-    //   } else {
-    //     this.autocomplete();
-    //   }
-    // }
-    if (event.keyCode === 13) {
-      if (event.target.id == "admin") {
-        this.model.addAdmin($(".username-input#admin").val());
-      } else if (event.target.id == "muted") {
-      } else if (event.target.id == "banned") {
+  keyPressEventHandler(event) {
+    if (event.target.className == "username-input") {
+      if (event.keyCode === 27) {
+        event.target.blur();
+      } else {
+        this.autocomplete(event);
       }
     }
   },
   autocomplete(e) {
-    const query = $("#channel-input").val();
+    // console.log(e.currentTarget);
+
+    const query = $(e.currentTarget).val();
+    console.log("QUERY:", query);
+
     let result = false;
     console.log(e);
 
     const id = `.autocomplete#${e.target.id}`;
     $(id).html("");
-    const condition =
-      e.target.id == "admin" ? { admin: false } : { banned: false };
+    // * only suggest users with no role yet
+    const condition = { admin: false, banned: false, muted: false };
 
     this.model.where(condition).forEach((user) => {
+      if (user.get("user_id") == window.currentUser.id) return;
       if (query.length === 0 || user.get("username").indexOf(query) !== -1) {
         $(id).append(
           `<span class="autocomplete-item">${user.get("username")}</span>`
