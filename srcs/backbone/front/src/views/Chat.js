@@ -5,7 +5,10 @@ import { FtSocket, FtSocketCollection } from "../models/FtSocket";
 import $ from "jquery";
 import _ from "underscore";
 import ChannelView from "./Channel";
-import { ChannelMessages } from "../models/Channels";
+import EditChannelView from "./EditChat";
+import { Chat } from "../models/Chat";
+import { Channel } from "../models/Channel";
+import { ChannelUsers } from "../models/ChannelUsers";
 import { showModal } from "../utils/modal";
 import toasts from "../utils/toasts";
 
@@ -18,7 +21,7 @@ export default Backbone.View.extend({
       this.newChannel(chat);
     });
   },
-
+  model: Chat,
   el: "#chat-container",
   events: {
     "click #chat-panel-close": function () {
@@ -31,88 +34,21 @@ export default Backbone.View.extend({
     "click .chat-channel": function (e) {
       this.changeChannel(e.target.id);
     },
-    "click .fa-cog": function () {
-      showModal(
-        "Edit channel",
-        _.template($("#tpl-channel-form").html())({
-          name: "",
-          password: "Enter new password",
-          checkbox: true,
-        }),
-        () => {
-          const password = $("#new-channel-password").val();
-          const no_pass = $("#no-password:checked").length > 0;
-          if (this.currentChat.get("private") == false && no_pass) return true;
-          if (password.length == 0 && !no_pass) {
-            toasts.notifyError("Enter a password or check the box");
-            return false;
-          }
-          const data = no_pass
-            ? `remove_password=${true}`
-            : `add_change_password=${password}`;
-          $.ajax({
-            url: `http://localhost:3000/api/channels/${this.currentChat.id}`,
-            type: "PUT",
-            data: data,
-          })
-            .done(() => {
-              toasts.notifySuccess(
-                `Password ${no_pass ? "removed" : "changed"}`
-              );
-              this.model.fetch();
-            })
-            .fail(() => {
-              toasts.notifyError("Failed to change password");
-            });
-          return true;
-        },
-        () => {}
-      );
-    },
+    "click #new-channel-button": "createChannel",
+    "click .button-icon#leave-channel": "leaveChannel",
+    "click .button-icon#edit-channel": "editChannel",
+    "click .button-icon#start-game": () => console.log("start game"),
+    "click .button-icon#block-user": () => console.log("block user"),
     "keyup #channel-input": "keyPressEventHandler",
     "focus #channel-input": "autocomplete",
     "blur #channel-input": "closeAutocomplete",
     "click .autocomplete-item": function (event) {
       this.newChannel(event.currentTarget.innerText, "");
     },
-    "click #chat-title": function () {
-      const login = this.currentChat.get("name");
-      console.log(login);
-      if (window.users.find((a) => a.get("login") === login)) {
-        window.location.hash = `user/${login}/`;
-      }
-    },
-    "click #chat-avatar": function () {
-      const login = this.currentChat.get("name");
-      console.log(login);
-      if (window.users.find((a) => a.get("login") === login)) {
-        window.location.hash = `user/${login}/`;
-      }
-    },
+    "click #chat-title": "getUserProfile",
+    "click #chat-avatar": "getUserProfile",
     "click .fa-search": function () {
       $("#channel-input").trigger("focus");
-    },
-    "click #new-channel-button": function () {
-      showModal(
-        "Create a new channel",
-        _.template($("#tpl-channel-form").html())({
-          name: "Name",
-          password: "Password (empty for no password)",
-          checkbox: false,
-        }),
-        () => {
-          const name = $("#new-channel-name").val();
-          const password = $("#new-channel-password").val();
-
-          if (!name.length) {
-            toasts.notifyError("Channel name can't be empty!");
-            return false;
-          }
-          this.newChannel(name, password);
-          return true;
-        },
-        () => {}
-      );
     },
   },
   render() {
@@ -122,7 +58,7 @@ export default Backbone.View.extend({
   renderChannelList() {
     const template = _.template($("#tpl-channel-list").html());
     let div = `<label class="chat-channel-label">Public</label>`;
-    let channelList = ``;
+    let channelList = "";
     let current = "public";
     this.model.forEach((channel) => {
       if (channel.attributes.private && current === "public") {
@@ -141,9 +77,9 @@ export default Backbone.View.extend({
     $("#autocomplete-container").hide();
   },
   renderChannel() {
-    const user = window.users.find(
-      (a) => a.get("login") === this.currentChat.get("name")
-    );
+    const user = window.users.findWhere({
+      login: this.currentChat.get("name"),
+    });
     const avatar = !!user ? user.get("avatar_url") : null;
 
     $("#chat-chat").html("");
@@ -161,16 +97,17 @@ export default Backbone.View.extend({
       $(`#${this.currentChat.id}.chat-channel`).removeClass("channel-current");
     }
     $(`#${id}.chat-channel`).addClass("channel-current");
-    this.currentChat = this.model.get(id);
+    this.currentChat = newChannel;
     this.renderChannel();
-    this.currentMessages = new ChannelMessages({ channel_id: id });
     if (!this.channelView) {
+      this.channelUsers = new ChannelUsers();
+      this.currentMessages = new Channel({ channel_id: id });
       this.channelView = new ChannelView({ model: this.currentMessages });
+      this.editView = new EditChannelView({ model: this.channelUsers });
     } else {
-      this.channelView.changeChannel(id);
+      this.currentMessages.changeChannel(id);
     }
   },
-
   keyPressEventHandler(event) {
     if (event.target.id == "channel-input") {
       if (event.keyCode === 27) {
@@ -180,24 +117,70 @@ export default Backbone.View.extend({
       }
     }
   },
-
   newChannel(name, password) {
-    const existing = this.model.find((a) => a.get("name") === name);
-    if (existing) {
-      this.changeChannel(existing.get("id"));
-    } else {
-      $.ajax({
-        url: `http://localhost:3000/api/channels/`,
-        type: "POST",
-        data: `name=${name}&password=${password}`,
-      }).done((data) => {
-        console.log("REQUEST DATA", data);
-        window.chat.fetch();
-        setTimeout(() => {
-          this.changeChannel(data.id);
-          toasts.notifySuccess("The channel has been created.");
-        }, 200);
-      });
+    this.model.addChannel(name, password, (id) => this.changeChannel(id));
+  },
+  createChannel() {
+    showModal(
+      "Create a new channel",
+      $("#create-channel-form").html(),
+      () => {
+        const name = $("#new-channel-name").val();
+        const password = $("#new-channel-password").val();
+
+        if (!name.length) {
+          toasts.notifyError("Channel name can't be empty!");
+          return false;
+        }
+        this.newChannel(name, password);
+        return true;
+      },
+      () => {}
+    );
+  },
+  editChannel() {
+    console.log("edit channel");
+
+    this.channelUsers.loadWithId(this.currentChat.id);
+
+    // this.channel_id = props.channel_id;
+    // this.url = `http://localhost:3000/api/channels/${this.channel_id}/channel_users/`;
+    // showModal(
+    //   "Edit channel",
+    //   _.template($("#tpl-edit-channel-form").html())({
+    //     muted: "",
+    //     banned: "",
+    //   }),
+    //   () => {
+    //     const password = $("#new-channel-password").val();
+    //     const no_pass = $("#no-password:checked").length > 0;
+    //     if ((password.length > 0) ^ !no_pass) {
+    //       toasts.notifyError("Enter a password or check the box");
+    //       return false;
+    //     }
+    //     if (this.currentChat.get("private") == false && no_pass) return true;
+    //     const data = no_pass
+    //       ? `remove_password=${true}`
+    //       : `add_change_password=${password}`;
+    //     let success_message = no_pass ? "removed" : "changed";
+    //     if (this.currentChat.get("private") == false) success_message = "added";
+    //     this.model.editChannel(data, this.currentChat.id, success_message);
+    //     return true;
+    //   },
+    //   () => {}
+    // );
+  },
+  leaveChannel() {
+    if (confirm(`Are your sure you want to leave the channel?`)) {
+      this.model.leaveChannel(this.currentChat.id);
+      // todo: change to another channel
+    }
+  },
+  getUserProfile() {
+    const login = this.currentChat.get("name");
+    console.log(login);
+    if (window.users.find((a) => a.get("login") === login)) {
+      window.location.hash = `user/${login}/`;
     }
   },
   autocomplete() {

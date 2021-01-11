@@ -17,6 +17,7 @@
 		transform: scale(0);
 		opacity: 0;
 	}
+
 	to {
 		transform: scale(1);
 		opacity: 1;
@@ -31,10 +32,13 @@
 		padding: 20px 20px 0px 0px;
 		box-sizing: border-box;
 		font-size: $xl;
-		i, svg {
+
+		i,
+		svg {
 			cursor: pointer;
 		}
 	}
+
 	.modal-controls {
 		box-sizing: border-box;
 		width: 100%;
@@ -42,7 +46,8 @@
 		justify-content: flex-end;
 		align-items: center;
 		padding: 10px;
-		> div {
+
+		>div {
 			margin: 5px;
 		}
 	}

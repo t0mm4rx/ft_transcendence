@@ -2,6 +2,8 @@ module Api
   class UsersController < ApplicationController
     LIMIT_PAGINATION_MAX = 20
     skip_before_action :authenticate_request, only: :create
+    before_action :set_user, except: [:create, :index]
+    before_action :validate_rights, only: [:destroy, :update]
     
     def index
       # users = User.where(online: true).limit(limit).offset(params[:offset])
@@ -11,54 +13,53 @@ module Api
     end
 
     def create
-      user = User.new(user_params_init)
-      if user.save
-        render json: user, status: :created
+      @user = User.new(user_params_init)
+      if @user.save
+        render json: @user, status: :created
       else
-        render json: user.errors, status: :unprocessable_entity # 422
+        render json: @user.errors, status: :unprocessable_entity # 422
       end
     end
 
     def update
-      user = User.find(params[:id])
-      if !user
-        return render json: { error: "no such user" }, status: :not_found 
-      end
-      unless user === current_user || current_user.admin
-        return render json: {}, status: :forbidden
-      end
-      user.update(user_params_change)
-      if user.save
-        render json: user
+      @user.update(user_params_change)
+      if @user.save
+        render json: @user
       else
-        render json: user.errors, status: :unprocessable_entity # 422
+        render json: @user.errors, status: :unprocessable_entity # 422
       end
     end
 
     def destroy
-      user = User.find(params[:id])
-      if !user
-        return render json: {}, status: :not_found 
-      end
-      unless user === current_user || current_user.admin
-        return render json: {}, status: :forbidden
-      end
-      if user.destroy
+      if @user.destroy
         render json: {}, status: :ok
       elsif
-        render json: user.errors, status: :forbidden
+        render json: @user.errors, status: :forbidden
       end
     end
 
     def show
-      id = params[:id]
-      id = current_user.id if id == "me"
-      user = User.find(id)
-
-      render json: user
+      # @user.update(admin: true);
+      # @user.save();
+      render json: @user
     end
 
     private
+
+    def set_user
+      id = params[:id]
+      id = current_user.id if id == "me"
+      @user = User.find(id)
+    end
+
+    def validate_rights
+      if !@user
+        return render json: {}, status: :not_found 
+      end
+      unless @user === current_user || current_user.admin
+        return render json: {}, status: :forbidden
+      end
+    end
 
     def user_params_init
       #params.require(:user).permit(:username, :login, :avatar_url)

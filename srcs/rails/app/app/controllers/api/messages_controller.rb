@@ -1,8 +1,8 @@
 module Api
 	class MessagesController < ApplicationController
 	before_action :set_channel
-	before_action :check_ban
 	before_action :validate_user
+	before_action :check_ban
 
 	def index
 		render json: @channel.messages
@@ -37,8 +37,6 @@ module Api
 			if join && (!@channel.private || @channel.password == password)
 				Channel.channel_user_add(@channel.id, current_user.id)
 			else
-				puts "JOIN #############################"
-				p join
 				message = "password"
 				message = "join" if join === true;
 				return render json: message, status: :unauthorized

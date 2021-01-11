@@ -32,10 +32,12 @@
     <% } %>
     <span id="chat-title"><%= name %></span>
     <% if (avatar != "") { %>
-    <div class="button-icon"><i class="fas fa-gamepad"></i></div>
-    <div class="button-icon"><i class="fas fa-ban"></i></div>
-    <% } else if (admin) { %>
-      <div class="button-icon"><i class="fas fa-cog"></i></div>
+    <div class="button-icon" id="start-game"><i class="fas fa-gamepad"></i></div>
+    <div class="button-icon" id="block-user"><i class="fas fa-ban"></i></div>
+    <% } else { if (admin) { %>
+      <div class="button-icon" id="edit-channel"><i class="fas fa-cog"></i></div>
+     <% } %>
+      <div class="button-icon" id="leave-channel"><i class="fas fa-sign-out-alt"></i></div>
      <% } %>
   </div>
   <div id="chat-messages"></div>
@@ -60,8 +62,8 @@
   </div>
 </script>
 
-<script type="text/template" id="tpl-channel-form">
-  <div id="form-new-channel">
+<!-- <script type="text/template" id="tpl-channel-form">
+  <div id="form-channel">
     <% if (name) { %>
     <div class="input-wrapper">
       <label for="new-channel-name">Name</label>
@@ -80,9 +82,69 @@
       </div>
       <% } %>
   </div>
+</script> -->
+
+<script type="text/template" id="tpl-edit-channel-form">
+  <div class="form-channel" id="edit">
+    <div class="input-wrapper">
+      <h3>Admins</h3>
+      <div class="user-container" id="admins">
+      <%= admins %>
+      </div>
+      <div class="input-field">
+      <input class="username-input" type="text" placeholder="Username" id="admin" />
+      <div class="autocomplete" id="admin"></div>
+      <div style="display: inline;" class="button" id="add-Admin">Add</div>
+      </div>
+    </div>
+    <div class="input-wrapper">
+      <h3>Muted</h3>
+      <div class="user-container">
+      <%= muted %>
+      </div>
+      <div class="input-field">
+      <input class="username-input" type="text" placeholder="Username" id="muted" />
+      <div class="autocomplete" id="muted"></div>
+      <label for="muted-until">until</label>
+      <input type="date" id="muted-until" />
+      <div style="display: inline;" class="button" id="mute-ok">Mute</div>
+      </div>
+    </div>
+    <div class="input-wrapper">
+      <h3>Banned</h3>
+      <div class="user-container">
+      <%= banned %>
+      </div>
+      <div class="input-field">
+        <input class="username-input" type="text" placeholder="Username" id="banned" />
+        <div class="autocomplete" id="banned"></div>
+        <label for="banned-until">until</label>
+        <input type="date" id="banned-until" />
+        <div style="display: inline;" class="button" id="ban-ok">Ban</div>
+        </div>
+    </div>
+    <div class="input-wrapper">
+      <h3>Change password</h3>
+      <div class="input-field">
+      <label for="new-channel-password">New password</label>
+      <input type="password" placeholder="Password" id="new-channel-password" />
+      <input type="checkbox" id="no-password" />
+      <label for="no-password">No password</label>
+      </div>
+    </div>
+  </div>
 </script>
+
+<script type="text/template" id="tpl-edit-channel-form-user">
+  <div class="chat-edit user-profile" id="<%= user_id %>">
+    <img id="chat-avatar" src="<%= avatar %>" />
+    <span id="chat-username"><%= username %></span>
+    <div class="button-icon delete" id="<%= user_id %>"><i class="fas fa-times-circle"></i></div>
+  </div>
+</script>
+
 <script type="text/html" id="create-channel-form">
-  <div id="form-new-channel">
+  <div class="form-channel" id="create">
     <div class="input-wrapper">
       <!-- <span>Name</span> -->
       <label for="new-channel-name">Name</label>
@@ -97,7 +159,7 @@
 </script>
 
 <script type="text/html" id="channel-password-form">
-  <div id="form-new-channel">
+  <div class="form-channel" id="enter-password">
     <div class="input-wrapper">
       <label for="new-channel-password">Password</label>
       <input type="password" placeholder="Password" id="new-channel-password" />

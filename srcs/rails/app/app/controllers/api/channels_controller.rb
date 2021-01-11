@@ -8,7 +8,6 @@ module Api
 		@private = Channel.where(public: false, direct: false);
 		@dms = current_user.channels.where(direct: true);
 		@channels =  @public +  @private + @dms
-
 		# @channels = {
 		# 	@channels = ActiveModelSerializers::SerializableResource.new(@public,
 		# 		{serializer: ChannelSerializer}).as_json;
