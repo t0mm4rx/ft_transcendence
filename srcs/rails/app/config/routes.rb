@@ -11,7 +11,7 @@ Rails.application.routes.draw do
 
     resources :friends, controller: 'friendships', only: [:create, :update, :destroy]
 
-    resources :tfa, only: [:create, :show]
+    resources :tfa, only: [:index, :show]
 
     resources :logintra, only: :index
     resources :accessintra, only: :index
