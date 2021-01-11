@@ -5,18 +5,9 @@ module Api
 	before_action :check_ban
 
 	def index
-		# @blocked_list = BlockedUser.cu_blocked_list(current_user)
-		# puts "LIST BLOCKED LIST IN MESSAGE INDEX ##############################################################"
-		# current_user.blocked_ids
-		# # @msgs = @channel.messages
-		# # @msg_clean = @msgs.select { |msg| msg.user_id != current_user.blocked_ids }
-		# # #p @msgs.user_id
-		# # p @messages.user_id
-		# puts "LIST BLOCKED  =======================##############################################################"
-		# p current_user.blocked_ids
-		# p @new_msg = Message.where.not(user_id: current_user.blocked_ids)
-		render json: @channel.messages
-		# render json: @new_msg
+		targets = BlockedUser.blocked_list(current_user)
+		@clean_msg = @channel.messages.where.not(user_id: targets)
+		render json: @clean_msg
 	end
 
 	def create
@@ -56,7 +47,9 @@ module Api
 
 	def check_ban
 		@cu = @channel.channel_users.find_by(user_id: current_user.id) rescue nil
-		if @cu.ban_date != nil && @cu != nil
+		if @cu == nil
+			return render json: error = {error: "You are not member of the channel"}.to_json, status: :forbidden
+		elsif @cu != nil && @cu.ban_date != nil
 			if @cu.ban_date > DateTime.now
 				return render json: error = {error: "You are ban until #{@cu.ban_date}"}.to_json, status: :forbidden
 			end
