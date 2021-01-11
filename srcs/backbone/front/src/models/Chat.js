@@ -47,7 +47,7 @@ const Chat = Backbone.Collection.extend({
       },
     });
   },
-  
+
   editChannel(data, id, success_message) {
     $.ajax({
       url: `http://localhost:3000/api/channels/${id}`,
@@ -64,17 +64,17 @@ const Chat = Backbone.Collection.extend({
   },
 
   leaveChannel(id) {
-    // $.ajax({
-    //   url: `http://localhost:3000/api/channels/${id}`,
-    //   type: "DELETE",
-    //   success: () => {
-    //     toasts.notifySuccess(`Left channel`);
-    //     // this.model.fetch();
-    //   },
-    //   error: () => {
-    //     toasts.notifyError("Failed to leave channel");
-    //   },
-    // });
+    $.ajax({
+      url: `http://localhost:3000//api/channels/${id}/channel_users/${window.currentUser.id}`,
+      type: "DELETE",
+      success: () => {
+        toasts.notifySuccess(`Left channel`);
+        // this.model.fetch();
+      },
+      error: () => {
+        toasts.notifyError("Failed to leave channel");
+      },
+    });
   },
 });
 

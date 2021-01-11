@@ -27,22 +27,21 @@ const Channel = Backbone.Collection.extend({
         this.socket(this.channel_id);
       },
       error: (data, state) => {
-        // if (!data.password) toasts.notifyError("Bad password");
-        console.log("ERROR: ", data, state);
-
+        const tplData = {
+          password: state.responseText == "password",
+        };
         if (state.status == 401) {
           showModal(
             `Join channel`,
-            _.template($("#tpl-join-channel-form").html())({
-              password: state.responseText == "join",
-            }),
-            // $("#channel-password-form").html(),
+            _.template($("#tpl-join-channel-form").html())(tplData),
             () => {
               const password = $("#new-channel-password").val();
               this.load({ password: password, join: true });
               return true;
             },
-            () => {}
+            () => {
+              $("#chat-chat").html("");
+            }
           );
         } else {
         }

@@ -48,8 +48,7 @@ module Api
 			if join && (!@channel.private || @channel.password == password)
 				Channel.channel_user_add(@channel.id, current_user.id)
 			else
-				message = "password"
-				message = "join" if join === true;
+				message = !@channel.private ? "join" : "password"
 				return render json: message, status: :unauthorized
 			end
 		end

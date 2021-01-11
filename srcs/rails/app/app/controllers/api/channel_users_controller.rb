@@ -21,7 +21,6 @@ class ChannelUsersController < ApplicationController
 		end
 	end
 
-
 	# PATCH/PUT /channels/:channel_id/:user_id
 	#http://localhost:3000/api/channels/:channel_id/channel_users/?add_admin=user_id
 	def update
@@ -81,9 +80,19 @@ class ChannelUsersController < ApplicationController
 
 	#add a params to delete a specific person, if its owner he's not owner anymore
 	def destroy
-		@channel.channel_users.destroy_all
-		head :no_content
+		return render json: {}, status: :forbidden unless params[:id].to_i === current_user.id
+		
+		@user = @channel.channel_users.find_by(user_id: params[:id]);
+		if @user.destroy
+			render json: {}
+		else
+			render json: {}, status: :unprocessable_entity
+		end
 	end
+	# def destroy
+	# 	@channel.channel_users.destroy_all
+	# 	head :no_content
+	# end
 
 	private
 	def set_channel
