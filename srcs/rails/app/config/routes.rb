@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     resources :friends, controller: 'friendships', only: [:create, :update, :destroy]
 
     resources :tfa, only: [:index, :create]
-
+    resources :admin, only: [:create]
     resources :logintra, only: :index
     resources :accessintra, only: :index
     post 'authenticate', to: 'authentication#authenticate'
