@@ -323,12 +323,7 @@
 	}
 
 	input {
-		max-width: 140px;
+		width: 240px;
+		align-self: center;
 	}
-}
-
-input[type=password] {
-	width: 140px;
-	align-self: center;
-	justify-self: center;
 }
