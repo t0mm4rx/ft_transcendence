@@ -12,8 +12,6 @@ module Api
     end
 
     def create
-      puts "########################"
-      p params
       request = Friendship.new(user: current_user, friend_id: params[:id])
       if request.save
         render json: request, status: :created

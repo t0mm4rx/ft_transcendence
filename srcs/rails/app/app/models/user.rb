@@ -11,6 +11,8 @@ class User < ApplicationRecord
 	has_many :channels, through: :channel_users
 	has_many :messages, dependent: :destroy
 
+	has_many :blocked, class_name: 'BlockedUser', dependent: :destroy
+
 	belongs_to :guild, optional: true
 
 	validates :username, presence: true, length: { minimum:2, maximum: 30}, uniqueness: { case_sensitive: false }
@@ -35,7 +37,8 @@ class User < ApplicationRecord
 		Friendship.accepted_record?(id, user.id)
 	end
 
-	def friendship_status(user)
+	def relation_to(user)
+		return "current_user" if id == user.id
 		friendship = Friendship.find_record(id, user.id)
 		return nil if !friendship
 		return "friends" if friendship.accepted

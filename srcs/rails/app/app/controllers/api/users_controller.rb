@@ -2,7 +2,9 @@ module Api
   class UsersController < ApplicationController
     LIMIT_PAGINATION_MAX = 20
     skip_before_action :authenticate_request, only: :create
-
+    before_action :set_user, except: [:create, :index]
+    before_action :validate_rights, only: [:destroy, :update]
+    
     def index
       # users = User.where(online: true).limit(limit).offset(params[:offset])
       # users = User.limit(limit).offset(params[:offset])
@@ -17,7 +19,7 @@ module Api
         user.save
         render json: user, status: :created
       else
-        render json: user.errors, status: :unprocessable_entity # 422
+        render json: @user.errors, status: :unprocessable_entity # 422
       end
     end
 
@@ -33,7 +35,7 @@ module Api
       if user.save
         render json: user
       else
-        render json: user.errors, status: :unprocessable_entity # 422
+        render json: @user.errors, status: :unprocessable_entity # 422
       end
     end
 
@@ -48,19 +50,32 @@ module Api
       if user.destroy
         render json: {}, status: :ok
       elsif
-        render json: user.errors, status: :forbidden
+        render json: @user.errors, status: :forbidden
       end
     end
 
     def show
-      id = params[:id]
-      id = current_user.id if id == "me"
-      user = User.find(id)
-
-      render json: user, relation: get_relation_to(user)
+      # @user.update(admin: true);
+      # @user.save();
+      render json: @user
     end
 
     private
+
+    def set_user
+      id = params[:id]
+      id = current_user.id if id == "me"
+      @user = User.find(id)
+    end
+
+    def validate_rights
+      if !@user
+        return render json: {}, status: :not_found 
+      end
+      unless @user === current_user || current_user.admin
+        return render json: {}, status: :forbidden
+      end
+    end
 
     def user_params_init
       #params.require(:user).permit(:username, :login, :avatar_url)
@@ -78,9 +93,9 @@ module Api
       ].min
     end
 
-    def get_relation_to(user)
-      return "current_user" if user === current_user
-      current_user.friendship_status(user)
-    end
+    # def get_relation_to(user)
+    #   return "current_user" if user === current_user
+    #   current_user.friendship_status(user)
+    # end
   end
 end

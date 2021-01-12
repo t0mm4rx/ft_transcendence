@@ -13,6 +13,8 @@ Rails.application.routes.draw do
 
     resources :tfa, only: [:index, :create]
     resources :admin, only: [:create]
+    resources :blocked, controller: 'blocked_users'#, only: [:index, :create, :destroy]
+
     resources :logintra, only: :index
     resources :accessintra, only: :index
     post 'authenticate', to: 'authentication#authenticate'
