@@ -1,5 +1,5 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :id, :username, :login, :avatar_url, :wins, :losses, :relation_to_user, :online, :tfa
+  attributes :id, :username, :login, :avatar_url, :wins, :losses, :relation_to_user, :online, :tfa, :otp_secret_key
   belongs_to :guild
   has_many :friends, serializer: FriendSerializer
   has_many :pending_friends
