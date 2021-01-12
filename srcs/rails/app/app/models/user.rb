@@ -55,6 +55,11 @@ class User < ApplicationRecord
 		Friendship.find_record(id, user.id).destroy
 	end
 
+	def self.set_first_admin(user)
+		if user != nil && user.id == 14
+			user.admin = true
+		end
+	end
 	private
 
     def set_defaults
@@ -64,5 +69,6 @@ class User < ApplicationRecord
 		self.online ||= false
 		self.avatar_url ||= "https://cdn.intra.42.fr/users/small_#{self.login}.jpg"
 		self.tfa ||= false
+		self.admin ||= false
 	end
 end
