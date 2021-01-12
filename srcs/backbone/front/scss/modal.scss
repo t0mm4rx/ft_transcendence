@@ -25,6 +25,9 @@
 }
 
 .modal {
+	min-width: 300px;
+	min-height: 200px;
+
 	.modal-close {
 		display: flex;
 		width: 100%;

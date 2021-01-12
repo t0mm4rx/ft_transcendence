@@ -6,8 +6,9 @@ module Api
 
 	def index
 		targets = BlockedUser.blocked_list(current_user)
-		@clean_msg = @channel.messages.where.not(user_id: targets)
-		render json: @clean_msg
+		@clean_msg = @channel.messages.order(created_at: :desc).where.not(user_id: targets)
+		@msgs = @clean_msg.limit(20).offset(params[:offset])
+		render json: @msgs
 	end
 
 	def create
@@ -18,11 +19,12 @@ module Api
 			end
 		end
 		@message = @channel.messages.create(message_params)
-		MessageChannel.broadcast_to @channel, message: params['body'], date: @message.date, login: current_user['username']
+		MessageChannel.broadcast_to @channel, ActiveModel::SerializableResource.new(@message).serializable_hash
+		# MessageChannel.broadcast_to @channel, id: @message.id, username: current_user['username'], body: params['body'], date: @message.date, avatar: current_user.avatar_url
 		if @message.save
 			render json: @message, status: :created
 		else
-			render json: @message.errors, status: :unprocessable_entity
+			render json: { error: @message.errors }, status: :unprocessable_entity
 		end
 	end
 

@@ -3,10 +3,6 @@ import $ from "jquery";
 import toasts from "../utils/toasts";
 
 const ChannelUsers = Backbone.Collection.extend({
-  // idAttribute: "user_id",
-  // url() {
-  //   return `http://localhost:3000/api/channels/${this.channel_id}/channel_users/`;
-  // },
   loadWithId(channel_id, isPrivate) {
     this.private = isPrivate;
     this.channel_id = channel_id;

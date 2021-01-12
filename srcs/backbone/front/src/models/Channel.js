@@ -10,6 +10,7 @@ import _ from "underscore";
 const Message = Backbone.Model.extend({});
 
 const Channel = Backbone.Collection.extend({
+  comparator: "date",
   url() {
     return `http://localhost:3000/api/channels/${this.channel_id}/messages`;
   },
@@ -17,14 +18,15 @@ const Channel = Backbone.Collection.extend({
   changeChannel(id) {
     this.channel_id = id;
     this.load();
+    this.fetchBlockedUsers();
   },
   load(auth) {
     this.fetch({
       data: auth,
       success: () => {
         console.log("FETCHED MESSAGES FOR ", this.channel_id);
-
         this.socket(this.channel_id);
+        this.trigger("changeChannel");
       },
       error: (data, state) => {
         const tplData = {
@@ -44,7 +46,25 @@ const Channel = Backbone.Collection.extend({
             }
           );
         } else {
+          toasts.notifyError(state.responseJSON.error);
+          $("#chat-chat").html("");
         }
+      },
+    });
+  },
+  loadMessages() {
+    // const offset = this.length();
+    // console.log("LOAD MSG", this.length);
+
+    this.fetch({
+      data: { offset: this.length },
+      remove: false,
+      success: (data) => {
+        console.log("Successfully fetched more messages");
+        this.trigger("loadMessages", data);
+      },
+      error: (data, state) => {
+        console.log(state.responseJSON);
       },
     });
   },
@@ -54,7 +74,7 @@ const Channel = Backbone.Collection.extend({
       type: "POST",
       data: `body=${body}`,
       success: () => {},
-      error: () => toasts.notifyError("Message could not be sent"),
+      error: (data, state) => toasts.notifyError(state.responseJSON.error),
     });
   },
   socket() {
@@ -68,14 +88,27 @@ const Channel = Backbone.Collection.extend({
       // Ignores pings.
       if (msg.type === "ping") return;
       if (msg.message) {
-        console.log(msg.message);
-        this.add({
-          username: msg.message.login,
-          body: msg.message.message,
-          date: msg.message.date,
-        });
+        if (
+          this.blockedUsers &&
+          this.blockedUsers.includes(msg.message.user_id)
+        ) {
+          return;
+        }
+        this.trigger("newMessage", msg.message);
       }
     };
+  },
+  fetchBlockedUsers() {
+    $.ajax({
+      url: `http://localhost:3000/api/blocked/`,
+      type: "GET",
+      success: (data) => {
+        console.log("BLOCKED USERS: ", data);
+
+        this.blockedUsers = data;
+      },
+      error: (data, state) => toasts.notifyError(state.responseJSON.error),
+    });
   },
 });
 

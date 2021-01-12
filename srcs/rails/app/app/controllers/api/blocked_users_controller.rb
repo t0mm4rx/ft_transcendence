@@ -20,7 +20,7 @@ module Api
 		end
 
 	    def destroy
-			@blocked_user = BlockedUser.find_by(target_id: params[:id])
+			@blocked_user = BlockedUser.find_by(user_id: current_user.id, target_id: params[:id])
 			if @blocked_user.destroy
 			  render json: {}, status: :ok
 			elsif

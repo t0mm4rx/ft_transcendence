@@ -45,7 +45,7 @@ export default Backbone.View.extend({
     "focus #channel-input": "autocomplete",
     "blur #channel-input": "closeAutocomplete",
     "click .autocomplete-item": function (event) {
-      this.newChannel(event.currentTarget.innerText, "");
+      this.newChannel(event.target.innerText, "");
     },
     "click #chat-title": "getUserProfile",
     "click #chat-avatar": "getUserProfile",
@@ -59,7 +59,6 @@ export default Backbone.View.extend({
   },
   renderChannelList() {
     const template = _.template($("#tpl-channel-list").html());
-    let div = `<label class="chat-channel-label">Public</label>`;
     let channelList = "";
     let current = "public";
     this.model.forEach((channel) => {
@@ -93,13 +92,14 @@ export default Backbone.View.extend({
     }
   },
   changeChannel(id) {
-    const newChannel = this.model.get(id);
-    if (newChannel === this.currentChat) return;
+    console.log("CHANGE TO", id);
+
+    if (this.currentChat && id === this.currentChat.id) return;
     if (this.currentChat) {
       $(`#${this.currentChat.id}.chat-channel`).removeClass("channel-current");
     }
     $(`#${id}.chat-channel`).addClass("channel-current");
-    this.currentChat = newChannel;
+    this.currentChat = this.model.get(id);
     this.renderChannel();
     if (!this.channelView) {
       this.channelView = new ChannelView({ model: this.currentMessages });

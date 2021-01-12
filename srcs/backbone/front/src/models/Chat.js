@@ -30,17 +30,21 @@ const Chat = Backbone.Collection.extend({
   },
   addChannel(name, password, onSuccess) {
     const existing = this.findWhere({ name: name });
-    if (existing) return resolve(existing.id);
+    if (!!existing) {
+      onSuccess(existing.id);
+      return;
+    }
     $.ajax({
       url: this.url,
       type: "POST",
       data: `name=${name}&password=${password}`,
       success: (data) => {
-        this.fetch();
-        setTimeout(() => {
-          toasts.notifySuccess("The channel has been created.");
-          onSuccess(data.id);
-        }, 200);
+        this.fetch({
+          success: () => {
+            toasts.notifySuccess("The channel has been created.");
+            onSuccess(data.id);
+          },
+        });
       },
       error: () => {
         toasts.notifyFailure("The channel couldn't be created.");
@@ -69,7 +73,6 @@ const Chat = Backbone.Collection.extend({
       type: "DELETE",
       success: () => {
         toasts.notifySuccess(`Left channel`);
-        // this.model.fetch();
       },
       error: () => {
         toasts.notifyError("Failed to leave channel");
