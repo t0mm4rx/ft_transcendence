@@ -93,13 +93,13 @@ export default Backbone.View.extend({
   },
   changeChannel(id) {
     console.log("CHANGE TO", id);
-
-    if (this.currentChat && id === this.currentChat.id) return;
+    const chosenChannel = this.model.get(id);
+    if (chosenChannel === this.currentChat) return;
     if (this.currentChat) {
       $(`#${this.currentChat.id}.chat-channel`).removeClass("channel-current");
     }
     $(`#${id}.chat-channel`).addClass("channel-current");
-    this.currentChat = this.model.get(id);
+    this.currentChat = chosenChannel;
     this.renderChannel();
     if (!this.channelView) {
       this.channelView = new ChannelView({ model: this.currentMessages });
