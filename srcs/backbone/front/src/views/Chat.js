@@ -40,7 +40,7 @@ export default Backbone.View.extend({
     "click .button-icon#leave-channel": "leaveChannel",
     "click .button-icon#edit-channel": "editChannel",
     "click .button-icon#start-game": () => console.log("start game"),
-    "click .button-icon#block-user": () => console.log("block user"),
+    "click .button-icon#block-user": "blockUser",
     "keyup #channel-input": "keyPressEventHandler",
     "focus #channel-input": "autocomplete",
     "blur #channel-input": "closeAutocomplete",
@@ -161,6 +161,13 @@ export default Backbone.View.extend({
     if (window.users.find((a) => a.get("login") === login)) {
       window.location.hash = `user/${login}/`;
     }
+  },
+  blockUser(e) {
+    console.log("BLOCK USER");
+    // const login = $(e.currentTarget).siblings("#chat-title").html();
+
+    // console.log($(e.currentTarget).siblings("#chat-title").html());
+    // window.currentUser.block(login);
   },
   autocomplete() {
     const query = $("#channel-input").val();
