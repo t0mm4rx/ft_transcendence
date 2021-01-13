@@ -4,7 +4,7 @@ module Api
     skip_before_action :authenticate_request, only: :create
     before_action :set_user, except: [:create, :index]
     before_action :validate_rights, only: [:destroy, :update]
-    
+
     def index
       # users = User.where(online: true).limit(limit).offset(params[:offset])
       # users = User.limit(limit).offset(params[:offset])
@@ -13,11 +13,11 @@ module Api
     end
 
     def create
-      user = User.new(user_params_init)
-      if user.save
-        User.set_first_admin(user)
-        user.save
-        render json: user, status: :created
+      @user = User.new(user_params_init)
+      if @user.save
+        User.set_first_admin(@user)
+       @user.save
+        render json: @user, status: :created
       else
         render json: @user.errors, status: :unprocessable_entity # 422
       end
@@ -70,7 +70,7 @@ module Api
 
     def validate_rights
       if !@user
-        return render json: {}, status: :not_found 
+        return render json: {}, status: :not_found
       end
       unless @user === current_user || current_user.admin
         return render json: {}, status: :forbidden

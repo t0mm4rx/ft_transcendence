@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     resources :tfa, only: [:index, :create]
     resources :admin, only: [:create]
     resources :blocked, controller: 'blocked_users'#, only: [:index, :create, :destroy]
+    resources :guilds
 
     resources :logintra, only: :index
     resources :accessintra, only: :index
