@@ -63,6 +63,15 @@ class User < ApplicationRecord
 			user.admin = true
 		end
 	end
+
+	def guild
+		friendships_.filter_map do |friendship|
+			if friendship.accepted
+				friendship.user_id == id ? friendship.friend : friendship.user
+			end
+		end
+	end
+
 	private
 
     def set_defaults
