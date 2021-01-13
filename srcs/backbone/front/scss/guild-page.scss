@@ -51,6 +51,18 @@
 		}
 		#guild-war-history {
 			margin-right: 5px;
+			.history-item {
+				display: flex;
+				background-color: $grey_dark_light;
+				padding: 20px;
+				justify-content: space-between;
+				.history-win {
+					color: $blue;
+				}
+				.history-loss {
+					color: $red;
+				}
+			}
 		}
 		#guild-users {
 			margin-left: 5px;

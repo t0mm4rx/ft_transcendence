@@ -8,6 +8,11 @@ export default Backbone.View.extend({
 	initialize: function () {
 		this.listenTo(window.users, 'add', this.renderUsers);
 	},
+	events: {
+		'click .message-button': function (event) {
+			$(document).trigger('chat', {chat: event.currentTarget.id.split('-')[1]});
+		}
+	},
 	render: function () {
 		this.$el.html(template);
 		this.renderUsers();
