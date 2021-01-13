@@ -7,9 +7,10 @@ module Api
 		end
 
 		def create
-			if current_user.guild
-				return render json: { error: "You already have a guild bro!"}, status: :forbidden
-			@guild = Guild.new(guild_params)
+		# if current_user.guild
+		# 	return render json: { error: "You already have a guild bro!"}, status: :forbidden
+		# end
+		@guild = Guild.new(guild_params)
 		if @guild.save
 			render json: @guild, status: :created
 		else
@@ -23,7 +24,7 @@ module Api
 			@guild = Guild.find(params[:id])
 		end
 		# Only allow a list of trusted parameters through.
-		def guild_param
+		def guild_params
 			params.permit(:name, :anagram)
 		end
 	end
