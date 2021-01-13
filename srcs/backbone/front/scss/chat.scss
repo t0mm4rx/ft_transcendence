@@ -58,6 +58,7 @@
 			hr {
 				width: 100%;
 				border: 1px solid $grey_dark_light;
+				box-sizing: border-box;
 			}
 
 			#input-container {
