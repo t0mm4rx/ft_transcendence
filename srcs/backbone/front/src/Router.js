@@ -14,27 +14,30 @@ import Cookies from "js-cookie";
 import $ from "jquery";
 import User from "./pages/User";
 import Livestream from "./pages/Livestream";
+import Guild from "./pages/Guild";
 
 export default Backbone.Router.extend({
   routes: {
     "": "home",
-    home: "home",
+    "home": "home",
     "home/": "home",
     "user/:id": "user",
     "user/:id/": "user",
-    guilds: "guilds",
+    "guilds": "guilds",
     "guilds/": "guilds",
-    game: "game",
+    "game": "game",
     "game/": "game",
     "livestream/:id": "livestream",
     "livestream/:id/": "livestream",
-    tournaments: "tournaments",
-    "tournaments/": "tournaments",
-    test: "test",
+    "tournaments": "tournaments",
+	"tournaments/": "tournaments",
+	"guild/:id": "guild",
+	"guild/:id/": "guild",
+    "test": "test",
     "test/": "test",
-    auth: "auth",
+    "auth": "auth",
     "auth/": "auth",
-    token: "token",
+    "token": "token",
     "token/": "token",
     ":whatever": "notFound",
     ":whatever/": "notFound",
@@ -106,6 +109,17 @@ export default Backbone.Router.extend({
       window.currentView.stopListening();
     }
     window.currentView = new Tournaments();
+    window.currentView.render();
+  },
+  guild: function (id) {
+	this.checkLogged();
+    this.showLayout();
+    if (window.currentView) {
+      window.currentView.undelegateEvents();
+      window.currentView.unbind();
+      window.currentView.stopListening();
+    }
+    window.currentView = new Guild({name: id});
     window.currentView.render();
   },
   test: function () {

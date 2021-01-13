@@ -1,0 +1,78 @@
+#guild-page {
+	width: 100%;
+	#guild-identity {
+		max-width: 800px;
+		margin: auto;
+		#guild-identity-layout {
+			display: flex;
+			#guild-points {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				.guild-info span:nth-child(2) {
+					font-size: $xxl;
+				}
+			}
+			#guild-infos {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-direction: column;
+				margin: 20px;
+			}
+		}
+		#guild-actions {
+			display: flex;
+			width: 100%;
+			justify-content: center;
+			align-items: center;
+			> .button-icon {
+				margin: 0px 10px;
+			}
+		}
+	}
+	.guild-info {
+		display: flex;
+		flex-direction: column;
+		margin: 5px;
+	}
+	.guild-info span:nth-child(2) {
+		font-size: $l;
+		font-weight: 800;
+	}
+	#guild-lower-panels {
+		width: 100%;
+		display: flex;
+		> .panel {
+			flex: 1;
+			margin: 10px;
+		}
+		#guild-war-history {
+			margin-right: 5px;
+			.history-item {
+				display: flex;
+				background-color: $grey_dark_light;
+				padding: 20px;
+				justify-content: space-between;
+				.history-win {
+					color: $blue;
+				}
+				.history-loss {
+					color: $red;
+				}
+			}
+		}
+		#guild-users {
+			margin-left: 5px;
+			#guild-users-list {
+				overflow-y: auto;
+			}
+			.owner-icon {
+				margin-right: 10px;
+			}
+		}
+	}
+
+}

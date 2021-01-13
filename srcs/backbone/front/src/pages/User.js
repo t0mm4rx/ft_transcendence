@@ -6,6 +6,7 @@ import { User } from '../models/User';
 import _ from 'underscore';
 import {showModal} from '../utils/modal';
 import toasts from '../utils/toasts';
+import {loadUsers} from '../utils/globals';
 
 export default Backbone.View.extend({
 	el: "#page",
@@ -48,6 +49,7 @@ export default Backbone.View.extend({
 		this.listenTo(window.users, 'add', this.fetchUser);
 		this.listenTo(this.user, 'change', this.render);
 		this.fetchUser();
+		loadUsers();
 	},
 	fetchUser: function () {
 		this.preview = window.users.models.find(a => a.get('login') === this.login);
