@@ -311,19 +311,8 @@
 		justify-content: center;
 	}
 
-	input[type="date"] {
-		background: $grey_dark_light;
-		box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-		border: none;
-		text-align: center;
-	}
-
 	input[type=date]::-webkit-calendar-picker-indicator {
 		filter: invert(1);
 	}
 
-	input {
-		width: 240px;
-		align-self: center;
-	}
 }
