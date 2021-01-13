@@ -64,6 +64,12 @@ const User = Backbone.Model.extend({
 				toasts.notifyError("An error occured.");
 			}
 		});
+	},
+	setTFA: function () {
+		$.ajax({
+			url: 'http://localhost:3000/api/tfa',
+			type: 'POST'
+		});
 	}
 });
 

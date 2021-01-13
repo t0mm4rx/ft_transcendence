@@ -15,14 +15,6 @@ ActiveRecord::Schema.define(version: 2021_01_11_111232) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "blocked_users", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "target_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_blocked_users_on_user_id"
-  end
-
   create_table "channel_users", force: :cascade do |t|
     t.bigint "channel_id", null: false
     t.bigint "user_id", null: false
@@ -31,7 +23,6 @@ ActiveRecord::Schema.define(version: 2021_01_11_111232) do
     t.boolean "owner"
     t.boolean "admin"
     t.datetime "ban_date"
-    t.datetime "mute_date"
     t.index ["channel_id"], name: "index_channel_users_on_channel_id"
     t.index ["user_id"], name: "index_channel_users_on_user_id"
   end
@@ -43,7 +34,7 @@ ActiveRecord::Schema.define(version: 2021_01_11_111232) do
     t.boolean "public"
     t.boolean "private"
     t.string "password"
-    t.boolean "direct", default: false
+    t.boolean "direct"
   end
 
   create_table "friendships", force: :cascade do |t|
@@ -102,7 +93,6 @@ ActiveRecord::Schema.define(version: 2021_01_11_111232) do
     t.index ["guild_id"], name: "index_users_on_guild_id"
   end
 
-  add_foreign_key "blocked_users", "users"
   add_foreign_key "channel_users", "channels"
   add_foreign_key "channel_users", "users"
   add_foreign_key "friendships", "users"
