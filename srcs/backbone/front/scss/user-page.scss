@@ -21,6 +21,7 @@
 	max-width: 800px;
 	margin-top: 50px;
 	position: relative;
+
 	#user-friend-badge {
 		position: absolute;
 		background-color: $blue;
@@ -34,9 +35,11 @@
 		align-items: center !important;
 		overflow: hidden;
 		cursor: pointer;
-		> svg {
+
+		>svg {
 			margin: 5px;
 		}
+
 		.user-friend-overlay {
 			position: absolute;
 			top: 0;
@@ -53,55 +56,77 @@
 			border-radius: 10px;
 		}
 	}
+
 	#user-friend-badge:hover {
 		.user-friend-overlay {
 			transform: scale(1);
 			opacity: 1;
 		}
 	}
+
 	#top-panel-container {
 		display: flex;
 		align-items: center;
+
 		* {
 			flex: 1;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 		}
+
 		#user-ladder {
 			span:nth-child(1) {
 				font-size: $xxl;
 				font-weight: 800;
 			}
 		}
+
 		#user-name-container {
 			span:nth-child(1) {
 				font-size: $xl;
 				font-weight: 800;
 			}
+
 			#user-name-buttons {
 				display: flex;
 				flex-direction: row;
+
 				.button-icon {
 					margin: 10px;
+
 					svg {
 						font-size: $xl;
 					}
+
+					svg#block-button>* {
+						color: red;
+					}
+
+					svg#unblock-button>* {
+						color: green;
+					}
 				}
+
+
 			}
 		}
+
 		#user-name-infos {
 			align-items: flex-start;
+
 			.user-info {
 				align-items: flex-start;
 				margin: 5px;
 			}
+
 			.user-info span:nth-child(2) {
 				font-size: $l;
 				font-weight: 800;
 			}
 		}
 	}
+
 	img {
 		position: absolute;
 		left: 50%;
@@ -113,16 +138,19 @@
 		border: none;
 		transform: translate(-50%, -50%) scale(0);
 	}
+
 	img[src] {
 		animation: avatar-animation .3s ease;
 		transform: translate(-50%, -50%) scale(1);
 	}
+
 	#user-level-container {
 		width: 100%;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+
 		#user-progress-container {
 			background-color: $grey_dark;
 			width: 80%;
@@ -130,6 +158,7 @@
 			border-radius: 10px;
 			overflow: hidden;
 			display: flex;
+
 			#user-progress-container-fill {
 				height: 100%;
 				background-color: $blue;
@@ -138,6 +167,7 @@
 				justify-content: center;
 				transition: width .3s ease;
 			}
+
 			#user-progress-container-free-space {
 				flex: 1;
 				display: flex;
@@ -146,10 +176,12 @@
 			}
 		}
 	}
+
 	.user-editable-field {
 		position: relative;
 		cursor: pointer;
-		> .button-icon {
+
+		>.button-icon {
 			position: absolute;
 			left: 0px;
 			top: 50%;
@@ -158,8 +190,9 @@
 			transition: .3s all ease;
 		}
 	}
+
 	.user-editable-field:hover {
-		> .button-icon {
+		>.button-icon {
 			transform: translate(-120%, -50%) scale(1);
 			opacity: 1;
 		}
@@ -168,30 +201,38 @@
 
 #user-page-bottom-container {
 	width: 100%;
-	> * {
+
+	>* {
 		margin: 10px 5px;
 		flex: 1;
 	}
-	#history-panel-container, #friends-panel-content {
+
+	#history-panel-container,
+	#friends-panel-content {
 		display: flex;
 		flex-direction: column;
 		overflow: auto;
 		max-height: 100%;
 	}
+
 	.history-item {
 		background-color: $grey_dark_light;
 		padding: 20px;
 		display: flex;
 		align-items: center;
+
 		span:nth-child(1) {
 			flex: 1;
 		}
+
 		.history-item-win {
 			color: $blue;
 		}
+
 		.history-item-info {
 			color: $grey_accent;
 		}
+
 		.history-item-loss {
 			color: $red;
 		}
@@ -207,6 +248,7 @@
 		transform: translate(-50%, -50%) scale(0);
 		opacity: 0;
 	}
+
 	to {
 		transform: translate(-50%, -50%) scale(1);
 		opacity: 1;

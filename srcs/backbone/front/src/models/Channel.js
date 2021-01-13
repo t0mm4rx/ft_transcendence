@@ -80,6 +80,9 @@ const Channel = Backbone.Collection.extend({
     });
   },
   socket() {
+    if (this.ftsocket) {
+      this.ftsocket.closeConnection();
+    }
     this.ftsocket = new FtSocket({
       id: this.channel_id,
       channel: "MessageChannel",
