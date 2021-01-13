@@ -15,7 +15,7 @@ module Api
 		@cu = @channel.channel_users.find_by(user_id: current_user.id)
 		if @cu.mute_date != nil && @cu != nil
 			if @cu.mute_date > DateTime.now
-				return render json: error = {error: "You are mute until #{@cu.mute_date}"}.to_json
+				return render json: { error: "You are mute until #{@cu.mute_date}"}, status: :forbidden
 			end
 		end
 		@message = @channel.messages.create(message_params)

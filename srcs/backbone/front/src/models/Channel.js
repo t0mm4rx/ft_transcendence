@@ -74,7 +74,9 @@ const Channel = Backbone.Collection.extend({
       type: "POST",
       data: `body=${body}`,
       success: () => {},
-      error: (data, state) => toasts.notifyError(state.responseJSON.error),
+      error: (state) => {
+        toasts.notifyError(state.responseJSON.error);
+      },
     });
   },
   socket() {
@@ -104,10 +106,9 @@ const Channel = Backbone.Collection.extend({
       type: "GET",
       success: (data) => {
         console.log("BLOCKED USERS: ", data);
-
         this.blockedUsers = data;
       },
-      error: (data, state) => toasts.notifyError(state.responseJSON.error),
+      error: (state) => toasts.notifyError(state.responseJSON.error),
     });
   },
 });
