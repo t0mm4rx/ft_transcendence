@@ -47,7 +47,7 @@ const Chat = Backbone.Collection.extend({
         });
       },
       error: () => {
-        toasts.notifyFailure("The channel couldn't be created.");
+        toasts.notifyError("The channel couldn't be created.");
       },
     });
   },
