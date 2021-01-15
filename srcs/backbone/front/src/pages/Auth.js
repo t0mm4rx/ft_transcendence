@@ -11,7 +11,7 @@ export default Backbone.View.extend({
 	initialize: function () {
 		this.isAuthOpen = false;
 		this.token = null;
-		this.qr_image = "https://chart.googleapis.com/chart?cht=qr&chs=400x400&chl=otpauth://totp/Transcendence?secret=GEZDGNBVGY3TQQSYLFKA&issuer=Transcendence";
+		this.qr_image = () => `https://chart.googleapis.com/chart?cht=qr&chs=400x400&chl=otpauth://totp/Transcendence?secret=${window.currentUser.get('otp_secret_key')}&issuer=Transcendence`;
 		this.listenTo(window.currentUser, 'change', this.renderSignup);
 	},
 	el: "#page",
@@ -20,14 +20,7 @@ export default Backbone.View.extend({
 			this.ask42Login();
 		},
 		'click #auth-go-button': function () {
-			const displayName = $("#display-name-input").val();
-			if (displayName.length <= 0) {
-				toasts.notifyError("The display name can't be empty");
-			} else {
-				window.currentUser.save('username', displayName);
-				toasts.notifySuccess("Your account has been created");
-				window.location.hash = "/";
-			}
+			this.signup();
 		},
 		'click #auth-2fa-button': function () {
 			this.check2fa();
@@ -39,12 +32,19 @@ export default Backbone.View.extend({
 				console.log("Block");
 				event.stopPropagation();
 			} else {
+				if (event.currentTarget.value.length > 1)
+				{
+					if (event.currentTarget.nextElementSibling) {
+						event.currentTarget.nextElementSibling.value = event.currentTarget.value[1];
+					}
+					event.currentTarget.value = event.currentTarget.value[0];
+				}
 				if (event.currentTarget.nextElementSibling)
 					event.currentTarget.nextElementSibling.focus();
 			}
 		},
 		'click #auth-2fa-show-qr': function () {
-			showModal("Lost your access ?", `<div id="modal-qr"><span>Scan this qr code in Google Authenticator.</span><img src="${this.qr_image}" /></div>`, () => true, () => true);
+			showModal("Lost your access ?", `<div id="modal-qr"><span>Scan this qr code in Google Authenticator.</span><img src="${this.qr_image()}" /></div>`, () => true, () => true);
 		},
 		'change #2fa-input': function (event) {
 			if (event.currentTarget.checked) {
@@ -84,16 +84,16 @@ export default Backbone.View.extend({
 				<div id="auth-2fa" class="auth-panel-secondary">
 					<h2>Open the Google Authenticator app</h2>
 					<div id="auth-2fa-inputs">
-						<input type="text" id="auth-2fa-1" />
-						<input type="text" id="auth-2fa-2" />
-						<input type="text" id="auth-2fa-3" />
-						<input type="text" id="auth-2fa-4" />
-						<input type="text" id="auth-2fa-5" />
-						<input type="text" id="auth-2fa-6" />
+						<input type="text" id="auth-2fa-1" placeholder="0"/>
+						<input type="text" id="auth-2fa-2" placeholder="1"/>
+						<input type="text" id="auth-2fa-3" placeholder="2"/>
+						<input type="text" id="auth-2fa-4" placeholder="3"/>
+						<input type="text" id="auth-2fa-5" placeholder="4"/>
+						<input type="text" id="auth-2fa-6" placeholder="5"/>
 					</div>
-					<div id="auth-2fa-qr-wrapper">
+					<!--<div id="auth-2fa-qr-wrapper">
 						<div class="button-icon" id="auth-2fa-show-qr"><i class="fas fa-qrcode"></i></div>
-					</div>
+					</div>-->
 					<span class="button" id="auth-2fa-button">Go!</span>
 				</div>
 			</div>`
@@ -114,7 +114,7 @@ export default Backbone.View.extend({
 					<label for="2fa-input">I want to use 2FA</label>
 				</div>
 				<div id="auth-2fa-section">
-					<img src=${this.qr_image} id="auth-qr-code" />
+					<img src=${this.qr_image()} id="auth-qr-code" />
 					<div id="qr-code-text"><span>Scan this QR code in Google Authenticator</span></div>
 				</div>
 				<span class="button" id="auth-go-button">Go!</span>
@@ -136,7 +136,6 @@ export default Backbone.View.extend({
 	},
 	ask42Login: function () {
 		let creation = null;
-		let token = null;
 		const w = window.open("http://0.0.0.0:3000/api/logintra", "_blank", "width=500px,height=500px");
 		window.addEventListener('message', event => {
 			w.close();
@@ -146,7 +145,7 @@ export default Backbone.View.extend({
 				return;
 			}
 			creation = eval(params.get("creation"));
-			token = params.get("token");
+			this.token = params.get("token");
 		}); 
 		this.toggleAuth();
 		const check = setInterval(() => {
@@ -154,41 +153,43 @@ export default Backbone.View.extend({
 				this.toggleAuth();
 				clearInterval(check);
 
-				if (!token) {
+				if (!this.token) {
 					toasts.notifyError("The authentification process hasn't been completed");
 					return;
 				}
 
-				// Scenario 1: first user connection, we show the register panel
-				if (creation) {
-					Cookies.set('user', token);
-					$(document).trigger('token_changed');
-					loadCurrentUser();
-					$("#auth-panel").addClass("auth-panel-open");
-					$("#auth-register").addClass("auth-panel-open");
-					return;
-				}
+				// We load the user
+				Cookies.set('user', this.token);
+				$(document).trigger('token_changed');
+				loadCurrentUser(() => {
+					// Scenario 1: first user connection, we show the register panel
+					if (creation) {
+						$("#auth-panel").addClass("auth-panel-open");
+						$("#auth-register").addClass("auth-panel-open");
+						return;
+					}
 
-				// Scenario 2: the user is already known but has 2FA activated
-				// if (!creation) {
-				// 	$("#auth-panel").addClass("auth-panel-open");
-				// 	$("#auth-2fa").addClass("auth-panel-open");
-				// }
-				
-				// Scenario 3: the user is already known and has no 2FA -> direct login
-				if (!creation) {
-					Cookies.set('user', token);
-					$(document).trigger('token_changed');
-					loadCurrentUser();
-					this.login(token);
-					return;
-				}
-
+					// Scenario 2: the user is already known but has 2FA activated
+					if (!creation && !!window.currentUser.get('tfa')) {
+						$("#auth-panel").addClass("auth-panel-open");
+						$("#auth-2fa").addClass("auth-panel-open");
+						return;
+					}
+					
+					// Scenario 3: the user is already known and has no 2FA -> direct login
+					if (!creation && !window.currentUser.get('tfa')) {
+						Cookies.set('user', this.token);
+						$(document).trigger('token_changed');
+						this.login();
+						return;
+					}
+				});
+				Cookies.remove('user');
 			}
 		}, 100);
 	},
-	login: function (token) {
-		Cookies.set('user', token);
+	login: function () {
+		Cookies.set('user', this.token);
 		$(document).trigger("token_changed");
 		loadCurrentUser();
 		window.location.hash = "/";
@@ -200,6 +201,37 @@ export default Backbone.View.extend({
 		if (code.length !== 6) {
 			toasts.notifyError("The code is incomplete.");
 			return;
+		}
+		$.ajax({
+			url: 'http://localhost:3000/api/tfa/',
+			type: 'get',
+			data: `code=${code}`,
+			success: () => {
+				window.currentUser.setTFA();
+				this.login();
+			},
+			error: () => {
+				toasts.notifyError("The given code is incorrect.");
+			}
+		})
+	},
+	signup: function () {
+		const displayName = $("#display-name-input").val();
+		const tfa = $("#2fa-input").is(':checked');
+		console.log("Signup, 2fa:", tfa);
+		if (displayName.length <= 0) {
+			toasts.notifyError("The display name can't be empty");
+		} else {
+			window.currentUser.save('username', displayName);
+			if (!tfa) {
+				this.login();
+				toasts.notifySuccess("Your account has been created");
+			} 
+			else {
+				$("#auth-register").removeClass("auth-panel-open");
+				$("#auth-panel").addClass("auth-panel-open");
+				$("#auth-2fa").addClass("auth-panel-open");
+			}
 		}
 	}
 });
