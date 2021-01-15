@@ -119,7 +119,7 @@ export default Backbone.Router.extend({
       window.currentView.unbind();
       window.currentView.stopListening();
     }
-    window.currentView = new Guild({name: id});
+    window.currentView = new Guild({anagram: id});
     window.currentView.render();
   },
   test: function () {

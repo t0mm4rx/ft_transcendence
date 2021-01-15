@@ -2,11 +2,14 @@
 import Backbone from 'backbone';
 import $ from 'jquery';
 import template from '../../templates/guild.html';
+import _ from 'underscore';
 
 export default Backbone.View.extend({
 	el: "#page",
-	initialize: function () {
-		this.listenTo(window.users, 'add', this.renderUsers);
+	initialize: function (options) {
+		this.listenTo(window.users, 'add', this.render);
+		this.listenTo(window.users, 'change', this.render);
+		this.anagram = options.anagram;
 	},
 	events: {
 		'click .message-button': function (event) {
@@ -14,10 +17,12 @@ export default Backbone.View.extend({
 		}
 	},
 	render: function () {
-		this.$el.html(template);
+		this.guild = window.guilds.where('anagram', this.anagram);
+		this.$el.html(_.template(template)({guild: this.guild}));
 		this.renderUsers();
 	},
 	renderUsers: function () {
+		this.guild = window.guilds.where('anagram', 'IAKL');
 		const friends = $("#guild-users-list");
 		friends.html("");
 		console.log(window.users.length);
