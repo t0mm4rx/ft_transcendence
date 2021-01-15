@@ -69,7 +69,8 @@ const User = Backbone.Model.extend({
     $.ajax({
       url: "http://localhost:3000/api/tfa",
       type: "POST",
-    });
+	});
+	window.currentUser.fetch();
   },
   block() {
     console.log(this);
