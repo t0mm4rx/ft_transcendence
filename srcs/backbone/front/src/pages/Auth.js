@@ -192,6 +192,7 @@ export default Backbone.View.extend({
 		Cookies.set('user', this.token);
 		$(document).trigger("token_changed");
 		loadCurrentUser();
+		loadGuilds();
 		window.location.hash = "/";
 	},
 	check2fa: function () {
