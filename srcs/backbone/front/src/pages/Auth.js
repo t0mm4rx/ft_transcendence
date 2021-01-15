@@ -20,14 +20,7 @@ export default Backbone.View.extend({
 			this.ask42Login();
 		},
 		'click #auth-go-button': function () {
-			const displayName = $("#display-name-input").val();
-			if (displayName.length <= 0) {
-				toasts.notifyError("The display name can't be empty");
-			} else {
-				window.currentUser.save('username', displayName);
-				toasts.notifySuccess("Your account has been created");
-				window.location.hash = "/";
-			}
+			this.signup();
 		},
 		'click #auth-2fa-button': function () {
 			this.check2fa();
@@ -98,9 +91,9 @@ export default Backbone.View.extend({
 						<input type="text" id="auth-2fa-5" placeholder="4"/>
 						<input type="text" id="auth-2fa-6" placeholder="5"/>
 					</div>
-					<div id="auth-2fa-qr-wrapper">
+					<!--<div id="auth-2fa-qr-wrapper">
 						<div class="button-icon" id="auth-2fa-show-qr"><i class="fas fa-qrcode"></i></div>
-					</div>
+					</div>-->
 					<span class="button" id="auth-2fa-button">Go!</span>
 				</div>
 			</div>`
@@ -171,8 +164,6 @@ export default Backbone.View.extend({
 				loadCurrentUser(() => {
 					// Scenario 1: first user connection, we show the register panel
 					if (creation) {
-						Cookies.set('user', this.token);
-						$(document).trigger('token_changed');
 						$("#auth-panel").addClass("auth-panel-open");
 						$("#auth-register").addClass("auth-panel-open");
 						return;
@@ -215,12 +206,32 @@ export default Backbone.View.extend({
 			url: 'http://localhost:3000/api/tfa/',
 			type: 'get',
 			data: `code=${code}`,
-			success: (res) => {
+			success: () => {
+				window.currentUser.setTFA();
 				this.login();
 			},
 			error: () => {
 				toasts.notifyError("The given code is incorrect.");
 			}
 		})
+	},
+	signup: function () {
+		const displayName = $("#display-name-input").val();
+		const tfa = $("#2fa-input").is(':checked');
+		console.log("Signup, 2fa:", tfa);
+		if (displayName.length <= 0) {
+			toasts.notifyError("The display name can't be empty");
+		} else {
+			window.currentUser.save('username', displayName);
+			if (!tfa) {
+				this.login();
+				toasts.notifySuccess("Your account has been created");
+			} 
+			else {
+				$("#auth-register").removeClass("auth-panel-open");
+				$("#auth-panel").addClass("auth-panel-open");
+				$("#auth-2fa").addClass("auth-panel-open");
+			}
+		}
 	}
 });
