@@ -8,7 +8,7 @@
 				<span>Ban a user</span>
 				<div class="input-row">
 					<input type="text" placeholder="Login of the user" id="ban-login-input" />
-					<input type="number" placeholder="Duration of the ban in minutes" id="ban-time-input" />
+					<input type="number" placeholder="Minutes" id="ban-time-input" />
 					<div class="button">
 						<span id="ban-button">Ban</span>
 					</div>
@@ -25,6 +25,25 @@
 	<div class="panel" id="tournament-management-panel">
 		<div class="panel-header">
 			<span>Create a tournament</span>
+		</div>
+		<div id="tournament-form">
+			<div class="input-wrapper">
+				<span>Tournament name</span>
+				<input type="text" placeholder="Monthly tournament #2" id="tournament-name-input" />
+			</div>
+			<div class="input-row">
+				<div class="input-wrapper">
+					<span>Registration time</span>
+					<input type="number" placeholder="In minutes" id="tournament-time-input" />
+				</div>
+				<div class="input-wrapper">
+					<span>Reward</span>
+					<input type="number" placeholder="Points" id="tournament-reward-input" />
+				</div>
+			</div>
+			<div class="button" id="create-tournament-button">
+				<span>Create</span>
+			</div>
 		</div>
 	</div>
 </div>

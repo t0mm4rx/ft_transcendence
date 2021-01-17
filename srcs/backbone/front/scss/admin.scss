@@ -13,7 +13,7 @@
 		box-sizing: border-box;
 	}
 	#channels-listing-wrapper {
-		height: 400px;
+		max-height: 400px;
 		overflow: hidden;
 		border-radius: 10px;
 		margin: 10px;
@@ -22,7 +22,7 @@
 		box-sizing: border-box;
 		background-color: $grey_dark_light;
 		overflow-y: auto;
-		height: 400px;
+		max-height: 400px;
 		.channel-item {
 			padding: 10px;
 			display: flex;
@@ -34,5 +34,15 @@
 				margin: 5px;
 			}
 		}
+	}
+	#tournament-form {
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+	#create-tournament-button {
+		align-self: center;
+		margin: 10px;
 	}
 }
