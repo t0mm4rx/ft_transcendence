@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import $ from 'jquery';
 import toasts from '../utils/toasts';
 import { User } from '../models/User';
-import { loadCurrentUser } from '../utils/globals';
+import { loadCurrentUser, loadGuilds } from '../utils/globals';
 import {showModal} from '../utils/modal';
 
 export default Backbone.View.extend({
@@ -213,6 +213,7 @@ export default Backbone.View.extend({
 			},
 			error: () => {
 				toasts.notifyError("The given code is incorrect.");
+				document.querySelectorAll("#auth-2fa-inputs input").forEach(el => el.value = "");
 			}
 		})
 	},
