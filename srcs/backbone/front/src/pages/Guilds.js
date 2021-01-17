@@ -2,6 +2,7 @@
 import Backbone from 'backbone';
 import $ from 'jquery';
 import template from '../../templates/guilds.html';
+import _ from "underscore";
 
 export default Backbone.View.extend({
 	el: "#page",
@@ -13,7 +14,6 @@ export default Backbone.View.extend({
 		"keydown #name-input": function (evt) {
 			setTimeout(() => {
 				$("#anagram-input").val(this.findAnagram());
-				// console.log();
 			}, 20);
 		},
 		"keydown #anagram-input": function () {
@@ -32,9 +32,12 @@ export default Backbone.View.extend({
 	},
 	initialize: function () {
 		this.listenTo(window.guilds, 'add', this.renderGuildsList);
+		this.listenTo(window.currentUser, 'change', this.render);
 	},
 	render: function () {
-		this.$el.html(template);
+		this.$el.html(_.template(template)({
+			isInGuild: !!window.currentUser.get('guild')
+		}));
 		this.renderGuildsList();
 	},
 	renderGuildsList: function () {

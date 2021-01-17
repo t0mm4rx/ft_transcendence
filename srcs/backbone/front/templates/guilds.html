@@ -6,6 +6,7 @@
 		<div id="guilds-listing"></div>
 	</div>
 	<div class="panel">
+		<% if (!isInGuild) { %>
 		<div class="panel-header">
 			<span>Create your guild</span>
 		</div>
@@ -22,5 +23,28 @@
 				<span id="guild-create-button">Create</span>
 			</div>
 		</div>
+		<% } else { %>
+		<div class="panel-header">
+			<i class="fas fa-bomb"></i>
+			<span>War zone</span>
+		</div>
+		<div id="guilds-create-form">
+			<div class="input-wrapper">
+				<span>Opponent guild's anagram</span>
+				<input type="text" placeholder="Other guild's 5 letter anagram" id="anagram-input" />
+			</div>
+			<div class="input-wrapper">
+				<span>Stake</span>
+				<input type="number" placeholder="The amount your guild will win/lose" id="stake-input" />
+			</div>
+			<div class="input-wrapper">
+				<span>Max unanswered games</span>
+				<input type="number" placeholder="Leave empty for no limit" id="max-input" min="1"/>
+			</div>
+			<div class="button">
+				<span id="guild-war-button">Declare war</span>
+			</div>
+		</div>
+		<% } %>
 	</div>
 </div>
