@@ -58,6 +58,9 @@ a {
 	align-items: center;
 	font-weight: 600;
 	font-size: $xl;
+	i, svg {
+		margin-right: 10px;
+	}
 }
 
 /*
