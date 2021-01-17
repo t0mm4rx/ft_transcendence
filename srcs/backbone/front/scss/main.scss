@@ -11,6 +11,7 @@
 @import './modal.scss';
 @import './guild-page.scss';
 @import './guilds-page.scss';
+@import './admin.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html,
@@ -109,6 +110,7 @@ a {
 	border: none;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	font-weight: 800;
 	font-size: $m;
 	width: auto;
@@ -290,6 +292,16 @@ input[type="number"],
 	align-items: center;
 	margin-top: 10px;
 	margin-bottom: 10px;
+}
+
+.input-row {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	> * {
+		flex: 1;
+		margin: 5px;
+	}
 }
 
 /*
