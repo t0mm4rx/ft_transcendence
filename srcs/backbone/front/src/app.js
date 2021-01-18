@@ -16,6 +16,7 @@ import $ from "jquery";
 import Cookies from "js-cookie";
 import { loadCurrentUser, loadUsers, loadGuilds } from "./utils/globals";
 import { Guilds } from "./models/Guild";
+import { FtSocket } from './models/FtSocket'
 
 // Temp game server
 // import express from 'express';
@@ -131,5 +132,37 @@ window.notifications.add(
 
 // Page layout
 window.layoutView = new PageLayout().render();
+
+// Global socket
+var globalSocket = new FtSocket({
+  channel: 'GlobalChannel',
+});
+
+globalSocket.socket.onmessage = function(event) { 
+			
+  const event_res = event.data;
+  const msg = JSON.parse(event_res);
+
+  // Ignores pings.
+  if (msg.type === "ping")
+    return;
+
+  if (msg.message)
+  {
+    if (msg.message.message == "new_client")
+    {
+      // Refresh HERE
+      console.log("[TMP] New client.");
+    }
+  }
+};
+
+// Send message to everyone
+globalSocket.sendMessage({
+  action: "to_broadcast",
+  infos: {
+    message: "new_client",
+    content: {}
+}}, false, true);
 
 Backbone.history.start();
