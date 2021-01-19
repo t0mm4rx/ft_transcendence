@@ -3,6 +3,7 @@ import Backbone from 'backbone';
 import $ from 'jquery';
 import template from '../../templates/guild.html';
 import _ from 'underscore';
+import {showModal} from '../utils/modal';
 
 export default Backbone.View.extend({
 	el: "#page",
@@ -14,6 +15,14 @@ export default Backbone.View.extend({
 	events: {
 		'click .message-button': function (event) {
 			$(document).trigger('chat', {chat: event.currentTarget.id.split('-')[1]});
+		},
+		'click .user-settings': function (event) {
+			const login = event.currentTarget.getAttribute("login");
+			showModal("Manage rights", 
+			`<div id="rights-management-wrapper"><div class="button"><span>Make owner</span></div><div class="button"><span>Make officer</span></div></div>`
+			, () => {
+				return true;
+			}, () => true);
 		}
 	},
 	render: function () {
@@ -35,6 +44,7 @@ export default Backbone.View.extend({
 					<span class="button-icon message-button" id="message-${friend.get('login')}"><i class="far fa-comment"></i></span>
 					${friend.get('online') ? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}
 					${friend.get('login') === 'rchallie' ? "<i class=\"fas fa-crown owner-icon\"></i>" : ""}
+					${!!window.currentUser.get('admin') ? `<span class="button-icon user-settings" login="${friend.get('login')}"><i class="fas fa-cog"></i></span>` : ""}
 				</div>`
 			);
 		});
