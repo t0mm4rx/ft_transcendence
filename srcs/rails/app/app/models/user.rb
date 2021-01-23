@@ -85,5 +85,7 @@ class User < ApplicationRecord
 		self.guild_id ||= nil
 		self.guild_owner ||= false
 		self.guild_officer ||= false
+		self.guild_locked ||= false
+		self.guild_invites ||= 0
 	end
 end
