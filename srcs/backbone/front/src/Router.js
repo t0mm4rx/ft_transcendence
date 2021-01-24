@@ -36,9 +36,9 @@ export default Backbone.Router.extend({
     "guild/:id/": "guild",
     test: "test",
     "test/": "test",
-    "admin": "admin",
+    admin: "admin",
     "admin/": "admin",
-    "auth": "auth",
+    auth: "auth",
     "auth/": "auth",
     token: "token",
     "token/": "token",
@@ -122,7 +122,7 @@ export default Backbone.Router.extend({
       window.currentView.unbind();
       window.currentView.stopListening();
     }
-    window.currentView = new Guild({anagram: id});
+    window.currentView = new Guild({ anagram: id });
     window.currentView.render();
   },
   test: function () {
@@ -137,20 +137,23 @@ export default Backbone.Router.extend({
     window.currentView.render();
   },
   admin: function () {
-	this.checkLogged();
-	this.showLayout();
-	if (!window.currentUser.get('admin'))
-	{
-		window.location.hash = "/";
-		return;
-	}
+    this.checkLogged();
+    this.showLayout();
+    if (!window.currentUser.get("admin")) {
+      window.location.hash = "/";
+      return;
+    }
     if (window.currentView) {
       window.currentView.undelegateEvents();
       window.currentView.unbind();
       window.currentView.stopListening();
-	}
-    window.currentView = new Admin();
-    window.currentView.render();
+    }
+    window.currentView = new Admin({
+      collection: window.chat,
+    });
+    window.chat.fetch({ success: () => window.currentView.render() });
+    // window.currentView = new Admin();
+    // window.currentView.render();
   },
   auth: function () {
     if (!!Cookies.get("user")) {

@@ -112,17 +112,16 @@ export default Backbone.View.extend({
     return html;
   },
   editChannel() {
-    this.channelUsers = new ChannelUsers({
+    const channelUsers = new ChannelUsers({
       channel_id: this.model.id,
-      private: this.model.get("private"),
     });
-    this.editView = new EditChat({
+    const editView = new EditChat({
       model: this.model,
-      collection: this.channelUsers,
+      collection: channelUsers,
     });
-    this.channelUsers.fetch({
+    channelUsers.fetch({
       success: () => {
-        this.editView.render(this.model.get("owner"));
+        editView.render(this.model.get("owner"));
       },
       error: () => toasts.notifyError("Failed to get channel data."),
     });

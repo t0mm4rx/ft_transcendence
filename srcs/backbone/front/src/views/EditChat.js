@@ -46,8 +46,8 @@ export default Backbone.View.extend({
             return false;
           }
           if (
-            this.model.get("private") === false &&
-            (password == "" || no_pass)
+            (password == "" && !no_pass) ||
+            (this.model.get("private") === false && no_pass)
           )
             return true;
           const data = no_pass
