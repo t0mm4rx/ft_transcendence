@@ -5,17 +5,16 @@ import $ from "jquery";
 import toasts from "../utils/toasts";
 
 const Channel = Backbone.Model.extend({
-  edit(data, id, success_message) {
+  leave() {
     $.ajax({
-      url: this.url,
-      type: "PUT",
-      data: data,
+      url: `http://localhost:3000/api/channels/${this.id}/channel_users/${window.currentUser.id}`,
+      type: "DELETE",
       success: () => {
-        toasts.notifySuccess(`Password ${success_message}`);
-        this.fetch();
+        toasts.notifySuccess(`Left channel`);
+        this.trigger("leave");
       },
       error: () => {
-        toasts.notifyError("Failed to change password");
+        toasts.notifyError("Failed to leave channel");
       },
     });
   },
@@ -23,15 +22,15 @@ const Channel = Backbone.Model.extend({
 
 const Chat = Backbone.Collection.extend({
   url: "http://localhost:3000/api/channels/",
-  model: Channel,
   initialize() {
     this.fetch();
     this.currentChat = null;
   },
-  addChannel(name, password, onSuccess) {
+  model: Channel,
+  addChannel(name, password) {
     const existing = this.findWhere({ name: name });
     if (!!existing) {
-      onSuccess(existing.id);
+      this.get(existing.id).trigger("changeTo");
       return;
     }
     $.ajax({
@@ -40,9 +39,9 @@ const Chat = Backbone.Collection.extend({
       data: `name=${name}&password=${password}`,
       success: (data) => {
         this.fetch({
-          success: () => {
+          success: (d) => {
             toasts.notifySuccess("The channel has been created.");
-            onSuccess(data.id);
+            setTimeout(() => this.get(data.id).trigger("changeTo"), 300);
           },
         });
       },
@@ -51,7 +50,6 @@ const Chat = Backbone.Collection.extend({
       },
     });
   },
-
   editChannel(data, id, success_message) {
     $.ajax({
       url: `http://localhost:3000/api/channels/${id}`,
@@ -59,23 +57,14 @@ const Chat = Backbone.Collection.extend({
       data: data,
       success: () => {
         toasts.notifySuccess(`Password ${success_message}`);
-        this.fetch();
+        this.fetch({
+          success: () => {
+            setTimeout(() => this.get(id).trigger("changeTo"), 300);
+          },
+        });
       },
       error: () => {
         toasts.notifyError("Failed to change password");
-      },
-    });
-  },
-
-  leaveChannel(id) {
-    $.ajax({
-      url: `http://localhost:3000//api/channels/${id}/channel_users/${window.currentUser.id}`,
-      type: "DELETE",
-      success: () => {
-        toasts.notifySuccess(`Left channel`);
-      },
-      error: () => {
-        toasts.notifyError("Failed to leave channel");
       },
     });
   },

@@ -1,113 +1,71 @@
 /* Chat panel view. Like the notification panel, the frame template is used to open/close the panel.*/
 import Backbone from "backbone";
 import template from "../../templates/chat.html";
-import { FtSocket, FtSocketCollection } from "../models/FtSocket";
 import $ from "jquery";
 import _ from "underscore";
-import ChannelView from "./Channel";
-import EditChannelView from "./EditChat";
-import { Chat } from "../models/Chat";
-import { Channel } from "../models/Channel";
-import { ChannelUsers } from "../models/ChannelUsers";
+import ChannelListElement from "./ChannelListElement";
 import { showModal } from "../utils/modal";
 import toasts from "../utils/toasts";
 
 export default Backbone.View.extend({
   initialize() {
-    this.listenTo(this.model, "sync", this.renderChannelList);
-    this.listenTo(this.model, "add", this.renderChannelList);
+    this.$el.html(template);
+    this.listenTo(this.collection, "sync", this.render);
+    this.listenTo(this.collection, "change", this.render);
     $(document).on("chat", (_, { chat }) => {
       $("#chat-panel").addClass("chat-panel-open");
       this.newChannel(chat);
     });
-    this.currentMessages = new Channel();
-    this.channelUsers = new ChannelUsers();
   },
-  model: Chat,
   el: "#chat-container",
   events: {
     "click #chat-panel-close": function () {
       $("#chat-panel").removeClass("chat-panel-open");
     },
     "click #chat-icon": function () {
-      this.model.fetch();
+      this.collection.fetch();
       $("#chat-panel").addClass("chat-panel-open");
     },
-    "click .chat-channel": function (e) {
-      this.changeChannel(e.target.id);
-    },
-    "click #new-channel-button": "createChannel",
-    "click .button-icon#leave-channel": "leaveChannel",
-    "click .button-icon#edit-channel": "editChannel",
-    "click .button-icon#start-game": () => console.log("start game"),
-    "click .button-icon#block-user": "blockUser",
-    "keyup #channel-input": "keyPressEventHandler",
+    "keyup #channel-input": "onKeyUp",
     "focus #channel-input": "autocomplete",
     "blur #channel-input": "closeAutocomplete",
+    "click #new-channel-button": "createChannel",
     "click .autocomplete-item": function (event) {
-      this.newChannel(event.target.innerText, "");
+      this.collection.addChannel(event.target.innerText, "");
     },
-    "click #chat-title": "getUserProfile",
-    "click #chat-avatar": "getUserProfile",
     "click .fa-search": function () {
       $("#channel-input").trigger("focus");
     },
   },
   render() {
-    this.$el.html(template);
-    this.renderChannelList();
-  },
-  renderChannelList() {
-    const template = _.template($("#tpl-channel-list").html());
-    let channelList = "";
-    let current = "public";
-    this.model.forEach((channel) => {
-      if (channel.attributes.private && current === "public") {
-        channelList += `<hr class="chat-channel-divider">`;
+    let current = "public"; // todo: enum
+    this.$("#channels-list").html(
+      `<div id="input-container">
+        <div id="icon-container">
+          <i class="fas fa-search"></i>
+        </div>
+        <input type="text" id="channel-input" placeholder="Find user" />
+      </div>`
+    );
+    this.collection.each((channel) => {
+      if (channel.get("private") && current == "public") {
+        this.$("#channels-list").append(`<hr class="chat-channel-divider"/>`);
         current = "private";
       }
-      if (channel.attributes.direct && current !== "direct") {
-        channelList += `<hr class="chat-channel-divider">`;
+      if (channel.get("direct") && current != "direct") {
+        this.$("#channels-list").append(`<hr class="chat-channel-divider"/>`);
         current = "direct";
       }
-      channelList += `<span class="chat-channel${
-        this.currentChat === channel ? " channel-current" : ""
-      }" id="${channel.id}">${channel.attributes.name}</span>`;
+      let channelView = new ChannelListElement({
+        model: channel,
+        id: channel.id,
+      });
+      this.$("#channels-list").append(channelView.render().el);
     });
-    $("#chat-channels").html(template({ channels: channelList }));
+    this.$("#channels-list").append(`<div id="autocomplete-container"></div>`);
     $("#autocomplete-container").hide();
   },
-  renderChannel() {
-    const user = window.users.findWhere({
-      login: this.currentChat.get("name"),
-    });
-    const avatar = !!user ? user.get("avatar_url") : null;
-
-    $("#chat-chat").html("");
-    if (this.currentChat) {
-      const template = _.template($("#tpl-chat-wrap").html());
-      const chatJson = this.currentChat.toJSON();
-      chatJson.avatar = !!avatar ? avatar : "";
-      $("#chat-chat").append(template(chatJson));
-    }
-  },
-  changeChannel(id) {
-    console.log("CHANGE TO", id);
-    const chosenChannel = this.model.get(id);
-    if (chosenChannel === this.currentChat) return;
-    if (this.currentChat) {
-      $(`#${this.currentChat.id}.chat-channel`).removeClass("channel-current");
-    }
-    $(`#${id}.chat-channel`).addClass("channel-current");
-    this.currentChat = chosenChannel;
-    this.renderChannel();
-    if (!this.channelView) {
-      this.channelView = new ChannelView({ model: this.currentMessages });
-      this.editView = new EditChannelView({ model: this.channelUsers });
-    }
-    this.currentMessages.changeChannel(id);
-  },
-  keyPressEventHandler(event) {
+  onKeyUp(event) {
     if (event.target.id == "channel-input") {
       if (event.keyCode === 27) {
         event.target.blur();
@@ -115,9 +73,6 @@ export default Backbone.View.extend({
         this.autocomplete();
       }
     }
-  },
-  newChannel(name, password) {
-    this.model.addChannel(name, password, (id) => this.changeChannel(id));
   },
   createChannel() {
     showModal(
@@ -131,29 +86,11 @@ export default Backbone.View.extend({
           toasts.notifyError("Channel name can't be empty!");
           return false;
         }
-        this.newChannel(name, password);
+        this.collection.addChannel(name, password);
         return true;
       },
       () => {}
     );
-  },
-  editChannel() {
-    this.channelUsers.loadWithId(
-      this.currentChat.id,
-      this.currentChat.get("private")
-    );
-    this.channelUsers.fetch({
-      success: () => {
-        this.editView.render(this.currentChat.get("owner"));
-      },
-      error: () => toasts.notifyError("Failed to get channel data."),
-    });
-  },
-  leaveChannel() {
-    if (confirm(`Are your sure you want to leave the channel?`)) {
-      this.model.leaveChannel(this.currentChat.id);
-      // todo: change to another channel
-    }
   },
   getUserProfile() {
     const login = this.currentChat.get("name");
@@ -162,13 +99,7 @@ export default Backbone.View.extend({
       window.location.hash = `user/${login}/`;
     }
   },
-  blockUser(e) {
-    console.log("BLOCK USER");
-    // const login = $(e.currentTarget).siblings("#chat-title").html();
 
-    // console.log($(e.currentTarget).siblings("#chat-title").html());
-    // window.currentUser.block(login);
-  },
   autocomplete() {
     const query = $("#channel-input").val();
     let result = false;

@@ -7,65 +7,16 @@
   <div id="chat-panel-close" class="button-icon">
     <i class="fas fa-times"></i>
   </div>
-
   <div id="chat-panel-content">
-    <div id="chat-channels"></div>
-    <div id="chat-chat"></div>
+    <div id="chat-channels">
+      <div id="channels-list"></div>
+      <div id="new-channel-button">
+        <i class="far fa-comments"></i><span>New channel</span>
+      </div>
+    </div>
+    <div class="chat-chat"></div>
   </div>
 </div>
-
-<script type="text/template" id="tpl-chat-message">
-  <div class="chat-message-container<%= sentByMe %><%= sentByLast%>" id="<%= username %>">
-    <% if (sentByLast == "")  { %>
-    <div class="chat-message-infos">
-  	<a href="/#user/<%= login %>/" class="chat-message-username" id="<%= login %>"><%= username %></a><span><%= date %></span>
-    </div>
-    <% } %>
-    <!-- <div class="chat-message-row">
-    <% if (sentByMe == "" && sentByLast == "") { %>
-      <img id="chat-avatar" src="<%= avatar %>" />
-      <% } %> -->
-      <div class="chat-message"><%= body %></div>
-    <!-- </div> -->
-  </div>
-</script>
-
-<script type="text/template" id="tpl-chat-wrap">
-  <div class="chat-header">
-    <% if (avatar != "") { %>
-    <img id="chat-avatar" src="<%= avatar %>" />
-    <% } %>
-    <span id="chat-title"><%= name %></span>
-    <% if (avatar != "") { %>
-    <div class="button-icon" id="start-game"><i class="fas fa-gamepad"></i></div>
-    <div class="button-icon" id="block-user"><i class="fas fa-ban"></i></div>
-    <% } else { if (admin) { %>
-      <div class="button-icon" id="edit-channel"><i class="fas fa-cog"></i></div>
-     <% } %>
-      <div class="button-icon" id="leave-channel"><i class="fas fa-sign-out-alt"></i></div>
-     <% } %>
-  </div>
-  <div id="chat-messages"></div>
-  <div class="chat-input">
-    <input type="text" id="chat-input" placeholder="Send something" />
-  </div>
-</script>
-
-<script type="text/template" id="tpl-channel-list">
-  <div id="input-container">
-    <div id="icon-container">
-      <i class="fas fa-search"></i>
-    </div>
-    <input type="text" id="channel-input" placeholder="Find user" />
-  </div>
-  <div id="channels-list">
-    <%= channels %>
-    <div id="autocomplete-container"></div>
-  </div>
-  <div id="new-channel-button">
-    <i class="far fa-comments"></i><span>New channel</span>
-  </div>
-</script>
 
 <script type="text/template" id="tpl-edit-channel-form">
   <div class="form-channel" id="edit">
@@ -121,37 +72,17 @@
   </div>
 </script>
 
-<script type="text/template" id="tpl-edit-channel-form-user">
-  <div class="chat-edit user-profile" id="<%= user_id %>">
-    <img id="chat-avatar" src="<%= avatar %>" />
-    <span id="chat-username"><%= username %></span>
-    <div class="button-icon delete"><i class="fas fa-times-circle"></i></div>
-  </div>
-</script>
-
 <script type="text/html" id="create-channel-form">
   <div class="form-channel" id="create">
     <div class="input-wrapper">
-      <!-- <label for="new-channel-name">Name</label> -->
       <input type="text" placeholder="Channel name" id="new-channel-name" />
     </div>
     <div class="input-wrapper">
-      <!-- <label for="new-channel-password">Password (empty for no password)</label> -->
       <input
         type="password"
         placeholder="Password (empty for no password)"
         id="new-channel-password"
       />
     </div>
-  </div>
-</script>
-
-<script type="text/template" id="tpl-join-channel-form">
-  <div id="form-channel">
-    <%  if (password) { %>
-    <div class="input-wrapper">
-      <input type="password" placeholder="Enter password" id="new-channel-password" />
-    </div>
-    <% } %>
   </div>
 </script>
