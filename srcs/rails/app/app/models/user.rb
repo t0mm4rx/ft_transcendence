@@ -59,18 +59,18 @@ class User < ApplicationRecord
 	end
 
 	def self.set_first_admin(user)
-		if user != nil && user.id == 14
+		if user != nil && user.id == 1
 			user.admin = true
 		end
 	end
 
-	def guild
-		friendships_.filter_map do |friendship|
-			if friendship.accepted
-				friendship.user_id == id ? friendship.friend : friendship.user
-			end
-		end
-	end
+	# def guild
+	# 	friendships_.filter_map do |friendship|
+	# 		if friendship.accepted
+	# 			friendship.user_id == id ? friendship.friend : friendship.user
+	# 		end
+	# 	end
+	# end
 
 	private
 
@@ -82,5 +82,10 @@ class User < ApplicationRecord
 		self.avatar_url ||= "https://cdn.intra.42.fr/users/small_#{self.login}.jpg"
 		self.tfa ||= false
 		self.admin ||= false
+		self.guild_id ||= nil
+		self.guild_owner ||= false
+		self.guild_officer ||= false
+		self.guild_locked ||= false
+		self.guild_invites ||= 0
 	end
 end
