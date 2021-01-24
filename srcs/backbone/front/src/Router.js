@@ -15,6 +15,7 @@ import $ from "jquery";
 import User from "./pages/User";
 import Livestream from "./pages/Livestream";
 import Guild from "./pages/Guild";
+import Admin from "./pages/Admin";
 
 export default Backbone.Router.extend({
   routes: {
@@ -35,7 +36,9 @@ export default Backbone.Router.extend({
     "guild/:id/": "guild",
     test: "test",
     "test/": "test",
-    auth: "auth",
+    "admin": "admin",
+    "admin/": "admin",
+    "auth": "auth",
     "auth/": "auth",
     token: "token",
     "token/": "token",
@@ -119,7 +122,7 @@ export default Backbone.Router.extend({
       window.currentView.unbind();
       window.currentView.stopListening();
     }
-    window.currentView = new Guild({ name: id });
+    window.currentView = new Guild({anagram: id});
     window.currentView.render();
   },
   test: function () {
@@ -131,6 +134,22 @@ export default Backbone.Router.extend({
       window.currentView.stopListening();
     }
     window.currentView = new Test();
+    window.currentView.render();
+  },
+  admin: function () {
+	this.checkLogged();
+	this.showLayout();
+	if (!window.currentUser.get('admin'))
+	{
+		window.location.hash = "/";
+		return;
+	}
+    if (window.currentView) {
+      window.currentView.undelegateEvents();
+      window.currentView.unbind();
+      window.currentView.stopListening();
+	}
+    window.currentView = new Admin();
     window.currentView.render();
   },
   auth: function () {

@@ -1,7 +1,7 @@
 <div id="guild-page">
 	<div class="panel" id="guild-identity">
 		<div class="panel-header">
-			<span>International killers team</span>
+			<span><%= !!guild ? guild.get('name') : '...' %></span>
 		</div>
 		<div id="guild-actions">
 			<div class="button-icon">
@@ -15,13 +15,13 @@
 			<div id="guild-points">
 				<div class="guild-info">
 					<span>Points</span>
-					<span>4254</span>
+					<span><%= !!guild ? guild.get('score') : '...' %></span>
 				</div>
 			</div>
 			<div id="guild-infos">
 				<div class="guild-info">
 					<span>Anagram</span>
-					<span>INAKL</span>
+					<span><%= !!guild ? guild.get('anagram') : '...' %></span>
 				</div>
 				<div class="guild-info">
 					<span># of users</span>

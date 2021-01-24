@@ -6,7 +6,7 @@ import template from '../../templates/game.html';
 import p5 from 'p5';
 import {Game, GameCollection} from '../models/Game';
 import GameCanvas from '../views/GameCanvas';
-import {FtSocket, FtSocketCollection} from '../models/FtSocket'
+import {FtSocket} from '../models/FtSocket'
 import { generateUUID } from '../utils/uuid'
 
 export default Backbone.View.extend({

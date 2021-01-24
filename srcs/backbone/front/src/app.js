@@ -14,7 +14,9 @@ import ChatPanel from "./views/Chat";
 import { Chat } from "./models/Chat";
 import $ from "jquery";
 import Cookies from "js-cookie";
-import { loadCurrentUser, loadUsers } from "./utils/globals";
+import { loadCurrentUser, loadUsers, loadGuilds } from "./utils/globals";
+import { Guilds } from "./models/Guild";
+import { FtSocket } from './models/FtSocket'
 
 // Temp game server
 // import express from 'express';
@@ -46,13 +48,9 @@ loadCurrentUser();
 window.users = new Users();
 loadUsers();
 
-// We create our global models
-// window.currentUser = new User({
-// 	id: 2564,
-// 	login: 'tmarx',
-// 	displayName: 'Air Marx',
-// 	avatar: 'https://cdn.intra.42.fr/users/large_tmarx.jpg'
-// });
+// Guilds
+window.guilds = new Guilds();
+loadGuilds();
 
 window.friends = new Friends();
 window.friends.add(
@@ -134,5 +132,37 @@ window.notifications.add(
 
 // Page layout
 window.layoutView = new PageLayout().render();
+
+// Global socket
+var globalSocket = new FtSocket({
+  channel: 'GlobalChannel',
+});
+
+globalSocket.socket.onmessage = function(event) { 
+			
+  const event_res = event.data;
+  const msg = JSON.parse(event_res);
+
+  // Ignores pings.
+  if (msg.type === "ping")
+    return;
+
+  if (msg.message)
+  {
+    if (msg.message.message == "new_client")
+    {
+      // Refresh HERE
+      console.log("[TMP] New client.");
+    }
+  }
+};
+
+// Send message to everyone
+globalSocket.sendMessage({
+  action: "to_broadcast",
+  infos: {
+    message: "new_client",
+    content: {}
+}}, false, true);
 
 Backbone.history.start();
