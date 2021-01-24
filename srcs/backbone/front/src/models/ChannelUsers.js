@@ -14,12 +14,16 @@ const ChannelUsers = Backbone.Collection.extend({
     console.log(this.models);
 
     const user = this.findWhere({ username: username });
+    console.log("USER", user);
+
+    // if (user.get("admin") == true && type != "admin") return null;
     if (user) {
       user.set(type, true);
-      if (type !== "admin") {
+      if (type == "banned" || type == "muted") {
         const dateType = type == "banned" ? "ban_date" : "mute_date";
         user.set(dateType, date);
       }
+      console.log(user, "SET", type, "TO TRUE");
     }
     return user;
   },
@@ -39,7 +43,7 @@ const ChannelUsers = Backbone.Collection.extend({
   saveChanges() {
     this.models.forEach((channelUser) => {
       if (channelUser.hasChanged()) {
-        console.log(channelUser);
+        console.log(channelUser, "has changed");
         channelUser.save({
           success: () => console.log("Successfully updated user"),
           error: () =>

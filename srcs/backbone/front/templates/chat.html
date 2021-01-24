@@ -20,7 +20,20 @@
 
 <script type="text/template" id="tpl-edit-channel-form">
   <div class="form-channel" id="edit">
-    <% if (owner) { %>
+    <% if (admin) { %>
+    <div class="input-wrapper">
+      <h3>Owners</h3>
+      <div class="user-container" id="owner">
+      <%= owners %>
+      </div>
+      <div class="input-field">
+      <input class="username" type="text" placeholder="Username" id="owner" />
+      <div class="autocomplete" id="owner"></div>
+      <div style="display: inline;" class="button add" id="owner">Add</div>
+      </div>
+    </div>
+    <% } %>
+    <% if (admin || owner) { %>
     <div class="input-wrapper">
       <h3>Admins</h3>
       <div class="user-container" id="admin">
@@ -32,7 +45,7 @@
       <div style="display: inline;" class="button add" id="admin">Add</div>
       </div>
     </div>
-    <% } %>
+    <% } if (!admin) { %>
     <div class="input-wrapper">
       <h3>Muted</h3>
       <div class="user-container" id="muted">
@@ -68,6 +81,7 @@
       <label for="no-password">No password</label>
       </div>
     </div>
+    <% } %>
     <% } %>
   </div>
 </script>
