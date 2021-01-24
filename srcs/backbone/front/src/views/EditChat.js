@@ -1,17 +1,21 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import _ from "underscore";
-import { ChannelUsers } from "../models/ChannelUsers";
 import { showModal } from "../utils/modal";
 import toasts from "../utils/toasts";
 
 export default Backbone.View.extend({
   initialize() {
-    this.userTemplate = _.template($("#tpl-edit-channel-form-user").html());
+    this.userTemplate = _.template(
+      `<div class="chat-edit user-profile" id="<%= user_id %>">
+        <img id="chat-avatar" src="<%= avatar %>" />
+        <span id="chat-username"><%= username %></span>
+        <div class="button-icon delete"><i class="fas fa-times-circle"></i></div>
+      </div>`
+    );
     this.template = _.template($("#tpl-edit-channel-form").html());
-    this.listenTo(this.model, "change", this.renderUser);
+    // this.listenTo(this.collection, "change", this.renderUser);
   },
-  model: ChannelUsers,
   el: "body",
   events: {
     "keyup input.username": "keyPressEventHandler",
@@ -22,15 +26,18 @@ export default Backbone.View.extend({
       $(id).val(e.currentTarget.innerText);
       $(id).blur();
     },
-    "click .button.add": "addToCategory",
-    "click .button-icon.delete": "removeFromCategory",
+    "click .add": "addToCategory",
+    "click .delete": "removeFromCategory",
   },
   render(owner) {
+    console.log("RENDER EDIT CHAT", this.collection);
+
     const templateData = this.renderChannelUsers(owner);
     showModal(
       "Edit channel",
       this.template(templateData),
       () => {
+        this.collection.saveChanges();
         if (owner) {
           const password = $("#new-channel-password").val();
           const no_pass = $("#no-password:checked").length > 0;
@@ -38,9 +45,18 @@ export default Backbone.View.extend({
             toasts.notifyError("Enter a password or check the box");
             return false;
           }
-          this.model.editPassword(password, no_pass);
+          if (
+            (password == "" && !no_pass) ||
+            (this.model.get("private") === false && no_pass)
+          )
+            return true;
+          const data = no_pass
+            ? `remove_password=${true}`
+            : `add_change_password=${password}`;
+          let success_message = no_pass ? "removed" : "changed";
+          if (this.model.get("private") === false) success_message = "added";
+          window.chat.editChannel(data, this.model.id, success_message);
         }
-        this.model.save();
         return true;
       },
       () => {}
@@ -49,15 +65,15 @@ export default Backbone.View.extend({
   },
   renderChannelUsers(owner) {
     let htmlAdmins = "";
-    this.model.where({ admin: true }).forEach((user) => {
+    this.collection.where({ admin: true }).forEach((user) => {
       htmlAdmins += this.userTemplate(user.toJSON());
     });
     let htmlMuted = "";
-    this.model.where({ muted: true }).forEach((user) => {
+    this.collection.where({ muted: true }).forEach((user) => {
       htmlMuted += this.userTemplate(user.toJSON());
     });
     let htmlBanned = "";
-    this.model.where({ banned: true }).forEach((user) => {
+    this.collection.where({ banned: true }).forEach((user) => {
       htmlBanned += this.userTemplate(user.toJSON());
     });
     return {
@@ -67,10 +83,9 @@ export default Backbone.View.extend({
       banned: htmlBanned,
     };
   },
-  renderUser(e) {
-    console.log("RENDER USER", e);
-  },
   addToCategory(e) {
+    console.log("ADD");
+
     let date;
     const category = e.currentTarget.id; //  admin | banned | muted
     const username = $(`input.username#${category}`).val();
@@ -83,19 +98,20 @@ export default Backbone.View.extend({
         return;
       }
     }
-    const user = this.model.addAs(category, username, date);
+    const user = this.collection.addAs(category, username, date);
     $(`input.username#${category}`).val("");
     if (!user) {
-      toasts.notifyError("No such user");
+      toasts.notifyError(`Failed to add ${username} as ${category}`);
     } else {
       $(`.user-container#${category}`).append(this.userTemplate(user.toJSON()));
       console.log("EDITED USER", user);
     }
   },
   removeFromCategory(e) {
+    console.log("REMOVE");
     const user = e.currentTarget.parentNode;
     const category = $(e.currentTarget).parents(".user-container")[0].id;
-    this.model.removeAs(category, user.id);
+    this.collection.removeAs(category, user.id);
     user.remove(); // from DOM
   },
 
@@ -122,7 +138,7 @@ export default Backbone.View.extend({
     // * only suggest users with no role yet
     const condition = { admin: false, banned: false, muted: false };
 
-    this.model.where(condition).forEach((user) => {
+    this.collection.where(condition).forEach((user) => {
       if (user.get("user_id") == window.currentUser.id) return;
       if (query.length === 0 || user.get("username").indexOf(query) !== -1) {
         $(id).append(

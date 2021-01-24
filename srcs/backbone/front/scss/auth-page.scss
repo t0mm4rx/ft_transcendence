@@ -119,7 +119,7 @@
 		}
 		#auth-qr-code {
 			width: 200px;
-			height: auto;
+			height: 200px;
 			margin: 10px auto;
 		}
 		#auth-2fa-section {
@@ -163,6 +163,9 @@
 		width: 100%;
 		display: flex;
 		justify-content: center;
+	}
+	#auth-2fa-button {
+		margin: 10px;
 	}
 }
 

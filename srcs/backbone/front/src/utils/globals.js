@@ -1,8 +1,11 @@
 import Cookies from 'js-cookie';
 
-const loadCurrentUser = () => {
+const loadCurrentUser = (success = () => {}, error = () => {}) => {
 	if (window.currentUser.status !== 200 && !!Cookies.get('user'))
-		window.currentUser.fetch();
+		window.currentUser.fetch({
+			success: success,
+			error: error
+		});
 }
 
 const loadUsers = () => {
@@ -10,9 +13,14 @@ const loadUsers = () => {
 		window.users.fetch();
 }
 
+const loadGuilds = () => {
+	if (window.guilds.status !== 200 && !!Cookies.get('user'))
+		window.guilds.fetch();
+}
+
 const logout = () => {
 	Cookies.remove('user');
 	window.location.reload();
 }
 
-export {loadCurrentUser, loadUsers, logout};
+export {loadCurrentUser, loadUsers, loadGuilds, logout};

@@ -70,9 +70,16 @@
 				overflow-y: auto;
 			}
 			.owner-icon {
-				margin-right: 10px;
+				margin: 10px;
 			}
 		}
 	}
 
+}
+
+#rights-management-wrapper {
+	padding: 20px;
+	> .button {
+		margin: 10px;
+	}
 }

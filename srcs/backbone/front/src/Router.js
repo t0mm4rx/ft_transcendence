@@ -15,29 +15,32 @@ import $ from "jquery";
 import User from "./pages/User";
 import Livestream from "./pages/Livestream";
 import Guild from "./pages/Guild";
+import Admin from "./pages/Admin";
 
 export default Backbone.Router.extend({
   routes: {
     "": "home",
-    "home": "home",
+    home: "home",
     "home/": "home",
     "user/:id": "user",
     "user/:id/": "user",
-    "guilds": "guilds",
+    guilds: "guilds",
     "guilds/": "guilds",
-    "game": "game",
+    game: "game",
     "game/": "game",
     "livestream/:id": "livestream",
     "livestream/:id/": "livestream",
-    "tournaments": "tournaments",
-	"tournaments/": "tournaments",
-	"guild/:id": "guild",
-	"guild/:id/": "guild",
-    "test": "test",
+    tournaments: "tournaments",
+    "tournaments/": "tournaments",
+    "guild/:id": "guild",
+    "guild/:id/": "guild",
+    test: "test",
     "test/": "test",
-    "auth": "auth",
+    admin: "admin",
+    "admin/": "admin",
+    auth: "auth",
     "auth/": "auth",
-    "token": "token",
+    token: "token",
     "token/": "token",
     ":whatever": "notFound",
     ":whatever/": "notFound",
@@ -112,14 +115,14 @@ export default Backbone.Router.extend({
     window.currentView.render();
   },
   guild: function (id) {
-	this.checkLogged();
+    this.checkLogged();
     this.showLayout();
     if (window.currentView) {
       window.currentView.undelegateEvents();
       window.currentView.unbind();
       window.currentView.stopListening();
     }
-    window.currentView = new Guild({name: id});
+    window.currentView = new Guild({ anagram: id });
     window.currentView.render();
   },
   test: function () {
@@ -132,6 +135,25 @@ export default Backbone.Router.extend({
     }
     window.currentView = new Test();
     window.currentView.render();
+  },
+  admin: function () {
+    this.checkLogged();
+    this.showLayout();
+    if (!window.currentUser.get("admin")) {
+      window.location.hash = "/";
+      return;
+    }
+    if (window.currentView) {
+      window.currentView.undelegateEvents();
+      window.currentView.unbind();
+      window.currentView.stopListening();
+    }
+    window.currentView = new Admin({
+      collection: window.chat,
+    });
+    window.chat.fetch({ success: () => window.currentView.render() });
+    // window.currentView = new Admin();
+    // window.currentView.render();
   },
   auth: function () {
     if (!!Cookies.get("user")) {
@@ -180,7 +202,7 @@ export default Backbone.Router.extend({
       window.notificationPanelView.render();
     }
     if (!window.chatPanelView) {
-      window.chatPanelView = new Chat({ model: window.chat });
+      window.chatPanelView = new Chat({ collection: window.chat });
       window.chatPanelView.render();
     }
   },

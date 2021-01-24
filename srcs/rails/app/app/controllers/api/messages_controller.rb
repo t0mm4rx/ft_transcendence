@@ -34,28 +34,32 @@ module Api
 	end
 
 	def validate_user
-		password = params.fetch('password', "")
-		join = params.fetch('join', false)
-		user_registered = @channel.users.find(current_user.id) rescue nil
-		unless user_registered
-			if join && (!@channel.private || @channel.password == password)
-				Channel.channel_user_add(@channel.id, current_user.id)
-			else
-				message = !@channel.private ? "join" : "password"
-				return render json: message, status: :unauthorized
+		# if current_user.admin === false && params[:peek]
+			password = params.fetch('password', "")
+			join = params.fetch('join', false)
+			user_registered = @channel.users.find(current_user.id) rescue nil
+			unless user_registered
+				if current_user.admin || (join && (!@channel.private || @channel.password == password))
+					Channel.channel_user_add(@channel.id, current_user.id)
+				else
+					message = !@channel.private ? "join" : "password"
+					return render json: message, status: :unauthorized
+				end
 			end
-		end
+		# end
 	end
 
 	def check_ban
-		@cu = @channel.channel_users.find_by(user_id: current_user.id) rescue nil
-		if @cu == nil
-			return render json: error = {error: "You are not member of the channel"}.to_json, status: :forbidden
-		elsif @cu != nil && @cu.ban_date != nil
-			if @cu.ban_date > DateTime.now
-				return render json: error = {error: "You are ban until #{@cu.ban_date}"}.to_json, status: :forbidden
+		# if current_user.admin === false && params[:peek]
+			@cu = @channel.channel_users.find_by(user_id: current_user.id) rescue nil
+			if @cu == nil
+				return render json: error = {error: "You are not member of the channel"}.to_json, status: :forbidden
+			elsif @cu != nil && @cu.ban_date != nil
+				if @cu.ban_date > DateTime.now
+					return render json: error = {error: "You are ban until #{@cu.ban_date}"}.to_json, status: :forbidden
+				end
 			end
-		end
+		# end
 	end
 
 	def message_params

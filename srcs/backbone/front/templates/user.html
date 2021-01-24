@@ -1,10 +1,10 @@
 <div id="user-page-container">
 	<div class="panel" id="top-panel">
-		<img <%= data.avatar_url ? `src="${data.avatar_url}"` : "" %>>
+		<img <%= data.avatar_url ? `src="${data.avatar_url}"` : "" %> class="<%=data.relation_to_user === "current_user" ? "avatar-current-user" : ""%>">
+		<input type="file" id="avatar-file" accept="image/*" />
 		<div id="top-panel-container">
 			<% if (data.relation_to_user === "friends") { %><div id="user-friend-badge"><div class="user-friend-overlay"><i class="fas fa-users-slash"></i></div><i class="fas fa-user-friends"></i> Friend</div><% } %>
 			<% if (data.relation_to_user === "request sent") { %><div id="user-friend-badge"><div class="user-friend-overlay"><i class="fas fa-users-slash"></i></div><i class="fas fa-hourglass-start"></i> Friend request sent</div><% } %>
-			<% if (data.relation_to_user === "current_user") { %><div id="user-friend-badge" class="button-icon"><i class="fas fa-cog"></i></div><% } %>
 			<div id="user-ladder">
 				<span>#2</span>
 				<span>on the ladder</span>
@@ -15,6 +15,9 @@
 					<% if (!data.relation_to_user) { %><div id="user-add-friend" class="button-icon"><i class="fas fa-user-plus"></i></div> <% } %> 
 					<div class="button-icon"><i class="fas fa-gamepad"></i></div>
 					<div class="button-icon message-button" id="message-<%= data.login %>"><i class="far fa-comment"></i></div>
+					<% if (data.relation_to_user !== "current_user") { %>
+						<div class="button-icon" id="<%= data.id %>"><i class="fas fa-ban" id="<%= data.blocked ? `un` : `` %>block-button" title="<%= data.blocked ? `un` : `` %>block"></i></div> 
+						<%  } %>
 				</div>
 			</div>
 			<div id="user-name-infos">
@@ -68,20 +71,7 @@
 		</div>
 		<div class="panel" id="friends-panel">
 			<div class="panel-header"><span>Friends</span></div>
-			<div id="friends-panel-content">
-				<!-- <div class="friend-item">
-					<img src="https://randomuser.me/api/portraits/men/8.jpg" onclick="window.location.hash='user/emacron/'"/>
-					<b class="friend-name" onclick="window.location.hash='user/emacron/'">Manu</b>
-					<span class="friend-status friend-status-online">online</span>
-					<span class="button-icon"><i class="far fa-comment"></i></span>
-					<span class="button-icon button-icon-accent"><i class="fas fa-gamepad"></i></span>
-				</div>
-				<div class="friend-item">
-					<img src="https://randomuser.me/api/portraits/men/18.jpg" onclick="window.location.hash='user/rchallie/'"/>
-					<b class="friend-name" onclick="window.location.hash='user/rchallie/'">Romain</b>
-					<span class="friend-status">offline</span>
-				</div> -->
-			</div>
+			<div id="friends-panel-content"></div>
 		</div>
 	</div>
 </div>
