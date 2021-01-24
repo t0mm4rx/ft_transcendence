@@ -1,10 +1,10 @@
 module Api
 	class GuildsController < ApplicationController
 		before_action :set_guild, only: [:show, :update, :destroy]
-		before_action :set_target, only: [:send_request]
+		before_action :set_target, only: [:send_request, :delete_member]
 		def index
-			#sort them by score
-			render json: Guild.all
+			#sort them by score from higher to lower
+			render json: Guild.order('score DESC')
 		end
 
 		def create
@@ -35,9 +35,21 @@ module Api
 			end
 		end
 
+		def delete_member
+			if current_user.guild_id && Guild.check_rights(current_user) && (@target.guild_id == current_user.guild_id)
+					@target.guild_invites = 0
+					@target.guild_owner = false
+					@target.guild_officer = false
+					@target.guild_locked = false
+					@target.save
+					render json: {}
+			else
+				return render json: { error: "You don't have the rights or he is not member of your guild"}
+			end
+		end
+
 		#send a request to a user without guild to join our guild, takes a target user in params
 		def send_request
-			p @target
 			if current_user.guild_id && Guild.check_rights(current_user)
 				if @target.guild_id
 					return render json: { error: "This player already have a guild!"}, status: :unprocessable_entity
@@ -87,7 +99,7 @@ module Api
 
 		# Only allow a list of trusted parameters through.
 		def guild_params
-			params.permit(:name, :anagram)
+			params.permit(:name, :anagram, :score)
 		end
 	end
 end

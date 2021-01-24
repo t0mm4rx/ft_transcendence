@@ -12,7 +12,7 @@ class Guild < ApplicationRecord
 		end
 	end
 
-    def set_defaults
-      self.score = 0
-    end
+	def set_defaults
+		self.score ||= 0
+	end
 end

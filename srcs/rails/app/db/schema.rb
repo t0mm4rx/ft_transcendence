@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_13_113626) do
+ActiveRecord::Schema.define(version: 2021_01_23_210321) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -101,6 +101,8 @@ ActiveRecord::Schema.define(version: 2021_01_13_113626) do
     t.boolean "tfa"
     t.boolean "guild_owner"
     t.boolean "guild_officer"
+    t.integer "guild_invites"
+    t.boolean "guild_locked"
     t.index ["guild_id"], name: "index_users_on_guild_id"
   end
 
