@@ -44,7 +44,7 @@ export default Backbone.View.extend({
     });
     channelUsers.fetch({
       success: () => {
-        editView.render(true);
+        editView.render(true, true);
       },
       error: () => toasts.notifyError("Failed to get channel data."),
     });

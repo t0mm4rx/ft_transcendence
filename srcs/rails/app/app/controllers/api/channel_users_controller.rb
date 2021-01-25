@@ -104,7 +104,7 @@ class ChannelUsersController < ApplicationController
 	end
 
 	def channel_user_params
-		if @channel.channel_users.find_by(user_id: current_user.id, owner: true)
+		if current_user.admin || @channel.channel_users.find_by(user_id: current_user.id, owner: true)
 			params.permit(:user_id, :channel_id, :owner, :admin, :ban_date, :mute_date)
 		elsif @channel.channel_users.find_by(user_id: current_user.id, admin: true)
 			params.permit(:user_id, :channel_id, :ban_date, :mute_date)

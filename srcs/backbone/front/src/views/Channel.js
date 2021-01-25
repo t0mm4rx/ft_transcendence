@@ -20,9 +20,9 @@ export default Backbone.View.extend({
   <div class="button-icon" id="block-user"><i class="fas fa-ban"></i></div>
   <% } else { if (model.get("admin") === true) { %>
     <div class="button-icon" id="edit-channel"><i class="fas fa-cog"></i></div>
-   <% } %>
+   <% } if (window.currentUser.get("admin") === false) {%>
     <div class="button-icon" id="leave-channel"><i class="fas fa-sign-out-alt"></i></div>
-   <% } %>
+   <% }} %>
    </div>`),
   messageTemplate: _.template(`<div class="chat-message-container<%= (sentByMe) ? " chat-message-container-me" : "" %><%= sentByLast ? " chat-message-container-no-margin": "" %>" id="<%= model.username %>">
   <% if (!sentByLast)  { %>

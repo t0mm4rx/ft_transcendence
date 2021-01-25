@@ -29,16 +29,14 @@ export default Backbone.View.extend({
     "click .add": "addToCategory",
     "click .delete": "removeFromCategory",
   },
-  render(owner) {
-    console.log("RENDER EDIT CHAT", this.collection);
-
-    const templateData = this.renderChannelUsers(owner);
+  render(owner, admin) {
+    const templateData = this.renderChannelUsers(owner, admin);
     showModal(
       "Edit channel",
       this.template(templateData),
       () => {
         this.collection.saveChanges();
-        if (owner) {
+        if (!admin && owner) {
           const password = $("#new-channel-password").val();
           const no_pass = $("#no-password:checked").length > 0;
           if (password.length > 0 && no_pass) {
@@ -63,7 +61,11 @@ export default Backbone.View.extend({
     );
     $(".autocomplete").hide();
   },
-  renderChannelUsers(owner) {
+  renderChannelUsers(owner, admin) {
+    let htmlOwners = "";
+    this.collection.where({ owner: true }).forEach((user) => {
+      htmlOwners += this.userTemplate(user.toJSON());
+    });
     let htmlAdmins = "";
     this.collection.where({ admin: true }).forEach((user) => {
       htmlAdmins += this.userTemplate(user.toJSON());
@@ -77,7 +79,9 @@ export default Backbone.View.extend({
       htmlBanned += this.userTemplate(user.toJSON());
     });
     return {
+      admin: admin,
       owner: owner,
+      owners: htmlOwners,
       admins: htmlAdmins,
       muted: htmlMuted,
       banned: htmlBanned,
@@ -108,7 +112,7 @@ export default Backbone.View.extend({
     }
   },
   removeFromCategory(e) {
-    console.log("REMOVE");
+    console.log("REMOVE", e);
     const user = e.currentTarget.parentNode;
     const category = $(e.currentTarget).parents(".user-container")[0].id;
     this.collection.removeAs(category, user.id);
@@ -136,7 +140,12 @@ export default Backbone.View.extend({
     const id = `.autocomplete#${e.target.id}`;
     $(id).html("");
     // * only suggest users with no role yet
-    const condition = { admin: false, banned: false, muted: false };
+    const condition = {
+      // owner: false,
+      admin: false,
+      banned: false,
+      muted: false,
+    };
 
     this.collection.where(condition).forEach((user) => {
       if (user.get("user_id") == window.currentUser.id) return;
