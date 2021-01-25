@@ -27,7 +27,7 @@ export default Backbone.View.extend({
 			}, 20);
 		},
 		"click #guild-create-button": function () {
-			window.guilds.save($("#name-input").val(), $("#anagram-input").val);
+			window.guilds.save($("#name-input").val(), $("#anagram-input").val());
 		}
 	},
 	initialize: function () {
