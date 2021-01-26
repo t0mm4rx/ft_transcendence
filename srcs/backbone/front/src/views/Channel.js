@@ -18,7 +18,7 @@ export default Backbone.View.extend({
   <% if (model.escape('avatar')) { %>
   <div class="button-icon" id="start-game"><i class="fas fa-gamepad"></i></div>
   <div class="button-icon" id="block-user"><i class="fas fa-ban"></i></div>
-  <% } else { if (model.get("admin") === true) { %>
+  <% } else { if (model.get("admin") === true || model.get("owner") === true) { %>
     <div class="button-icon" id="edit-channel"><i class="fas fa-cog"></i></div>
    <% } if (window.currentUser.get("admin") === false) {%>
     <div class="button-icon" id="leave-channel"><i class="fas fa-sign-out-alt"></i></div>
@@ -39,6 +39,10 @@ export default Backbone.View.extend({
     this.listenTo(this.collection, "join", this.joinChannel);
     this.listenTo(this.collection, "newMessage", this.onNewMessage);
     this.listenTo(this.collection, "load", this.onLoadMessages);
+
+    this.channelUsers = new ChannelUsers({
+      channel_id: this.model.id,
+    });
 
     this.lastUser = null;
   },
@@ -112,20 +116,36 @@ export default Backbone.View.extend({
     return html;
   },
   editChannel() {
-    const channelUsers = new ChannelUsers({
-      channel_id: this.model.id,
-    });
-    const editView = new EditChat({
+    this.editView = new EditChat({
       model: this.model,
-      collection: channelUsers,
+      collection: this.channelUsers,
     });
-    channelUsers.fetch({
+    this.channelUsers.fetch({
       success: () => {
-        editView.render(this.model.get("owner"));
+        console.log("Successfully fetched channel users");
+
+        this.editView.render(this.model.get("owner"));
       },
       error: () => toasts.notifyError("Failed to get channel data."),
     });
   },
+  // editChannel() {
+  //   const channelUsers = new ChannelUsers({
+  //     channel_id: this.model.id,
+  //   });
+  //   const editView = new EditChat({
+  //     model: this.model,
+  //     collection: channelUsers,
+  //   });
+  //   channelUsers.fetch({
+  //     success: () => {
+  //       console.log("Successfully fetched channel users");
+
+  //       editView.render(this.model.get("owner"));
+  //     },
+  //     error: () => toasts.notifyError("Failed to get channel data."),
+  //   });
+  // },
   leaveChannel() {
     if (confirm(`Are your sure you want to leave the channel?`)) {
       this.model.leave();

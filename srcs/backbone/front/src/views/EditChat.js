@@ -7,13 +7,14 @@ import toasts from "../utils/toasts";
 export default Backbone.View.extend({
   initialize() {
     this.userTemplate = _.template(
-      `<div class="chat-edit user-profile" id="<%= user_id %>">
-        <img id="chat-avatar" src="<%= avatar %>" />
-        <span id="chat-username"><%= username %></span>
-        <div class="button-icon delete"><i class="fas fa-times-circle"></i></div>
+      `<div class="chat-edit user-profile" id="<%= model.escape("user_id") %>">
+        <img id="chat-avatar" src="<%= model.escape("avatar") %>" />
+        <span id="chat-username"><%= model.escape("username") %></span>
+        <div class="button-icon delete" id="<%= category %>"><i class="fas fa-times-circle"></i></div>
       </div>`
     );
     this.template = _.template($("#tpl-edit-channel-form").html());
+    // this.listenTo(this.model, "destroy", () => this.remove());
     // this.listenTo(this.collection, "change", this.renderUser);
   },
   el: "body",
@@ -55,28 +56,35 @@ export default Backbone.View.extend({
           if (this.model.get("private") === false) success_message = "added";
           window.chat.editChannel(data, this.model.id, success_message);
         }
+        this.undelegateEvents();
+        this.$el.removeData().unbind();
         return true;
       },
-      () => {}
+      () => {
+        console.log("CANCEL");
+        this.collection.rollbackChanges();
+        this.undelegateEvents();
+        this.$el.removeData().unbind();
+      }
     );
     $(".autocomplete").hide();
   },
   renderChannelUsers(owner, admin) {
     let htmlOwners = "";
     this.collection.where({ owner: true }).forEach((user) => {
-      htmlOwners += this.userTemplate(user.toJSON());
+      htmlOwners += this.userTemplate({ model: user, category: "owner" });
     });
     let htmlAdmins = "";
     this.collection.where({ admin: true }).forEach((user) => {
-      htmlAdmins += this.userTemplate(user.toJSON());
+      htmlAdmins += this.userTemplate({ model: user, category: "admin" });
     });
     let htmlMuted = "";
     this.collection.where({ muted: true }).forEach((user) => {
-      htmlMuted += this.userTemplate(user.toJSON());
+      htmlMuted += this.userTemplate({ model: user, category: "muted" });
     });
     let htmlBanned = "";
     this.collection.where({ banned: true }).forEach((user) => {
-      htmlBanned += this.userTemplate(user.toJSON());
+      htmlBanned += this.userTemplate({ model: user, category: "banned" });
     });
     return {
       admin: admin,
@@ -88,8 +96,6 @@ export default Backbone.View.extend({
     };
   },
   addToCategory(e) {
-    console.log("ADD");
-
     let date;
     const category = e.currentTarget.id; //  admin | banned | muted
     const username = $(`input.username#${category}`).val();
@@ -107,14 +113,20 @@ export default Backbone.View.extend({
     if (!user) {
       toasts.notifyError(`Failed to add ${username} as ${category}`);
     } else {
-      $(`.user-container#${category}`).append(this.userTemplate(user.toJSON()));
+      $(`.user-container#${category}`).append(
+        this.userTemplate({ model: user, category: category })
+      );
       console.log("EDITED USER", user);
     }
   },
   removeFromCategory(e) {
     console.log("REMOVE", e);
     const user = e.currentTarget.parentNode;
-    const category = $(e.currentTarget).parents(".user-container")[0].id;
+    // const username = e.currentTarget.previousElementSibling.innerHTML;
+    const category = e.currentTarget.id;
+    console.log("CAT", category);
+
+    // this.collection.removeAs(category, username);
     this.collection.removeAs(category, user.id);
     user.remove(); // from DOM
   },
@@ -148,7 +160,6 @@ export default Backbone.View.extend({
     };
 
     this.collection.where(condition).forEach((user) => {
-      if (user.get("user_id") == window.currentUser.id) return;
       if (query.length === 0 || user.get("username").indexOf(query) !== -1) {
         $(id).append(
           `<span class="autocomplete-item">${user.get("username")}</span>`

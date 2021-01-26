@@ -59,28 +59,26 @@ export default Backbone.View.extend({
         },
         () => {}
       );
-	},
-	"click .avatar-current-user": function () {
-		$("#avatar-file").trigger("click");
-	},
-	"change #avatar-file": function () {
-		if (!document.querySelector("#avatar-file").files.length)
-			return;
-		const file = document.querySelector("#avatar-file").files[0];
-		if (!file)
-			return;
-		var reader = new FileReader();
-		reader.readAsDataURL(file);
-		reader.onload = function () {
-			const b64 = reader.result;
-			console.log("Image to upload", b64);
-			document.querySelector(".avatar-current-user").src = b64;
-		};
-		reader.onerror = function (error) {
-			console.log(error);
-			toasts.notifyError("Unable to read the image you selected");
-		};
-	}
+    },
+    "click .avatar-current-user": function () {
+      $("#avatar-file").trigger("click");
+    },
+    "change #avatar-file": function () {
+      if (!document.querySelector("#avatar-file").files.length) return;
+      const file = document.querySelector("#avatar-file").files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function () {
+        const b64 = reader.result;
+        console.log("Image to upload", b64);
+        document.querySelector(".avatar-current-user").src = b64;
+      };
+      reader.onerror = function (error) {
+        console.log(error);
+        toasts.notifyError("Unable to read the image you selected");
+      };
+    },
   },
   initialize: function (options) {
     this.login = options.login;
