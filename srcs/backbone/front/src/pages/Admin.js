@@ -19,6 +19,7 @@ export default Backbone.View.extend({
     "click .edit-channel": "editChannel",
     "click .show-channel": "showChannel",
     "click .delete-channel": "deleteChannel",
+    "click #ban-button": "banUser",
   },
   renderChannelsList: function () {
     const list = $("#channels-listing");
@@ -70,5 +71,14 @@ export default Backbone.View.extend({
   },
   getId(e) {
     return e.currentTarget.parentNode.id;
+  },
+  banUser() {
+    const login = $("#ban-login-input").val();
+    const time = $("#ban-time-input").val();
+    console.log("BAN", login, time);
+    const user = window.users.findWhere({ login: login });
+    console.log("USER ", user);
+
+    user.banUntil(time);
   },
 });
