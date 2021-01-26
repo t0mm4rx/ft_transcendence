@@ -1,6 +1,6 @@
 module Api
 	class WarsController < ApplicationController
-		 before_action :set_guilds, only: [:create, :show, :update, :destroy]
+		 before_action :set_guilds, only: [:create, :show, :destroy]
 		 before_action :set_target, only: [:send_request]
 		# before_action :set_target, only: [:send_request, :delete_member]
 		def index
@@ -18,6 +18,16 @@ module Api
 			end
 		end
 
+		def update
+			war = War.find_by(id: params[:id])
+			war.update(war_params)
+			if war.save
+				render json: war, status: :created
+			else
+				render json: war.errors, status: :unprocessable_entity
+			end
+		end
+
 		#send a request to war with a guild
 		def send_request
 			if @guild1.isinwar
@@ -26,9 +36,9 @@ module Api
 				return render json: { error: "One war at a time bro! The other guild are already in war"}, status: :unprocessable_entity
 			end
 			@guild2.war_invites = current_user.guild_id
-			@guild1.war_invites = @guild2.id
+		#	@guild1.war_invites = @guild2.id
 			@guild2.save
-			@guild1.save
+		#	@guild1.save
 			return render json: @guild2, status: :created
 		end
 
@@ -36,13 +46,18 @@ module Api
 		def accept_invitation
 			if current_user.guild.war_invites != 0
 				guild_inviter = Guild.find_by(id: current_user.guild.war_invites)
-				@current_user.guild.isinwar = true
-				@current_user.guild.war_invites = 0
-				@current_user.save
+				current_user.guild.isinwar = true
+				current_user.guild.war_invites = 0
+				current_user.save
 				guild_inviter.isinwar = true
 				guild_inviter.war_invites = 0
 				guild_inviter.save
-				#call the war creation function @war = War.create(war_params)
+				@war = War.create(guild1_id: current_user.guild_id, guild2_id: guild_inviter.id)
+				if @war.save
+					render json: @war, status: :created
+				else
+					render json: @war.errors
+				end
 			else
 				return render json: { error: "You have no invitations to war bro!"}, status: :unprocessable_entity
 			end
@@ -74,6 +89,9 @@ module Api
 
 		def set_target
 			@guild2 = Guild.find_by(id: params[:target_id])
+			if @guild2.nil?
+				return render json: { error: "This guild doesn't exist"}, status: :unprocessable_entity
+			end
 			@guild1 = current_user.guild
 		end
 	end

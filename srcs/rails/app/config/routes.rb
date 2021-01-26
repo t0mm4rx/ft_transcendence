@@ -20,7 +20,7 @@ Rails.application.routes.draw do
       post '/guilds/accept_invitation', to: 'guilds#accept_invitation'
       post '/guilds/delete_member', to: 'guilds#delete_member'
 
-    resources :wars, only: [:index, :create]
+    resources :wars, only: [:index, :update, :create]
       post '/wars/send_request', to: 'wars#send_request'
       post '/wars/ignore_invitation', to: 'wars#ignore_invitation'
       post '/wars/accept_invitation', to: 'wars#accept_invitation'
