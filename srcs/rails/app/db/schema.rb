@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_25_172538) do
+ActiveRecord::Schema.define(version: 2021_01_25_231046) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -71,6 +71,8 @@ ActiveRecord::Schema.define(version: 2021_01_25_172538) do
     t.integer "score"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "war_invites"
+    t.boolean "isinwar"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -109,8 +111,8 @@ ActiveRecord::Schema.define(version: 2021_01_25_172538) do
   create_table "wars", force: :cascade do |t|
     t.integer "guild1_id", null: false
     t.integer "guild2_id", null: false
-    t.datetime "start"
-    t.datetime "end"
+    t.datetime "start_date"
+    t.datetime "end_date"
     t.datetime "wt_start"
     t.datetime "wt_end"
     t.integer "wt_max_unanswers"

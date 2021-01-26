@@ -21,6 +21,9 @@ Rails.application.routes.draw do
       post '/guilds/delete_member', to: 'guilds#delete_member'
 
     resources :wars, only: [:index, :create]
+      post '/wars/send_request', to: 'wars#send_request'
+      post '/wars/ignore_invitation', to: 'wars#ignore_invitation'
+      post '/wars/accept_invitation', to: 'wars#accept_invitation'
     resources :logintra, only: :index
     resources :accessintra, only: :index
     post 'authenticate', to: 'authentication#authenticate'

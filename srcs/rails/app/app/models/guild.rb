@@ -20,5 +20,7 @@ class Guild < ApplicationRecord
 
 	def set_defaults
 		self.score ||= 0
+		self.isinwar ||= false
+		self.war_invites ||= 0
 	end
 end
