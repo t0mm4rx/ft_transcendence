@@ -78,7 +78,7 @@ export default Backbone.View.extend({
     console.log("BAN", login, time);
     const user = window.users.findWhere({ login: login });
     console.log("USER ", user);
-
-    user.banUntil(time);
+    if (!user) toasts.notifyError("No such user.");
+    else user.banUntil(time);
   },
 });
