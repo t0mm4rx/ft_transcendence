@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_26_233824) do
+ActiveRecord::Schema.define(version: 2021_01_27_154028) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -63,6 +63,10 @@ ActiveRecord::Schema.define(version: 2021_01_26_233824) do
     t.string "opponent"
     t.string "status"
     t.integer "number_player"
+    t.integer "player_score"
+    t.integer "opponent_score"
+    t.integer "winner_id"
+    t.integer "winner_score"
   end
 
   create_table "guilds", force: :cascade do |t|
@@ -105,6 +109,7 @@ ActiveRecord::Schema.define(version: 2021_01_26_233824) do
     t.boolean "guild_officer"
     t.integer "guild_invites"
     t.boolean "guild_locked"
+    t.datetime "banned_until"
     t.index ["guild_id"], name: "index_users_on_guild_id"
   end
 

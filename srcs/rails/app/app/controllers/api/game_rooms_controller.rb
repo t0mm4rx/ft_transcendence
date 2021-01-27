@@ -52,6 +52,21 @@ module Api
             render json: game_room
         end
 
+        def update_score
+            game_room = GameRoom.find(params[:id])
+            game_room.update_attribute(:player_score, params[:player_score])
+            game_room.update_attribute(:opponent_score, params[:opponent_score])
+            if game_room.player_score > game_room.opponent_score
+                game_room.winner_id = game_room.player
+                game_room.winner_score = game_room.player_score
+            else
+                game_room.winner_id = game_room.opponent
+                game_room.winner_score = game_room.opponent_score
+            game_room.update_attribute(:winner_id, game_room.winner_id)
+            render json: game_room
+            end
+        end
+
         private
 
         # Set GameRoom param
@@ -59,7 +74,8 @@ module Api
 
             # require() : mark required parameter
             # permit() : set the autorized parameter
-            params.require(:game_room).permit(:player, :opponent, :status, :number_player)
+          #  params.require(:game_room).permit(:player, :opponent, :status, :number_player)
+            params.permit(:player, :opponent, :status, :number_player)
         end
 
     end
