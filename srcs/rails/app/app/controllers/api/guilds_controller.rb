@@ -35,6 +35,26 @@ module Api
 			end
 		end
 
+		def show
+			#@wars = @guild.guild1_wars
+			@wars = War.where(guild1_id: params[:id], war_closed: true) + War.where(guild2_id: params[:id], war_closed: true)
+			 if @wars
+				return render json: @wars
+			 else
+				return render json: { error: "No war history!"}, status: :unprocessable_entity
+			end
+		end
+
+		def update
+		#	guild = Guild.find_by(id: params[:id])
+			@guild.update(guild_update_params)
+			if @guild.save
+				render json: @guild, status: :created
+			else
+				render json: @guild.errors, status: :unprocessable_entity
+			end
+		end
+
 		def delete_member
 			if current_user.guild_id && Guild.check_rights(current_user) && (@target.guild_id == current_user.guild_id)
 					@target.guild_invites = 0
@@ -100,6 +120,10 @@ module Api
 		# Only allow a list of trusted parameters through.
 		def guild_params
 			params.permit(:name, :anagram, :score)
+		end
+
+		def guild_update_params
+			params.permit(:name, :anagram, :score, :war_invites, :isinwar)
 		end
 	end
 end

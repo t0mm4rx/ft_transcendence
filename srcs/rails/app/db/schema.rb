@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_25_231046) do
+ActiveRecord::Schema.define(version: 2021_01_26_233824) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -122,6 +122,10 @@ ActiveRecord::Schema.define(version: 2021_01_25_231046) do
     t.integer "prize"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "guild1_unanswers"
+    t.integer "guild2_unanswers"
+    t.integer "guild_win"
+    t.boolean "war_closed"
   end
 
   add_foreign_key "blocked_users", "users"

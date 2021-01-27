@@ -14,7 +14,7 @@ Rails.application.routes.draw do
     resources :tfa, only: [:index, :create]
     resources :admin, only: [:create]
     resources :blocked, controller: 'blocked_users'#, only: [:index, :create, :destroy]
-    resources :guilds, only: [:index, :create, :destroy]
+    resources :guilds, only: [:index, :create, :show, :update, :destroy]
       post '/guilds/send_request', to: 'guilds#send_request'
       post '/guilds/ignore_invitation', to: 'guilds#ignore_invitation'
       post '/guilds/accept_invitation', to: 'guilds#accept_invitation'

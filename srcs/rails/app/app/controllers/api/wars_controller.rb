@@ -2,14 +2,14 @@ module Api
 	class WarsController < ApplicationController
 		 before_action :set_guilds, only: [:create, :show, :destroy]
 		 before_action :set_target, only: [:send_request]
-		# before_action :set_target, only: [:send_request, :delete_member]
+		 before_action :check_if_war_end, only: [:index, :show]
+
 		def index
 			#sort them by score from higher to lower
 			render json: War.all
 		end
 
 		def create
-			#@war = War.create(guild1: @guild1, guild2: @guild2, :start)
 			@war = War.create(war_params)
 			if @war.save
 				render json: @war, status: :created
@@ -30,15 +30,15 @@ module Api
 
 		#send a request to war with a guild
 		def send_request
-			if @guild1.isinwar
+			if @guild2.id == current_user.guild_id
+				return render json: { error: "You cannot declare a war to your guild bro!"}, status: :unprocessable_entity
+			elsif @guild1.isinwar
 				return render json: { error: "One war at a time bro! You are already in war"}, status: :unprocessable_entity
 			elsif @guild2.isinwar
 				return render json: { error: "One war at a time bro! The other guild are already in war"}, status: :unprocessable_entity
 			end
 			@guild2.war_invites = current_user.guild_id
-		#	@guild1.war_invites = @guild2.id
 			@guild2.save
-		#	@guild1.save
 			return render json: @guild2, status: :created
 		end
 
@@ -48,7 +48,7 @@ module Api
 				guild_inviter = Guild.find_by(id: current_user.guild.war_invites)
 				current_user.guild.isinwar = true
 				current_user.guild.war_invites = 0
-				current_user.save
+				current_user.guild.save
 				guild_inviter.isinwar = true
 				guild_inviter.war_invites = 0
 				guild_inviter.save
@@ -93,6 +93,21 @@ module Api
 				return render json: { error: "This guild doesn't exist"}, status: :unprocessable_entity
 			end
 			@guild1 = current_user.guild
+		end
+
+		def check_if_war_end
+			p "heeeeeeeere=========================="
+			@wars = War.where(war_closed: false)
+			p @wars
+			@wars.each do |war|
+				if war.end_date < DateTime.now
+					war.guild1.isinwar = false
+					war.guild2.isinwar = false
+					war.war_closed = true
+					war.save
+				#winner is the guild that as the most point
+				end
+			end
 		end
 	end
 end
