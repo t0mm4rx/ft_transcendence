@@ -14,12 +14,16 @@ Rails.application.routes.draw do
     resources :tfa, only: [:index, :create]
     resources :admin, only: [:create]
     resources :blocked, controller: 'blocked_users'#, only: [:index, :create, :destroy]
-    resources :guilds, only: [:index, :create, :destroy]
-    post '/guilds/send_request', to: 'guilds#send_request'
-    post '/guilds/ignore_invitation', to: 'guilds#ignore_invitation'
-    post '/guilds/accept_invitation', to: 'guilds#accept_invitation'
-    post '/guilds/delete_member', to: 'guilds#delete_member'
+    resources :guilds, only: [:index, :create, :show, :update, :destroy]
+      post '/guilds/send_request', to: 'guilds#send_request'
+      post '/guilds/ignore_invitation', to: 'guilds#ignore_invitation'
+      post '/guilds/accept_invitation', to: 'guilds#accept_invitation'
+      post '/guilds/delete_member', to: 'guilds#delete_member'
 
+    resources :wars, only: [:index, :update, :create]
+      post '/wars/send_request', to: 'wars#send_request'
+      post '/wars/ignore_invitation', to: 'wars#ignore_invitation'
+      post '/wars/accept_invitation', to: 'wars#accept_invitation'
     resources :logintra, only: :index
     resources :accessintra, only: :index
     post 'authenticate', to: 'authentication#authenticate'
