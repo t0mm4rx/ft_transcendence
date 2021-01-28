@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_23_210321) do
+ActiveRecord::Schema.define(version: 2021_01_27_154028) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -63,6 +63,10 @@ ActiveRecord::Schema.define(version: 2021_01_23_210321) do
     t.string "opponent"
     t.string "status"
     t.integer "number_player"
+    t.integer "player_score"
+    t.integer "opponent_score"
+    t.integer "winner_id"
+    t.integer "winner_score"
   end
 
   create_table "guilds", force: :cascade do |t|
@@ -71,6 +75,8 @@ ActiveRecord::Schema.define(version: 2021_01_23_210321) do
     t.integer "score"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "war_invites"
+    t.boolean "isinwar"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -103,7 +109,28 @@ ActiveRecord::Schema.define(version: 2021_01_23_210321) do
     t.boolean "guild_officer"
     t.integer "guild_invites"
     t.boolean "guild_locked"
+    t.datetime "banned_until"
     t.index ["guild_id"], name: "index_users_on_guild_id"
+  end
+
+  create_table "wars", force: :cascade do |t|
+    t.integer "guild1_id", null: false
+    t.integer "guild2_id", null: false
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.datetime "wt_start"
+    t.datetime "wt_end"
+    t.integer "wt_max_unanswers"
+    t.boolean "add_count_all"
+    t.integer "guild1_score"
+    t.integer "guild2_score"
+    t.integer "prize"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "guild1_unanswers"
+    t.integer "guild2_unanswers"
+    t.integer "guild_win"
+    t.boolean "war_closed"
   end
 
   add_foreign_key "blocked_users", "users"
@@ -114,4 +141,6 @@ ActiveRecord::Schema.define(version: 2021_01_23_210321) do
   add_foreign_key "messages", "channels"
   add_foreign_key "messages", "users"
   add_foreign_key "users", "guilds"
+  add_foreign_key "wars", "guilds", column: "guild1_id"
+  add_foreign_key "wars", "guilds", column: "guild2_id"
 end
