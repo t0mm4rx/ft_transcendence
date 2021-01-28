@@ -71,6 +71,10 @@ class User < ApplicationRecord
 	# 		end
 	# 	end
 	# end
+	def banned
+		return false if !banned_until
+		banned_until > DateTime.now
+	end
 
 	private
 

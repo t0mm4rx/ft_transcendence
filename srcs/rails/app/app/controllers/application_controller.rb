@@ -22,6 +22,9 @@ class ApplicationController < ActionController::API
 
 	def authenticate_request
 		@current_user = AuthorizeApiRequest.call(request.headers).result
-		render json: { error: 'Not Authorized' }, status: 401 unless @current_user
+		if current_user.banned
+			return render json: { error: "You are banned from the website until #{@current_user.banned_until}"}, status: :forbidden
+		end
+		render json: { error: 'Not Authorized' }, status: 401 unless @current_user 
 	end
 end

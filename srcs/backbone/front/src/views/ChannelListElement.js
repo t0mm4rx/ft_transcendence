@@ -10,6 +10,7 @@ export default Backbone.View.extend({
   initialize() {
     this.listenTo(this.model, "changeTo", this.renderMessages);
     this.listenTo(this.model, "leave", this.leave);
+    this.listenTo(this.model, "block", this.onBlock);
     // this.listenTo(this.model, "banned", this.leave);
   },
   events: {
@@ -44,5 +45,8 @@ export default Backbone.View.extend({
     this.channelMessages = null;
     this.channelView = null;
     $(`.channel-current`).removeClass("channel-current");
+  },
+  onBlock() {
+    if (this.channelMessages) this.channelMessages.fetch();
   },
 });

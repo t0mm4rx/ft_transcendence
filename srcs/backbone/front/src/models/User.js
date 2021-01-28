@@ -69,8 +69,8 @@ const User = Backbone.Model.extend({
     $.ajax({
       url: "http://localhost:3000/api/tfa",
       type: "POST",
-	});
-	window.currentUser.fetch();
+    });
+    window.currentUser.fetch();
   },
   block() {
     console.log(this);
@@ -82,6 +82,7 @@ const User = Backbone.Model.extend({
       success: () => {
         toasts.notifySuccess(`You just blocked ${this.get("username")}`);
         this.set("blocked", true);
+        window.chat.trigger("block");
       },
       error: () =>
         toasts.notifyError(`Could not block ${this.get("username")}`),
@@ -95,9 +96,25 @@ const User = Backbone.Model.extend({
       success: () => {
         toasts.notifySuccess(`You just unblocked ${this.get("username")}`);
         this.set("blocked", false);
+        window.chat.trigger("block");
       },
       error: () =>
         toasts.notifyError(`Could not unblock ${this.get("username")}`),
+    });
+  },
+  banUntil(time) {
+    $.ajax({
+      url: `http://localhost:3000/api/users/${this.id}`,
+      type: "PUT",
+      data: { banned_until: time },
+      success: () => {
+        toasts.notifySuccess(
+          `You just banned ${this.escape("username")} for ${time} minutes`
+        );
+        this.set("banned", true);
+      },
+      error: () =>
+        toasts.notifyError(`Could not ban ${this.escape("username")}`),
     });
   },
 });

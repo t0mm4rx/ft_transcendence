@@ -25,6 +25,9 @@ module Api
 
     def update
       user = User.find(params[:id])
+      if params.has_key?(:banned_until)
+        params[:banned_until] = Time.now + params[:banned_until].to_i * 60
+      end
       if !user
         return render json: { error: "no such user" }, status: :not_found
       end
@@ -75,6 +78,9 @@ module Api
       unless @user === current_user || current_user.admin
         return render json: {}, status: :forbidden
       end
+      if params.has_key?(:banned_until) && !current_user.admin
+        return render json: {}, status: :forbidden 
+      end
     end
 
     def user_params_init
@@ -83,7 +89,7 @@ module Api
     end
 
     def user_params_change
-      params.permit(:username, :avatar_url, :password, :guild_id)
+      params.permit(:username, :avatar_url, :password, :guild_id, :banned_until)
     end
 
     def limit
