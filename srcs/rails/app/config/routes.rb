@@ -20,6 +20,8 @@ Rails.application.routes.draw do
     post '/guilds/accept_invitation', to: 'guilds#accept_invitation'
     post '/guilds/delete_member', to: 'guilds#delete_member'
 
+    resources :tournaments
+
     resources :logintra, only: :index
     resources :accessintra, only: :index
     post 'authenticate', to: 'authentication#authenticate'
