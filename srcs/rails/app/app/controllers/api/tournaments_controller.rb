@@ -7,6 +7,11 @@ class Api::TournamentsController < ApplicationController
 		@tournaments = Tournament.all
 		render json: @tournaments
 	end
+
+	def show
+		@reg_users = TournamentUser.where(tournament_id: params[:id])
+		render json: @reg_users
+	end
 	
 	def create
 		@tournament = Tournament.new(tournament_params)
@@ -38,16 +43,19 @@ class Api::TournamentsController < ApplicationController
 		if @reg_user.save
 		  render json: @reg_user
 		else
-		  render json: {}, status: :unprocessable_entity
+		  render json: @reg_user.errors, status: :unprocessable_entity
 		end
 	end
 
 	def unregister
 		@reg_user = TournamentUser.find_by(tournament: @tournament, user: current_user)
+		unless @reg_user
+			return render json: { error: "Not registered" }, status: :not_found
+		end
 		if @reg_user.destroy
-			render json: "Successfully unregistered"
+			render json: {}
 		else
-			render json: {}, status: :unprocessable_entity
+			render json: @reg_user.errors, status: :unprocessable_entity
 		end
 	end
 	

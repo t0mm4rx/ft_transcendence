@@ -10,7 +10,7 @@
 		width: 300px;
 		height: 300px;
 		margin: 20px;
-		// background-color: blue;
+		// background-color: $blue;
 		box-sizing: border-box;
 		// background-color: $grey_dark_light;
 		overflow-y: auto;
@@ -21,10 +21,19 @@
 		// background: $grey_dark_light;
 		// background: rgb(72, 45, 255);
 		// background: linear-gradient(0deg, rgba(72, 45, 255, 1) 0%, rgba(28, 30, 138, 0.24833683473389356) 46%, rgba(18, 27, 111, 0.15309873949579833) 100%);
-		width: 100%;
+		// width: 100%;
 		height: 620px;
 		margin: 20px;
 		text-align: center;
+		// display: flex;
+		// flex-direction: column;
+		padding: 20px;
+		padding-top: 40px;
+		overflow: visible !important;
+		width: 60%;
+		max-width: 800px;
+		// margin-top: 50px;
+		position: relative;
 
 		display: grid;
 		grid-template-columns: 1fr 1fr;
@@ -35,6 +44,49 @@
 		* {
 			padding: 10px;
 		}
+
+		#tournament-badge {
+			position: absolute;
+			background-color: $blue;
+			top: 0;
+			right: 0;
+			transform: translate(50%, -50%);
+			padding: 10px;
+			border-radius: 10px;
+			display: flex;
+			flex-direction: row !important;
+			align-items: center !important;
+			overflow: hidden;
+			cursor: pointer;
+
+			>svg {
+				margin: 5px;
+			}
+
+			.register-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: $red;
+				transform: scale(0);
+				opacity: 0;
+				transition: .3s ease all;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 10px;
+			}
+		}
+
+		#tournament-badge:hover {
+			.register-overlay {
+				transform: scale(1);
+				opacity: 1;
+			}
+		}
+
 
 		#information {
 			grid-area: header;
@@ -80,7 +132,7 @@
 		}
 
 		h1 {
-			text-shadow: 2px 2px blue;
+			text-shadow: 2px 2px $blue;
 		}
 	}
 }
@@ -90,7 +142,7 @@
 	margin: 10px;
 	display: flex;
 	align-items: center;
-	// background-color: blue;
+	// background-color: $blue;
 	// background-color: $grey_dark;
 	background-color: $grey_dark_light;
 	border-radius: 10px;
@@ -106,6 +158,5 @@
 
 .tournament-item.current {
 	border-style: solid;
-	border-color: blue;
-
+	border-color: $blue;
 }

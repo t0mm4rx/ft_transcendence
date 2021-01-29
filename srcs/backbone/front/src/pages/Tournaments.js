@@ -18,9 +18,10 @@ export default Backbone.View.extend({
       const start = new Date(tournament.get("start"));
       const reg = new Date(tournament.get("registration_start"));
       const tournamentElement = new TournamentElement({ model: tournament });
-      console.log("T REG", reg);
-      console.log("T START", start);
-      console.log(now);
+      // console.log("T REG", reg);
+      // console.log("T START", start);
+      // console.log(now);
+      console.log(tournament.get("name"), tournament.get("registered"));
 
       if (now > start) {
         this.$(".tournament-listing#current").append(

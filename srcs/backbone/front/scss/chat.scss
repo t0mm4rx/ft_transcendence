@@ -201,6 +201,10 @@
 				.chat-message-infos span:nth-child(1) {
 					font-size: $s;
 					margin-right: 5px;
+
+					.chat-message-username {
+						padding-right: 4em;
+					}
 				}
 
 				.chat-message-infos span:nth-child(2) {

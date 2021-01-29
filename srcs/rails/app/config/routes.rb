@@ -21,6 +21,8 @@ Rails.application.routes.draw do
       post '/guilds/delete_member', to: 'guilds#delete_member'
 
     resources :tournaments
+    post '/tournaments/:id/register', to: 'tournaments#register'
+    delete '/tournaments/:id/unregister', to: 'tournaments#unregister'
 
     resources :wars, only: [:index, :update, :create]
       post '/wars/send_request', to: 'wars#send_request'
