@@ -9,7 +9,7 @@ class Api::TournamentsController < ApplicationController
 	end
 
 	def show
-		@reg_users = TournamentUser.where(tournament_id: params[:id])
+		@reg_users = TournamentUser.where(tournament_id: params[:id]).order(:level)
 		render json: @reg_users
 	end
 	

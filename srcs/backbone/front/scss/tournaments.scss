@@ -37,6 +37,7 @@
 
 		display: grid;
 		grid-template-columns: 1fr 1fr;
+		grid-template-rows: 20rem 1fr;
 		grid-template-areas:
 			"header header"
 			"ranking games";
@@ -94,7 +95,7 @@
 			grid-template-columns: 1fr 1fr 1fr;
 			grid-template-areas:
 				"header header header"
-				". img ."
+				"img1 img2 img3"
 				"players time prize";
 
 			h1 {
@@ -105,10 +106,29 @@
 				grid-area: players;
 			}
 
-			img {
-				grid-area: img;
+			.tournament-symbol {
 				align-self: center;
 				justify-self: center;
+				height: 60px;
+				width: 60px;
+				color: $grey_dark_light;
+
+				* {
+					color: $blue;
+				}
+			}
+
+			#img1 {
+				grid-area: img1;
+
+			}
+
+			#img2 {
+				grid-area: img2;
+			}
+
+			#img3 {
+				grid-area: img3;
 			}
 
 			#time {
@@ -121,6 +141,11 @@
 
 		}
 
+		.tournament-item {
+			// margin: auto;
+			width: 90%;
+		}
+
 		#ranking {
 			grid-area: ranking;
 			overflow-y: auto;
@@ -129,6 +154,18 @@
 		#games {
 			grid-area: games;
 			overflow-y: auto;
+
+			.tournament-item {
+				justify-content: center;
+			}
+
+			#user-1 {
+				justify-self: flex-start;
+			}
+
+			#user-2 {
+				justify-self: flex-start;
+			}
 		}
 
 		h1 {
@@ -138,21 +175,21 @@
 }
 
 .tournament-item {
+	max-height: 35px;
 	padding: 15px;
 	margin: 10px;
-	display: flex;
 	align-items: center;
-	// background-color: $blue;
-	// background-color: $grey_dark;
+	display: flex;
 	background-color: $grey_dark_light;
 	border-radius: 10px;
+	font-size: $m;
 
-	span {
-		margin-right: auto;
-	}
-
-	.button-icon {
-		margin: 5px;
+	img {
+		height: 50px;
+		width: 50px;
+		border-radius: 50px;
+		cursor: pointer;
+		margin-right: 20px;
 	}
 }
 
