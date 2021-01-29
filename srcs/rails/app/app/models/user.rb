@@ -19,6 +19,8 @@ class User < ApplicationRecord
 	validates :login, presence: true, length: { minimum:2, maximum: 30 }, uniqueness: { case_sensitive: false }
 	validates :avatar_url, presence: true, length: { minimum:5, maximum: 255 } # format: { with: ConstantData::VALID_EMAIL_REGEX }
 
+	#has_many :games, class_name: 'GameRoom'
+
 	after_initialize :set_defaults
 
 	def friendships_

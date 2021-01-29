@@ -2,6 +2,7 @@ module Api
 	class WarsController < ApplicationController
 		 before_action :set_guilds, only: [:create, :show, :destroy]
 		 before_action :set_target, only: [:send_request]
+		 before_action :set_guilds_update, only: [:update, :wt_game_invite]
 		 before_action :check_if_war_end, only: [:index, :show]
 
 		def index
@@ -19,13 +20,18 @@ module Api
 		end
 
 		def update
-			war = War.find_by(id: params[:id])
-			war.update(war_params)
-			if war.save
-				render json: war, status: :created
-			else
-				render json: war.errors, status: :unprocessable_entity
-			end
+			# if params[:prize].to_i > @guild1.score
+			# 	return render json: { error: "Prize is superior to the guild1 actual score!"}, status: :unprocessable_entity
+			# elsif params[:prize].to_i > @guild2.score
+			# 	return render json: { error: "Prize is superior to the guild2 actual score!"}, status: :unprocessable_entity
+			# else
+				@war.update(war_params)
+				if @war.save
+					render json: @war, status: :created
+				else
+					render json: @war.errors, status: :unprocessable_entity
+				end
+			#end
 		end
 
 		#send a request to war with a guild
@@ -48,12 +54,14 @@ module Api
 				guild_inviter = Guild.find_by(id: current_user.guild.war_invites)
 				current_user.guild.isinwar = true
 				current_user.guild.war_invites = 0
-				current_user.guild.save
 				guild_inviter.isinwar = true
 				guild_inviter.war_invites = 0
-				guild_inviter.save
 				@war = War.create(guild1_id: current_user.guild_id, guild2_id: guild_inviter.id)
 				if @war.save
+					guild_inviter.present_war_id = @war.id
+					current_user.guild.present_war_id = @war.id
+					guild_inviter.save
+					current_user.guild.save
 					render json: @war, status: :created
 				else
 					render json: @war.errors
@@ -74,9 +82,43 @@ module Api
 			end
 		end
 
+		#the game invite is sending a request to all the member of the guild adverse to play a game
+		def wt_game_invite
+			if current_user.guild.wt_game_invite != 0
+				return render json: { error: "You already have a war time invitation waiting for you, it's not useful to send a new one!"}, status: :unprocessable_entity
+			elsif current_user.guild.isinwtgame == true
+				return render json: { error: "Your guild is already in a war time game bro!"}, status: :unprocessable_entity
+			else
+				@enemy.wt_game_invite = current_user.id
+				@enemy.save
+				return render json: @enemy, status: :created
+			end
+		end
+
+		#the game accept is accepting the war time game invitation
+		def wt_game_accept
+			if current_user.guild.wt_game_invite == 0
+				return render json: { error: "You don't have any war time game invitation"}, status: :unprocessable_entity
+			elsif current_user.guild.isinwtgame == true
+				return render json: { error: "Your guild is already in a war time game bro!"}, status: :unprocessable_entity
+			else #add a condition where the inviter have to stay online until the time to answer, otherwise he loose?
+				opponent = User.find_by(id: current_user.guild.wt_game_invite)
+				game_room = GameRoom.create(player: current_user.id, opponent: opponent.id, status: "notstarted", number_player: 2, game_type: "war_time")
+				current_user.guild.isinwtgame = true
+				opponent.guild.isinwtgame = true
+				current_user.save
+				opponent.save
+				return render json: game_room, status: :created
+			end
+		end
+
 		private
 		def war_params
-			params.permit(:guild1_id, :guild2_id, :start_date, :end_date, :wt_start, :wt_end, :wt_max_unanswers, :add_count_all, :guild1_score, :guild2_score, :prize)
+			params.permit(:guild1_id, :guild2_id, :start_date, :end_date, :wt_start, :wt_end, :wt_max_unanswers, :wt_time_to_answer, :add_count_all, :guild1_score, :guild2_score, :prize)
+		end
+
+		def game_params
+			params.permit(:player, :opponent, :status, :number_player)
 		end
 
 		def set_guilds
@@ -85,6 +127,17 @@ module Api
 				return render json: { error: "Guild1_id need to match current user guild id"}, status: :unprocessable_entity
 			end
 			@guild2 = Guild.find_by(id: params[:guild2_id])
+		end
+
+		def set_guilds_update
+			@war = War.find_by(id: params[:id])
+			@guild1 = Guild.find_by(id: @war.guild1_id)
+			@guild2 = Guild.find_by(id: @war.guild2_id)
+			if current_user.guild_id == @guild1.id
+				@enemy = @guild2
+			else
+				@enemy = @guild1
+			end
 		end
 
 		def set_target
@@ -96,13 +149,18 @@ module Api
 		end
 
 		def check_if_war_end
-			p "heeeeeeeere=========================="
 			@wars = War.where(war_closed: false)
-			p @wars
+			if @wars.nil?
+				return
+			end
 			@wars.each do |war|
 				if war.end_date < DateTime.now
+					War.winner_is(war)
+					War.update_guilds_score(war)
 					war.guild1.isinwar = false
 					war.guild2.isinwar = false
+					war.guild1.present_war_id = 0
+					war.guild2.present_war_id = 0
 					war.war_closed = true
 					war.save
 				#winner is the guild that as the most point

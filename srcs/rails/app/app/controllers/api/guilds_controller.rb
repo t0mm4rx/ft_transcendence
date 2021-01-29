@@ -107,6 +107,10 @@ module Api
 			end
 		end
 
+		# def launch_wt_match
+		# 	war.create_game()
+		# end
+
 		private
 		# Use callbacks to share common setup or constraints between actions.
 		def set_guild
