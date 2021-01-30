@@ -1,5 +1,6 @@
 module Api
     class GameRoomsController < ApplicationController
+      # before_action :check_wt_game
         # Index page, show all GameRooms
         def index
 
@@ -63,6 +64,7 @@ module Api
                 game_room.winner_id = game_room.opponent
                 game_room.winner_score = game_room.opponent_score
             game_room.update_attribute(:winner_id, game_room.winner_id)
+            GameRoom.update_war_scores(game_room, current_user)
             render json: game_room
             end
         end
@@ -75,8 +77,11 @@ module Api
             # require() : mark required parameter
             # permit() : set the autorized parameter
           #  params.require(:game_room).permit(:player, :opponent, :status, :number_player)
-            params.permit(:player, :opponent, :status, :number_player)
+            params.permit(:player, :opponent, :status, :number_player, :game_type)
         end
 
+        # def check_wt_game
+        #     if war_time
+        # end
     end
 end

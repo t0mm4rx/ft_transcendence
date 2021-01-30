@@ -28,6 +28,9 @@ Rails.application.routes.draw do
       post '/wars/send_request', to: 'wars#send_request'
       post '/wars/ignore_invitation', to: 'wars#ignore_invitation'
       post '/wars/accept_invitation', to: 'wars#accept_invitation'
+      post '/wars/wt_game_invite', to: 'wars#wt_game_invite'
+      post '/wars/wt_game_accept', to: 'wars#wt_game_accept'
+
     resources :logintra, only: :index
     resources :accessintra, only: :index
     post 'authenticate', to: 'authentication#authenticate'
