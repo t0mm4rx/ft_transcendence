@@ -7,7 +7,7 @@ import toasts from "../utils/toasts";
 const Channel = Backbone.Model.extend({
   leave() {
     $.ajax({
-      url: `http://localhost:3000/api/channels/${this.id}/channel_users/${window.currentUser.id}`,
+      url: `http://` + window.location.hostname + `:3000/api/channels/${this.id}/channel_users/${window.currentUser.id}`,
       type: "DELETE",
       success: () => {
         toasts.notifySuccess(`Left channel`);
@@ -21,7 +21,7 @@ const Channel = Backbone.Model.extend({
 });
 
 const Chat = Backbone.Collection.extend({
-  url: "http://localhost:3000/api/channels/",
+  url: "http://" + window.location.hostname + ":3000/api/channels/",
   initialize() {
     this.fetch();
     this.currentChat = null;
@@ -52,7 +52,7 @@ const Chat = Backbone.Collection.extend({
   },
   editChannel(data, id, success_message) {
     $.ajax({
-      url: `http://localhost:3000/api/channels/${id}`,
+      url: `http://` + window.location.hostname + `:3000/api/channels/${id}`,
       type: "PUT",
       data: data,
       success: () => {

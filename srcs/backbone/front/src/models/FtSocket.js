@@ -20,7 +20,7 @@ const FtSocket = Backbone.Model.extend({
         
         // Init a new socket to backend.
         // URL NEED TO BE CHANGED BY THE ACTUAL
-        this.socket = new WebSocket("ws://0.0.0.0:3000/cable");
+        this.socket = new WebSocket("ws://" + window.location.hostname + ":3000/cable");
 
         // Connect client to identifier. (Please no overload)
         this.socket.onopen = function(event) {

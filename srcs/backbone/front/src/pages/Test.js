@@ -21,7 +21,7 @@ export default Backbone.View.extend({
     createDataBase: function()
     {
         // Change to be the actual url
-        fetch(`http://localhost:3000/game_rooms`,{
+        fetch(`http://` + window.location.hostname + `:3000/game_rooms`,{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

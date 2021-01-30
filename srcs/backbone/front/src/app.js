@@ -17,6 +17,7 @@ import Cookies from "js-cookie";
 import { loadCurrentUser, loadUsers, loadGuilds } from "./utils/globals";
 import { Guilds } from "./models/Guild";
 import { FtSocket } from './models/FtSocket'
+import toasts from "./utils/toasts";
 
 // Temp game server
 // import express from 'express';
@@ -154,6 +155,18 @@ globalSocket.socket.onmessage = function(event) {
       // Refresh HERE
       console.log("[TMP] New client.");
     }
+    else if (msg.message.content.request_to == window.currentUser.get("id"))
+    {
+      window.currentUser.fetch();
+      console.log("From : ", msg.message.content.from);
+      if (msg.message.message == "friend_request")
+        toasts.notifySuccess("Friend request received from " + msg.message.content.from.login);
+    }
+    else 
+    {
+      console.log("MSG : ", msg.message.message);
+      console.log("CONTENT : ", msg.message.content);
+    }
   }
 };
 
@@ -164,5 +177,7 @@ globalSocket.sendMessage({
     message: "new_client",
     content: {}
 }}, false, true);
+
+export default globalSocket;
 
 Backbone.history.start();

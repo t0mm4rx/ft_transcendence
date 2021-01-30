@@ -6,10 +6,10 @@ import $ from 'jquery';
 const Guild = Backbone.Model.extend({});
 
 const Guilds = Backbone.Collection.extend({
-	url: 'http://localhost:3000/api/guilds/',
+	url: 'http://' + window.location.hostname + ':3000/api/guilds/',
 	save: function (name, anagram) {
 		$.ajax({
-			url: 'http://localhost:3000/api/guilds/',
+			url: 'http://' + window.location.hostname + ':3000/api/guilds/',
 			type: 'POST',
 			success: () => {
 				toasts.notifySuccess(`Your guild ${name} has been created!`);

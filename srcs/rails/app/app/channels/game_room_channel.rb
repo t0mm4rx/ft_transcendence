@@ -28,15 +28,6 @@ class GameRoomChannel < ApplicationCable::Channel
   def unsubscribed
 
     @game_room = GameRoom.find(params[:id])
-    
-    puts "AAAAAAAAAAAAAAAAAAAAAAA"
-    puts "AAAAAAAAAAAAAAAAAAAAAAA"
-    puts ""
-    puts @connect_type
-    puts @game_room.status
-    puts ""
-    puts "AAAAAAAAAAAAAAAAAAAAAAA"
-    puts "AAAAAAAAAAAAAAAAAAAAAAA"
 
     if @connect_type == "normal"
 
@@ -48,15 +39,6 @@ class GameRoomChannel < ApplicationCable::Channel
       end
 
     end
-
-    puts "BBBBBBBBBBBBBBBBBBBBBBBBBBB"
-    puts "BBBBBBBBBBBBBBBBBBBBBBBBBBB"
-    puts ""
-    puts @connect_type
-    puts @game_room.status
-    puts ""
-    puts "BBBBBBBBBBBBBBBBBBBBBBBBBBB"
-    puts "BBBBBBBBBBBBBBBBBBBBBBBBBBB"
 
     if @game_room.status != "notstarted"
       GameRoomChannel.broadcast_to @game_room, message:"client_quit", content: { "player_id" => @player_id, "display_name" => @display_name, "connection_type" => @connect_type }.to_json

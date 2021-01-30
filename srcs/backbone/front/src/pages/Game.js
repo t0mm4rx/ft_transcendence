@@ -50,7 +50,7 @@ export default Backbone.View.extend({
 		'end_game' : function(event, info)
 		{
 			// Get actual informations about the game
-			fetch(`http://localhost:3000/api/game_rooms/` + info.game_id, {
+			fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + info.game_id, {
 				headers: {
 					'Content-Type': 'application/json',
 					'Accept': 'application/json',
@@ -61,7 +61,7 @@ export default Backbone.View.extend({
 			.then(searchResult => {
 
 				// Update game data on backend part
-				fetch(`http://localhost:3000/api/game_rooms/` + info.game_id,{
+				fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + info.game_id,{
 					method: 'PATCH',
 					headers: {
 						'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ export default Backbone.View.extend({
 				clearTimeout(show);
 
 				// Get actual informations about the game
-				fetch(`http://localhost:3000/api/game_rooms/` + self.gameinfos.id, {
+				fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + self.gameinfos.id, {
 					headers: {
 						'Content-Type': 'application/json',
 						'Accept': 'application/json',
@@ -156,7 +156,7 @@ export default Backbone.View.extend({
 				.then(searchResult => {
 
 					// Update game data on backend part
-					fetch(`http://localhost:3000/api/game_rooms/` + self.gameinfos.id,{
+					fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + self.gameinfos.id,{
 						method: 'PATCH',
 						headers: {
 							'Content-Type': 'application/json',
@@ -282,7 +282,7 @@ export default Backbone.View.extend({
 	{
 		// /!\ To change to be the actual url
 		// Ask the backend to create the "game_room".
-		fetch(`http://localhost:3000/api/game_rooms`,{
+		fetch(`http://` + window.location.hostname + `:3000/api/game_rooms`,{
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -340,7 +340,7 @@ export default Backbone.View.extend({
 		self.gameinfos.opponent = opponent_infos;
 
 		// Update game data on backend part
-		fetch(`http://localhost:3000/api/game_rooms/` + self.gameinfos.id,{
+		fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + self.gameinfos.id,{
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
@@ -419,7 +419,7 @@ export default Backbone.View.extend({
 		var is_disco = true;
 
 		// Request to the backend.
-		await fetch(`http://localhost:3000/api/game/is_disconnected`, {
+		await fetch(`http://` + window.location.hostname + `:3000/api/game/is_disconnected`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -559,7 +559,7 @@ export default Backbone.View.extend({
 		} 
 
 		// Ask backend to get a game that doesn't have opponend.
-		fetch(`http://localhost:3000/api/game/match_no_opponent`, {
+		fetch(`http://` + window.location.hostname + `:3000/api/game/match_no_opponent`, {
 			headers: {
 				'Content-Type': 'application/json',
 				'Accept': 'application/json',

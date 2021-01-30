@@ -2,12 +2,13 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import toasts from "../utils/toasts";
+import globalSocket from "../app"
 
 const User = Backbone.Model.extend({
-  urlRoot: `http://localhost:3000/api/users/`,
+  urlRoot: `http://` + window.location.hostname + `:3000/api/users/`,
   save: function (key, value) {
     $.ajax({
-      url: `http://localhost:3000/api/users/${window.currentUser.get("id")}/`,
+      url: `http://` + window.location.hostname + `:3000/api/users/${window.currentUser.get("id")}/`,
       type: "PUT",
       data: `${key}=${value}`,
       success: () => {
@@ -17,11 +18,19 @@ const User = Backbone.Model.extend({
   },
   askFriend: function () {
     $.ajax({
-      url: `http://localhost:3000/api/friends/`,
+      url: `http://` + window.location.hostname + `:3000/api/friends/`,
       type: "POST",
       data: `id=${this.get("id")}`,
       success: () => {
         this.set("relation_to_user", "request sent");
+
+        globalSocket.sendMessage({
+          action: "to_broadcast",
+          infos: {
+            message: "friend_request",
+            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")} }
+        }}, false, true);
+
         toasts.notifySuccess("Friend request sent.");
       },
       error: (err) => {
@@ -32,7 +41,7 @@ const User = Backbone.Model.extend({
   },
   unfriend: function () {
     $.ajax({
-      url: `http://localhost:3000/api/friends/${this.get("id")}/`,
+      url: `http://` + window.location.hostname + `:3000/api/friends/${this.get("id")}/`,
       type: "DELETE",
       success: () => {
         this.set("relation_to_user", null);
@@ -41,6 +50,14 @@ const User = Backbone.Model.extend({
             `${this.get("login")} is not your friend anymore.`
           );
         else toasts.notifySuccess(`You're not friends anymore.`);
+
+        globalSocket.sendMessage({
+          action: "to_broadcast",
+          infos: {
+            message: "unfriend_request",
+            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")}}
+        }}, false, true);
+
         window.currentUser.fetch();
       },
       error: (err) => {
@@ -50,13 +67,21 @@ const User = Backbone.Model.extend({
   },
   acceptFriend: function () {
     $.ajax({
-      url: `http://localhost:3000/api/friends/${this.get("id")}`,
+      url: `http://` + window.location.hostname + `:3000/api/friends/${this.get("id")}`,
       type: "PUT",
       success: () => {
         this.set("relation_to_user", "friends");
         if (this.get("login"))
           toasts.notifySuccess(`${this.get("login")} is now your friend.`);
         else toasts.notifySuccess(`You have a new friend!`);
+
+        globalSocket.sendMessage({
+          action: "to_broadcast",
+          infos: {
+            message: "friend_request_reply",
+            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")}}
+        }}, false, true);
+
         window.currentUser.fetch();
       },
       error: (err) => {
@@ -67,7 +92,7 @@ const User = Backbone.Model.extend({
   },
   setTFA: function () {
     $.ajax({
-      url: "http://localhost:3000/api/tfa",
+      url: "http://" + window.location.hostname + ":3000/api/tfa",
       type: "POST",
 	});
 	window.currentUser.fetch();
@@ -76,7 +101,7 @@ const User = Backbone.Model.extend({
     console.log(this);
 
     $.ajax({
-      url: "http://localhost:3000/api/blocked",
+      url: "http://" + window.location.hostname + ":3000/api/blocked",
       type: "POST",
       data: { target_id: this.id },
       success: () => {
@@ -90,7 +115,7 @@ const User = Backbone.Model.extend({
   unblock() {
     console.log(this);
     $.ajax({
-      url: `http://localhost:3000/api/blocked/${this.id}`,
+      url: `http://`+ window.location.hostname + `:3000/api/blocked/${this.id}`,
       type: "DELETE",
       success: () => {
         toasts.notifySuccess(`You just unblocked ${this.get("username")}`);
@@ -104,7 +129,7 @@ const User = Backbone.Model.extend({
 
 const Users = Backbone.Collection.extend({
   model: User,
-  url: "http://localhost:3000/api/users?limit=20",
+  url: "http://" + window.location.hostname + ":3000/api/users?limit=20",
   // parse: function (data) {
   // 	data.forEach(el => {
   // 		this.add(new User(el));

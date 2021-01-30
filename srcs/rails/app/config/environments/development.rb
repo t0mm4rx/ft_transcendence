@@ -65,8 +65,5 @@ Rails.application.configure do
   # config.action_cable.disable_request_forgery_protection = true
 
   # Allowed request origin for WebSocket
-  config.action_cable.allowed_request_origins = [
-     # Local address we use for our standalone client
-     'http://localhost:8080',
-  ]
+  config.action_cable.disable_request_forgery_protection = true
 end
