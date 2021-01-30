@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_27_154028) do
+ActiveRecord::Schema.define(version: 2021_01_29_211748) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -89,6 +89,25 @@ ActiveRecord::Schema.define(version: 2021_01_27_154028) do
     t.index ["user_id"], name: "index_messages_on_user_id"
   end
 
+  create_table "tournament_users", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "tournament_id", null: false
+    t.integer "level"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["tournament_id"], name: "index_tournament_users_on_tournament_id"
+    t.index ["user_id"], name: "index_tournament_users_on_user_id"
+  end
+
+  create_table "tournaments", force: :cascade do |t|
+    t.string "name"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.datetime "registration_start"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "username"
     t.string "login"
@@ -110,6 +129,7 @@ ActiveRecord::Schema.define(version: 2021_01_27_154028) do
     t.integer "guild_invites"
     t.boolean "guild_locked"
     t.datetime "banned_until"
+    t.integer "ladder_score", default: 0
     t.index ["guild_id"], name: "index_users_on_guild_id"
   end
 
@@ -140,6 +160,8 @@ ActiveRecord::Schema.define(version: 2021_01_27_154028) do
   add_foreign_key "friendships", "users", column: "friend_id"
   add_foreign_key "messages", "channels"
   add_foreign_key "messages", "users"
+  add_foreign_key "tournament_users", "tournaments"
+  add_foreign_key "tournament_users", "users"
   add_foreign_key "users", "guilds"
   add_foreign_key "wars", "guilds", column: "guild1_id"
   add_foreign_key "wars", "guilds", column: "guild2_id"

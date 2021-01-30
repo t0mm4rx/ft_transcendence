@@ -2,6 +2,12 @@ import Backbone from "backbone";
 import $ from "jquery";
 import toasts from "../utils/toasts";
 
+const PermanentTournament = Backbone.Model.extend({
+  initialize() {
+    this.set("users", window.users);
+  },
+});
+
 const TournamentUsers = Backbone.Collection.extend({
   initialize(props) {
     this.url = `http://localhost:3000/api/tournaments/${props.id}`;
@@ -62,4 +68,4 @@ const Tournaments = Backbone.Collection.extend({
   model: Tournament,
 });
 
-export { Tournaments };
+export { Tournaments, PermanentTournament };

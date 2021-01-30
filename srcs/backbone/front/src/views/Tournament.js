@@ -12,6 +12,7 @@ export default Backbone.View.extend({
     <i id="img1" class="tournament-symbol fas fa-child"></i>
     <i id="img2" class="tournament-symbol fas fa-hourglass-half"></i>
     <i id="img3" class="tournament-symbol fas fa-award"></i>
+    
     <span id="players">players:</span><h3 id="players"><%= model.get("users").length %></h3>
     <span id="time"><%= timeTitle %>:</span><h3 id="time"><%= (new Date(model.escape(timeTitle).replace(/-/g, "/"))).toLocaleString(
       "en-US",
@@ -28,6 +29,11 @@ export default Backbone.View.extend({
   <div class="current-tournament" id="ranking"></div>
   <div class="current-tournament" id="games"></div>`
   ),
+  permanentTemplate: `<div class="current-tournament" id="information">
+    <h1>PERMANENT</h1>
+    </div>
+    <div class="current-tournament" id="ranking"></div>
+    <div class="current-tournament" id="games"></div>`,
   userTemplate: _.template(
     `<div class="tournament-item"><% if (rank) {%> <span class="rank"><%= rank %>. </span><%} %>
     <a href="/#user/<%= model.login %>/"><img class="tournament-avatar" src="<%= model.avatar_url %>" /></a><span><%= model.username %></span>
@@ -61,22 +67,33 @@ export default Backbone.View.extend({
         timeTitle: registrationOpen ? "start" : "end",
       })
     );
-    this.renderUsers(!registrationOpen);
+    this.renderUsers(
+      this.model.get("users").map((user) => (user ? user.get("user") : user)),
+      !registrationOpen
+    );
     this.renderGames();
     return this;
   },
-  renderUsers(putRank) {
-    console.log("MODEL:", this.model.get("users"));
+  renderPermanent() {
+    this.$el.html(this.permanentTemplate);
+    this.renderUsers(
+      this.model.get("users").map((user) => user.toJSON()),
+      true
+    );
+    // this.renderGames();
+    return this;
+  },
+  renderUsers(users, putRank) {
     let html = "";
     let rank;
     if (putRank) {
       rank = 1;
     }
-    this.model.get("users").each((user) => {
-      if (user.get("user")) {
-        console.log("USER", user.get("user"));
-        html += this.userTemplate({ model: user.get("user"), rank: rank });
-        rank++;
+    users.forEach((user) => {
+      if (user) {
+        console.log("User", user);
+        html += this.userTemplate({ model: user, rank: rank });
+        if (rank) rank++;
       }
     });
     this.$("#ranking").html(html);
