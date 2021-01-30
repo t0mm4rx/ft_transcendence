@@ -1,7 +1,4 @@
 class GameRoom < ApplicationRecord
-	# belongs_to :player, class_name: 'User', :foreign_key => 'player'
-	# belongs_to :opponent, class_name: 'User', :foreign_key => 'opponent'
-	# belongs_to :gameable, polymorphic: true
 
 	def self.update_war_scores(game_room, current_user)
 		if current_user.guild.present_war_id != 0
@@ -13,12 +10,14 @@ class GameRoom < ApplicationRecord
 				guild1.isinwtgame = false
 				guild2.isinwtgame = false
 				if winner.guild_id == war.guild1_id
-					war.guild1_score =+ 1
+					war.guild1_score += 1
 				else
-					war.guild2_score =+ 1
+					war.guild2_score += 1
 				end
 				war.save
 				game_room.save
+				guild1.save
+				guild2.save
 			end
 		end
 	end

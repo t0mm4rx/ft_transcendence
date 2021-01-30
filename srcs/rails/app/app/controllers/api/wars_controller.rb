@@ -2,11 +2,11 @@ module Api
 	class WarsController < ApplicationController
 		 before_action :set_guilds, only: [:create, :show, :destroy]
 		 before_action :set_target, only: [:send_request]
-		 before_action :set_guilds_update, only: [:update, :wt_game_invite]
-		 before_action :check_if_war_end, only: [:index, :show]
+		 before_action :set_guilds_update, only: [:update, :wt_game_invite, :wt_game_accept]
+		 before_action :check_if_wt_unanswered, only: [:index, :show]
+		 before_action :check_if_war_end, only: [:index, :show, :wt_game_invite, :wt_game_accept]
 
 		def index
-			#sort them by score from higher to lower
 			render json: War.all
 		end
 
@@ -20,18 +20,12 @@ module Api
 		end
 
 		def update
-			# if params[:prize].to_i > @guild1.score
-			# 	return render json: { error: "Prize is superior to the guild1 actual score!"}, status: :unprocessable_entity
-			# elsif params[:prize].to_i > @guild2.score
-			# 	return render json: { error: "Prize is superior to the guild2 actual score!"}, status: :unprocessable_entity
-			# else
-				@war.update(war_params)
-				if @war.save
-					render json: @war, status: :created
-				else
-					render json: @war.errors, status: :unprocessable_entity
-				end
-			#end
+			@war.update(war_params)
+			if @war.save
+				render json: @war, status: :created
+			else
+				render json: @war.errors, status: :unprocessable_entity
+			end
 		end
 
 		#send a request to war with a guild
@@ -84,12 +78,15 @@ module Api
 
 		#the game invite is sending a request to all the member of the guild adverse to play a game
 		def wt_game_invite
-			if current_user.guild.wt_game_invite != 0
-				return render json: { error: "You already have a war time invitation waiting for you, it's not useful to send a new one!"}, status: :unprocessable_entity
+			if War.check_if_war_time(@war) == false
+				return render json: { error: "It's not war time bro!"}, status: :unprocessable_entity
+			elsif current_user.guild.wt_game_invite != 0 || @enemy.wt_game_invite != 0
+				return render json: { error: "There is already a war time invitation pending between you, it's not useful to send a new one!"}, status: :unprocessable_entity
 			elsif current_user.guild.isinwtgame == true
 				return render json: { error: "Your guild is already in a war time game bro!"}, status: :unprocessable_entity
 			else
 				@enemy.wt_game_invite = current_user.id
+				@enemy.wt_date_to_answer = DateTime.now + @war.wt_time_to_answer
 				@enemy.save
 				return render json: @enemy, status: :created
 			end
@@ -99,15 +96,18 @@ module Api
 		def wt_game_accept
 			if current_user.guild.wt_game_invite == 0
 				return render json: { error: "You don't have any war time game invitation"}, status: :unprocessable_entity
+			elsif War.check_if_war_time(@war) == false
+					return render json: { error: "It's not war time bro!"}, status: :unprocessable_entity
 			elsif current_user.guild.isinwtgame == true
 				return render json: { error: "Your guild is already in a war time game bro!"}, status: :unprocessable_entity
 			else #add a condition where the inviter have to stay online until the time to answer, otherwise he loose?
 				opponent = User.find_by(id: current_user.guild.wt_game_invite)
 				game_room = GameRoom.create(player: current_user.id, opponent: opponent.id, status: "notstarted", number_player: 2, game_type: "war_time")
+				current_user.guild.wt_game_invite = 0
 				current_user.guild.isinwtgame = true
 				opponent.guild.isinwtgame = true
-				current_user.save
-				opponent.save
+				current_user.guild.save
+				opponent.guild.save
 				return render json: game_room, status: :created
 			end
 		end
@@ -131,6 +131,9 @@ module Api
 
 		def set_guilds_update
 			@war = War.find_by(id: params[:id])
+			if @war.war_closed == true
+				return render json: { error: "War is closed !"}, status: :unprocessable_entity
+			end
 			@guild1 = Guild.find_by(id: @war.guild1_id)
 			@guild2 = Guild.find_by(id: @war.guild2_id)
 			if current_user.guild_id == @guild1.id
@@ -148,22 +151,30 @@ module Api
 			@guild1 = current_user.guild
 		end
 
-		def check_if_war_end
+		def check_if_wt_unanswered
 			@wars = War.where(war_closed: false)
 			if @wars.nil?
 				return
 			end
 			@wars.each do |war|
+				War.check_no_answer(war)
+				war.save
+			end
+		end
+
+		def check_if_war_end
+			@wars = War.where(war_closed: false)
+			if @wars.nil?
+				return
+			end
+				@wars.each do |war|
+				if war.end_date == nil
+					return render json: { error: "A war has been created without updating the rules. It's because a war request has been accepted, but you did't update the dates, etc."}, status: :unprocessable_entity
+				end
 				if war.end_date < DateTime.now
 					War.winner_is(war)
 					War.update_guilds_score(war)
-					war.guild1.isinwar = false
-					war.guild2.isinwar = false
-					war.guild1.present_war_id = 0
-					war.guild2.present_war_id = 0
-					war.war_closed = true
-					war.save
-				#winner is the guild that as the most point
+					War.close_war(war)
 				end
 			end
 		end

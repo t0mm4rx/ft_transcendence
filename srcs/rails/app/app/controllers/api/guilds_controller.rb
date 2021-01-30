@@ -107,10 +107,6 @@ module Api
 			end
 		end
 
-		# def launch_wt_match
-		# 	war.create_game()
-		# end
-
 		private
 		# Use callbacks to share common setup or constraints between actions.
 		def set_guild
@@ -127,7 +123,7 @@ module Api
 		end
 
 		def guild_update_params
-			params.permit(:name, :anagram, :score, :war_invites, :isinwar)
+			params.permit(:name, :anagram, :score, :war_invites, :isinwar, :present_war_id, :isinwtgame, :wt_date_to_answer)
 		end
 	end
 end
