@@ -6,6 +6,8 @@ import toasts from '../utils/toasts';
 import { User } from '../models/User';
 import { loadCurrentUser, loadGuilds } from '../utils/globals';
 import {showModal} from '../utils/modal';
+import { Chat } from "../models/Chat";
+import { Tournaments } from "../models/Tournaments";
 
 export default Backbone.View.extend({
 	initialize: function () {
@@ -197,6 +199,8 @@ export default Backbone.View.extend({
 		$(document).trigger("token_changed");
 		loadCurrentUser();
 		loadGuilds();
+		window.chat = new Chat();
+		window.tournaments = new Tournaments();
 		window.location.hash = "/";
 	},
 	check2fa: function () {
