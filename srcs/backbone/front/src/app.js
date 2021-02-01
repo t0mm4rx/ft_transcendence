@@ -53,47 +53,6 @@ loadUsers();
 window.guilds = new Guilds();
 loadGuilds();
 
-window.friends = new Friends();
-window.friends.add(
-  new User({
-    login: "emacron",
-    displayName: "Manu",
-    avatar: "https://randomuser.me/api/portraits/men/8.jpg",
-    status: "online",
-  })
-);
-window.friends.add(
-  new User({
-    login: "magrosje",
-    displayName: "Mathis",
-    avatar: "https://randomuser.me/api/portraits/men/9.jpg",
-    status: "online",
-  })
-);
-window.friends.add(
-  new User({
-    login: "ljames",
-    displayName: "Lebron",
-    avatar: "https://randomuser.me/api/portraits/men/10.jpg",
-    status: "online - in game",
-  })
-);
-window.friends.add(
-  new User({
-    login: "frlindh",
-    displayName: "Fredrika",
-    avatar: "https://randomuser.me/api/portraits/women/3.jpg",
-    status: "offline",
-  })
-);
-window.friends.add(
-  new User({
-    login: "rchallie",
-    displayName: "Romain",
-    avatar: "https://randomuser.me/api/portraits/men/11.jpg",
-    status: "offline",
-  })
-);
 
 window.liveGames = new GameCollection();
 window.liveGames.add(
@@ -118,8 +77,10 @@ window.liveGames.add(
   })
 );
 
-window.chat = new Chat();
-window.tournaments = new Tournaments();
+if (token) {
+	window.chat = new Chat();
+	window.tournaments = new Tournaments();
+}
 
 window.notifications = new NotificationCollection();
 window.notifications.add(

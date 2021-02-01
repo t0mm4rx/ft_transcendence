@@ -11,11 +11,13 @@ const Guilds = Backbone.Collection.extend({
 		$.ajax({
 			url: 'http://localhost:3000/api/guilds/',
 			type: 'POST',
+			data: `name=${name}&anagram=${anagram}`,
 			success: () => {
 				toasts.notifySuccess(`Your guild ${name} has been created!`);
 				window.guilds.fetch();
 			},
 			error: (error) => {
+				console.log(error);
 				if (error.responseJSON.anagram) {
 					let msg = "The anagram ";
 					msg += error.responseJSON.anagram.join(", ");
@@ -33,4 +35,8 @@ const Guilds = Backbone.Collection.extend({
 	}
 });
 
-export {Guild, Guilds};
+const getGuildMembers = (guildId) => {
+	return window.users.filter(a => !!a.get('guild') && a.get('guild').id == guildId);
+}
+
+export {Guild, Guilds, getGuildMembers};
