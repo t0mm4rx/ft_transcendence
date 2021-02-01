@@ -141,7 +141,7 @@ export default Backbone.View.extend({
 			w.close();
 			const params = new URLSearchParams("?" + event.data.params);
 			if (!params.get("token") || !params.get("creation")) {
-				toasts.notifyError("Cannot get the 42 API token");
+				toasts.notifyError("Cannot get the 42 API token.");
 				return;
 			}
 			creation = eval(params.get("creation"));
@@ -154,7 +154,7 @@ export default Backbone.View.extend({
 				clearInterval(check);
 
 				if (!this.token) {
-					toasts.notifyError("The authentification process hasn't been completed");
+					toasts.notifyError("The authentification process hasn't been completed.");
 					return;
 				}
 
@@ -183,7 +183,11 @@ export default Backbone.View.extend({
 						this.login();
 						return;
 					}
-				});
+				}, (data, state) => {
+					if (state.status === 403) {
+						toasts.notifyError("You have been banned from the website.");
+					}
+				  });
 				Cookies.remove('user');
 			}
 		}, 100);
@@ -222,7 +226,7 @@ export default Backbone.View.extend({
 		const tfa = $("#2fa-input").is(':checked');
 		console.log("Signup, 2fa:", tfa);
 		if (displayName.length <= 0) {
-			toasts.notifyError("The display name can't be empty");
+			toasts.notifyError("The display name can't be empty.");
 		} else {
 			window.currentUser.save('username', displayName);
 			if (!tfa) {
