@@ -27,7 +27,7 @@ export default Backbone.View.extend({
   messageTemplate: _.template(`<div class="chat-message-container<%= (sentByMe) ? " chat-message-container-me" : "" %><%= sentByLast ? " chat-message-container-no-margin": "" %>" id="<%= model.username %>">
   <% if (!sentByLast)  { %>
   <div class="chat-message-infos">
-  <a href="/#user/<%= login %>/" class="chat-message-username" id="<%= model.login %>"><%= model.username %></a><span><%= model.date %></span>
+  <a href="/#user/<%= model.login %>/" class="chat-message-username" id="<%= model.login %>"><%= model.username %></a><span><%= date %></span>
   </div>
   <% } %>
     <div class="chat-message"><%= model.body %></div>
@@ -101,17 +101,32 @@ export default Backbone.View.extend({
     ).scrollHeight;
   },
   messagesToHTML(messages) {
+    const options = {
+      // weekday: "long",
+      // year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+    };
     console.log("MSG -> HTML", messages.length);
     if (messages.length > 0) this.firstUser = messages[0].get("username");
     let html = "";
     messages.forEach((message) => {
       const username = message.get("username");
-      this.lastUser = username;
+      const date = new Date(message.get("date")).toLocaleString(
+        "en-US",
+        options
+      );
       html += this.messageTemplate({
         model: message.toJSON(),
+        date: date,
         sentByMe: username == window.currentUser.get("username"),
-        sentByLast: this.lastUser === username,
+        sentByLast: this.lastUser == username,
       });
+
+      this.lastUser = username;
     });
     return html;
   },
@@ -129,23 +144,6 @@ export default Backbone.View.extend({
       error: () => toasts.notifyError("Failed to get channel data."),
     });
   },
-  // editChannel() {
-  //   const channelUsers = new ChannelUsers({
-  //     channel_id: this.model.id,
-  //   });
-  //   const editView = new EditChat({
-  //     model: this.model,
-  //     collection: channelUsers,
-  //   });
-  //   channelUsers.fetch({
-  //     success: () => {
-  //       console.log("Successfully fetched channel users");
-
-  //       editView.render(this.model.get("owner"));
-  //     },
-  //     error: () => toasts.notifyError("Failed to get channel data."),
-  //   });
-  // },
   leaveChannel() {
     if (confirm(`Are your sure you want to leave the channel?`)) {
       this.model.leave();

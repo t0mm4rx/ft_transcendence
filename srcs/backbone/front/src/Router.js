@@ -16,6 +16,7 @@ import User from "./pages/User";
 import Livestream from "./pages/Livestream";
 import Guild from "./pages/Guild";
 import Admin from "./pages/Admin";
+import toasts from "./utils/toasts";
 
 export default Backbone.Router.extend({
   routes: {
@@ -31,7 +32,8 @@ export default Backbone.Router.extend({
     "livestream/:id": "livestream",
     "livestream/:id/": "livestream",
     tournaments: "tournaments",
-    "tournaments/": "tournaments",
+    "tournaments/(:id)": "tournaments",
+    "tournaments/:id/": "tournaments",
     "guild/:id": "guild",
     "guild/:id/": "guild",
     test: "test",
@@ -103,7 +105,7 @@ export default Backbone.Router.extend({
     window.currentView = new Livestream();
     window.currentView.render();
   },
-  tournaments: function () {
+  tournaments: function (id) {
     this.checkLogged();
     this.showLayout();
     if (window.currentView) {
@@ -111,8 +113,11 @@ export default Backbone.Router.extend({
       window.currentView.unbind();
       window.currentView.stopListening();
     }
-    window.currentView = new Tournaments();
-    window.currentView.render();
+    window.currentView = new Tournaments({ collection: window.tournaments });
+    window.tournaments.fetch({
+      success: () => window.currentView.render(id),
+      error: () => toasts.notifyError("Could not load tournaments."),
+    });
   },
   guild: function (id) {
     this.checkLogged();

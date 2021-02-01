@@ -12,11 +12,12 @@ import { Notification, NotificationCollection } from "./models/Notification";
 import { Game, GameCollection } from "./models/Game";
 import ChatPanel from "./views/Chat";
 import { Chat } from "./models/Chat";
+import { Tournaments } from "./models/Tournaments";
 import $ from "jquery";
 import Cookies from "js-cookie";
 import { loadCurrentUser, loadUsers, loadGuilds } from "./utils/globals";
 import { Guilds } from "./models/Guild";
-import { FtSocket } from './models/FtSocket'
+import { FtSocket } from "./models/FtSocket";
 
 // Temp game server
 // import express from 'express';
@@ -118,6 +119,7 @@ window.liveGames.add(
 );
 
 window.chat = new Chat();
+window.tournaments = new Tournaments();
 
 window.notifications = new NotificationCollection();
 window.notifications.add(
@@ -135,22 +137,18 @@ window.layoutView = new PageLayout().render();
 
 // Global socket
 var globalSocket = new FtSocket({
-  channel: 'GlobalChannel',
+  channel: "GlobalChannel",
 });
 
-globalSocket.socket.onmessage = function(event) { 
-			
+globalSocket.socket.onmessage = function (event) {
   const event_res = event.data;
   const msg = JSON.parse(event_res);
 
   // Ignores pings.
-  if (msg.type === "ping")
-    return;
+  if (msg.type === "ping") return;
 
-  if (msg.message)
-  {
-    if (msg.message.message == "new_client")
-    {
+  if (msg.message) {
+    if (msg.message.message == "new_client") {
       // Refresh HERE
       console.log("[TMP] New client.");
     }
@@ -158,11 +156,16 @@ globalSocket.socket.onmessage = function(event) {
 };
 
 // Send message to everyone
-globalSocket.sendMessage({
-  action: "to_broadcast",
-  infos: {
-    message: "new_client",
-    content: {}
-}}, false, true);
+globalSocket.sendMessage(
+  {
+    action: "to_broadcast",
+    infos: {
+      message: "new_client",
+      content: {},
+    },
+  },
+  false,
+  true
+);
 
 Backbone.history.start();
