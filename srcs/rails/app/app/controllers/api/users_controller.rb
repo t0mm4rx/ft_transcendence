@@ -58,7 +58,7 @@ module Api
     end
 
     def show
-      # @user.update(admin: true);
+      # @user.update(ladder_score: 1000);
       # @user.save();
       render json: @user
     end

@@ -81,6 +81,7 @@ class User < ApplicationRecord
 	private
 
     def set_defaults
+		self.ladder_score ||= 1000
 		self.wins ||= 0
 		self.losses ||= 0
 		self.admin ||= false

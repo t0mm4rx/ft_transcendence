@@ -1,5 +1,5 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :id, :username, :login, :avatar_url, :wins, :losses, :relation_to_user, :online, :tfa, :otp_secret_key, :admin, :blocked, :guild_id, :guild_owner, :guild_officer, :guild_invites, :guild_locked, :banned
+  attributes :id, :username, :login, :avatar_url, :ladder_score, :wins, :losses, :relation_to_user, :online, :tfa, :otp_secret_key, :admin, :blocked, :guild_id, :guild_owner, :guild_officer, :guild_invites, :guild_locked, :banned
 
   belongs_to :guild
   has_many :friends, serializer: FriendSerializer

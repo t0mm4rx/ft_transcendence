@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_29_211748) do
+ActiveRecord::Schema.define(version: 2021_01_29_213634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -67,7 +67,6 @@ ActiveRecord::Schema.define(version: 2021_01_29_211748) do
     t.integer "opponent_score"
     t.integer "winner_id"
     t.integer "winner_score"
-    t.string "game_type"
   end
 
   create_table "guilds", force: :cascade do |t|
@@ -78,9 +77,6 @@ ActiveRecord::Schema.define(version: 2021_01_29_211748) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "war_invites"
     t.boolean "isinwar"
-    t.integer "present_war_id"
-    t.integer "wt_game_invite"
-    t.boolean "isinwtgame"
     t.datetime "wt_date_to_answer"
   end
 
@@ -156,7 +152,6 @@ ActiveRecord::Schema.define(version: 2021_01_29_211748) do
     t.integer "guild2_unanswers"
     t.integer "guild_win"
     t.boolean "war_closed"
-    t.integer "wt_time_to_answer"
   end
 
   add_foreign_key "blocked_users", "users"

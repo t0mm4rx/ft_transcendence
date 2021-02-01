@@ -23,7 +23,8 @@ class Api::TournamentsController < ApplicationController
 	end
 	
 	def update
-		if @tournament.update_attributes(tournament_params)
+		@tournament.update(tournament_params)
+		if @tournament.save
 		  render json: @tournament
 		else
 		  render json: {}, status: :unprocessable_entity

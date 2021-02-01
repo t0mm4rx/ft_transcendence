@@ -2,10 +2,21 @@ class GameRoom < ApplicationRecord
 
 	# after a ladder game is finished we need to update the users' scores
 	# for more info: https://github.com/mxhold/elo_rating
+	# def calculate_new_user_score
+	# 	newScores = EloRating::Match.new.add_player(rating: p1.ladder_score).add_player(p2.ladder_score, winner: score2 > score1).updated_ratings # => [1988, 2012]
+	# 	p1.update_attributes(ladder_score: newScores[0])
+	# 	p2.update_attributes(ladder_score: newScores[1])
+
+	# after a ladder game is finished we need to update the users' scores
+	# for more info: https://github.com/mxhold/elo_rating
 	def calculate_new_user_score
-		newScores = EloRating::Match.new.add_player(rating: p1.ladder_score).add_player(p2.ladder_score, winner: score2 > score1).updated_ratings # => [1988, 2012]
-		p1.update_attributes(ladder_score: newScores[0])
-		p2.update_attributes(ladder_score: newScores[1])
+		p1  = Elo::Player.new(rating: p1.ladder_score)
+		p2 = Elo::Player.new(rating: p2.ladder_score)
+		game = p1.versus(p2, result: p1.score > p2.score)
+		p1.update(ladder_score: p1.rating)
+		p2.update(ladder_score: p2.rating)
+		p1.save && p2.save 
+
 	def self.update_war_scores(game_room, current_user)
 		if current_user.guild.present_war_id != 0
 			war = War.find(current_user.guild.present_war_id)
