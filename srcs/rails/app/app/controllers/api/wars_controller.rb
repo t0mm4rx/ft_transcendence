@@ -44,7 +44,7 @@ module Api
 
 		#current user can accept war invitation
 		def accept_invitation
-			if current_user.guild.war_invites != 0
+			if current_user.guild && current_user.guild.war_invites != 0
 				guild_inviter = Guild.find_by(id: current_user.guild.war_invites)
 				current_user.guild.isinwar = true
 				current_user.guild.war_invites = 0
@@ -65,11 +65,11 @@ module Api
 			end
 		end
 
-		#current user can ignore invitation to war no params needed
+		#current user can ignore4 invitation to war no params needed
 		def ignore_invitation
-			if current_user.guild.war_invites != 0
+			if current_user.guild && current_user.guild.war_invites != 0
 				current_user.guild.war_invites = 0
-				current_user.save
+				current_user.guild.save
 				return render json: current_user.guild
 			else
 				return render json: { error: "You have no invitations to war bro!"}, status: :unprocessable_entity
