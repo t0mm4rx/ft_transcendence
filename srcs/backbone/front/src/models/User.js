@@ -74,7 +74,6 @@ const User = Backbone.Model.extend({
   },
   block() {
     console.log(this);
-
     $.ajax({
       url: "http://localhost:3000/api/blocked",
       type: "POST",
