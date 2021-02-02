@@ -15,6 +15,7 @@ const Guilds = Backbone.Collection.extend({
 			success: () => {
 				toasts.notifySuccess(`Your guild ${name} has been created!`);
 				window.guilds.fetch();
+				window.currentUser.fetch();
 			},
 			error: (error) => {
 				console.log(error);

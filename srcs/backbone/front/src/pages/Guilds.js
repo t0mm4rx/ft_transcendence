@@ -48,7 +48,7 @@ export default Backbone.View.extend({
 				`<div class="guild-item">
 					<span class="guild-item-clickable" anagram="${guild.get('anagram')}">${guild.get('anagram')}</span>
 					<span class="guild-item-clickable" anagram="${guild.get('anagram')}">${guild.get('name')}</span>
-					<span>${guild.get('score')}</span>
+					<span>${guild.get('score') ?? 0}</span>
 				</div>`
 			);
 		});

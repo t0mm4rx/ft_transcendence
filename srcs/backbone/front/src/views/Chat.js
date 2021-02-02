@@ -36,7 +36,7 @@ export default Backbone.View.extend({
     },
     "click .fa-search": function () {
       $("#channel-input").trigger("focus");
-    },
+	},
   },
   render() {
     this.channelViews = [];
@@ -95,14 +95,6 @@ export default Backbone.View.extend({
       () => {}
     );
   },
-  getUserProfile() {
-    const login = this.currentChat.get("name");
-    console.log(login);
-    if (window.users.find((a) => a.get("login") === login)) {
-      window.location.hash = `user/${login}/`;
-    }
-  },
-
   autocomplete() {
     const query = $("#channel-input").val();
     let result = false;
