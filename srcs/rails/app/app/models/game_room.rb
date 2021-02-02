@@ -1,7 +1,7 @@
 class GameRoom < ApplicationRecord
 
 	def self.update_war_scores(game_room, current_user)
-		if current_user.guild.present_war_id != 0
+		if current_user.guild && current_user.guild.present_war_id
 			war = War.find(current_user.guild.present_war_id)
 			guild1 = Guild.find_by(id: war.guild1_id)
 			guild2 = Guild.find_by(id: war.guild2_id)

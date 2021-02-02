@@ -131,6 +131,9 @@ module Api
 
 		def set_guilds_update
 			@war = War.find_by(id: params[:id])
+			if @war.nil?
+				return render json: { error: "You have no war"}, status: :unprocessable_entity
+			end
 			if @war.war_closed == true
 				return render json: { error: "War is closed !"}, status: :unprocessable_entity
 			end
@@ -149,6 +152,9 @@ module Api
 				return render json: { error: "This guild doesn't exist"}, status: :unprocessable_entity
 			end
 			@guild1 = current_user.guild
+			if @guild1.nil?
+				return render json: { error: "You don't have guild"}, status: :unprocessable_entity
+			end
 		end
 
 		def check_if_wt_unanswered
@@ -156,6 +162,10 @@ module Api
 			if @wars.nil?
 				return
 			end
+			if @wars.empty?
+				return
+			end
+			p @wars
 			@wars.each do |war|
 				War.check_no_answer(war)
 				war.save
