@@ -69,7 +69,7 @@ module Api
 		def ignore_invitation
 			if current_user.guild && current_user.guild.war_invites != 0
 				current_user.guild.war_invites = 0
-				current_user.save
+				current_user.guild.save
 				return render json: current_user.guild
 			else
 				return render json: { error: "You have no invitations to war bro!"}, status: :unprocessable_entity
