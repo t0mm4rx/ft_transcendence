@@ -1,7 +1,7 @@
 default: &default
   adapter: postgresql
   encoding: unicode
- # host: localhost
+  #host: localhost
   host: postgresql_db
   username: railsapp
   password: ecnednecsnart
