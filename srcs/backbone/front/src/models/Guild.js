@@ -15,6 +15,7 @@ const Guilds = Backbone.Collection.extend({
 			success: () => {
 				toasts.notifySuccess(`Your guild ${name} has been created!`);
 				window.guilds.fetch();
+				window.currentUser.fetch();
 			},
 			error: (error) => {
 				console.log(error);
@@ -30,6 +31,32 @@ const Guilds = Backbone.Collection.extend({
 					msg += "."
 					toasts.notifyError(msg);
 				}
+			}
+		});
+	},
+	acceptWar: function () {
+		$.ajax({
+			url: 'http://localhost:3000/api/wars/accept_invitation',
+			type: 'POST',
+			success: () => {
+				toasts.notifySuccess('The war has been declared!');
+				window.currentUser.fetch();
+			},
+			error: () => {
+				toasts.notifyError('Unable to accept the request.');
+			}
+		});
+	},
+	declineWar: function () {
+		$.ajax({
+			url: 'http://localhost:3000/api/wars/ignore_invitation',
+			type: 'POST',
+			success: () => {
+				toasts.notifySuccess('You declined the war.');
+				window.currentUser.fetch();
+			},
+			error: () => {
+				toasts.notifyError('Unable to decline the request.');
 			}
 		});
 	}

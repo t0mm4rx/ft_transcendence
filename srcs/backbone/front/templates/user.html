@@ -23,7 +23,7 @@
 			<div id="user-name-infos">
 				<div class="user-info">
 					<span>Guild</span>
-					<span><%= data.guild || "None" %></span>
+					<span><%= data.guild ? data.guild.name : "None" %></span>
 				</div>
 				<div class="user-info">
 					<span># of tournaments</span>

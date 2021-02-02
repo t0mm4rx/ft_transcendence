@@ -10,8 +10,6 @@ import $ from 'jquery';
 export default Backbone.View.extend({
 	el: "#notifications-menu",
 	initialize: function () {
-		// this.listenTo(this.model, 'add', this.renderList);
-		// this.listenTo(this.model, 'remove', this.renderList);
 		this.listenTo(window.currentUser, 'change', this.renderList);
 		this.listenTo(window.users, 'add', this.renderList);
 		this.notifs = [];
@@ -25,16 +23,26 @@ export default Backbone.View.extend({
 				$("#notification-panel").addClass("notification-panel-open");
 		},
 		'click .notification-delete': function (el) {
-			this.model.remove(el.currentTarget.getAttribute("notification-id"));
-		},
-		'click .notification-accept': function (el) {
-			const elId = el.currentTarget.id;
+			const elId = el.currentTarget.getAttribute('notification-id');
 			const type = elId.split('-')[0];
 			const id = parseInt(elId.split('-')[1]);
-			console.log(id);
+			if (type === 'friend') {
+				window.users.models.find(a => a.get('id') === 3).unfriend();
+			}
+			if (type === 'war') {
+				window.guilds.declineWar();
+			}
+		},
+		'click .notification-accept': function (el) {
+			const elId = el.currentTarget.getAttribute('notification-id');
+			const type = elId.split('-')[0];
+			const id = parseInt(elId.split('-')[1]);
 			if (type === 'friend') {
 				const target = new User({id: id});
 				target.acceptFriend();
+			}
+			if (type === 'war') {
+				window.guilds.acceptWar();
 			}
 		}
 	},
@@ -56,6 +64,15 @@ export default Backbone.View.extend({
 				});
 			}
 		});
+		if (window.currentUser.get('guild') && window.currentUser.get('guild').war_invites) {
+			const guild_id = window.currentUser.get('guild').war_invites;
+			const guild = window.guilds.where('id', guild_id);
+			this.notifs.push({
+				title: `${guild.get('name')} declares war to your guild`,
+				type: 'war',
+				id: 0
+			});
+		}
 		if (this.notifs.length <= 0) {
 			$("#notification-panel").removeClass("notification-panel-open");
 			$("#notification-badge").hide();
