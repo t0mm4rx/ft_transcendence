@@ -2,6 +2,7 @@
 import Backbone from 'backbone';
 import $ from 'jquery';
 import template from '../../templates/guild.html';
+import {getGuildMembers} from '../models/Guild';
 import _ from 'underscore';
 import {showModal} from '../utils/modal';
 
@@ -10,6 +11,7 @@ export default Backbone.View.extend({
 	initialize: function (options) {
 		this.listenTo(window.users, 'add', this.render);
 		this.listenTo(window.users, 'change', this.render);
+		this.listenTo(window.currentUser, 'change', this.render);
 		this.anagram = options.anagram;
 	},
 	events: {
@@ -35,7 +37,10 @@ export default Backbone.View.extend({
 		const friends = $("#guild-users-list");
 		friends.html("");
 		console.log(window.users.length);
-		window.users.forEach(friend => {
+		if (!this.guild)
+			return
+		console.log(getGuildMembers(this.guild.id));
+		getGuildMembers(this.guild.id).forEach(friend => {
 			friends.append(
 				`<div class="friend-item">
 					<img src="${friend.get('avatar_url')}" onclick="window.location.hash='user/${friend.get('login')}/'"/>
@@ -43,7 +48,7 @@ export default Backbone.View.extend({
 					<span class="friend-status${friend.get('online') ? " friend-status-online" : ""}">${friend.get('online') ? "Online" : "Offline"}</span>
 					<span class="button-icon message-button" id="message-${friend.get('login')}"><i class="far fa-comment"></i></span>
 					${friend.get('online') ? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}
-					${friend.get('login') === 'rchallie' ? "<i class=\"fas fa-crown owner-icon\"></i>" : ""}
+					${!!friend.get('guild') && friend.get('guild').anagram === this.anagram ? "<i class=\"fas fa-crown owner-icon\"></i>" : ""}
 					${!!window.currentUser.get('admin') ? `<span class="button-icon user-settings" login="${friend.get('login')}"><i class="fas fa-cog"></i></span>` : ""}
 				</div>`
 			);

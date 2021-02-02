@@ -71,8 +71,8 @@ export default Backbone.View.extend({
       reader.readAsDataURL(file);
       reader.onload = function () {
         const b64 = reader.result;
-        console.log("Image to upload", b64);
-        document.querySelector(".avatar-current-user").src = b64;
+		document.querySelector(".avatar-current-user").src = b64;
+		window.currentUser.save('avatar_url', b64);
       };
       reader.onerror = function (error) {
         console.log(error);
