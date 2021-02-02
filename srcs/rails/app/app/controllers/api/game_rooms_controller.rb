@@ -16,7 +16,8 @@ module Api
             if game_room.save
                 render json: game_room
             else
-                render json: {errors: game.errors.full_messages}, status: 422
+                render json: game_room.errors, status: 422
+                # render json: {errors: game.errors.full_messages}, status: 422
             end
         end
 
@@ -28,22 +29,23 @@ module Api
 
         def update
             game_room = GameRoom.find(params[:id])
-            game_room.update_attribute(:player, params[:player])
-            game_room.update_attribute(:opponent, params[:opponent])
+            game_room.update_attribute(:player_id, params[:player_id])
+            game_room.update_attribute(:opponent_id, params[:opponent_id])
             game_room.update_attribute(:status, params[:status])
-        end
-
-        def first_no_oppenent
-            game_room = GameRoom.where("opponent" => "").first
             render json: game_room
         end
 
-        def is_diconnected
+        def first_no_oppenent
+            game_room = GameRoom.where(opponent: nil).first
+            render json: game_room
+        end
+
+        def is_disconnected
             game_room = GameRoom.where(
-                "opponent = ? AND status = ?", params[:player], "active").or(GameRoom.where(
-                    "player = ? AND status = ?", params[:player], "active")).or(GameRoom.where(
-                        "opponent = ? AND status = ?", params[:player], "notstarted")).or(GameRoom.where(
-                            "player = ? AND status = ?", params[:player], "notstarted"))
+                "opponent_id = ? AND status = ?", params[:player_id], "active").or(GameRoom.where(
+                    "player_id = ? AND status = ?", params[:player], "active")).or(GameRoom.where(
+                        "opponent_id = ? AND status = ?", params[:player], "notstarted")).or(GameRoom.where(
+                            "player_id = ? AND status = ?", params[:player_id], "notstarted"))
             render json: game_room.first
         end
 
@@ -57,16 +59,12 @@ module Api
             game_room = GameRoom.find(params[:id])
             game_room.update_attribute(:player_score, params[:player_score])
             game_room.update_attribute(:opponent_score, params[:opponent_score])
-            if game_room.player_score > game_room.opponent_score
-                game_room.winner_id = game_room.player
-                game_room.winner_score = game_room.player_score
-            else
-                game_room.winner_id = game_room.opponent
-                game_room.winner_score = game_room.opponent_score
-            game_room.update_attribute(:winner_id, game_room.winner_id)
-            GameRoom.update_war_scores(game_room, current_user)
-            render json: game_room
+            if game_room.game_over? #&& !game_room.winner
+                game_room.update_attribute(:status, "ended")
+                game_room.update_scores
+                # game_room.update_war_scores(current_user)
             end
+            render json: game_room
         end
 
         private
@@ -77,7 +75,7 @@ module Api
             # require() : mark required parameter
             # permit() : set the autorized parameter
           #  params.require(:game_room).permit(:player, :opponent, :status, :number_player)
-            params.permit(:player, :opponent, :status, :number_player, :game_type)
+            params.permit(:player_id, :opponent_id, :status, :number_player, :game_type, :tournament_id, :ladder)
         end
 
         # def check_wt_game
