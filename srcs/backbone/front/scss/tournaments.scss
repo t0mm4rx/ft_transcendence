@@ -197,3 +197,18 @@
 	border-style: solid;
 	border-color: $blue;
 }
+
+.tournament-item.permanent {
+	// background-color: $red;
+	background-color: $grey_dark;
+	font-size: $s;
+	// color: $red;
+	// box-shadow: blue;
+	// border-radius: 0;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+	margin-bottom: 30px;
+	// margin-right: auto;
+	justify-self: center;
+	display: block;
+	// display: inline-block;
+}

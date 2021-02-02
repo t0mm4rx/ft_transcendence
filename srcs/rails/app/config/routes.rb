@@ -38,7 +38,7 @@ Rails.application.routes.draw do
     # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
     resources :game_rooms, only: [:index, :create, :show, :update]
     get '/game/match_no_opponent', to: 'game_rooms#first_no_oppenent'
-    post '/game/is_disconnected', to: 'game_rooms#is_diconnected'
+    post '/game/is_disconnected', to: 'game_rooms#is_disconnected'
     get '/game/tmp_last_game', to: 'game_rooms#tmp_last_game'
     post '/game/:id/update_score', to: 'game_rooms#update_score'
 end

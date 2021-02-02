@@ -6,7 +6,7 @@
 			<% if (data.relation_to_user === "friends") { %><div id="user-friend-badge"><div class="user-friend-overlay"><i class="fas fa-users-slash"></i></div><i class="fas fa-user-friends"></i> Friend</div><% } %>
 			<% if (data.relation_to_user === "request sent") { %><div id="user-friend-badge"><div class="user-friend-overlay"><i class="fas fa-users-slash"></i></div><i class="fas fa-hourglass-start"></i> Friend request sent</div><% } %>
 			<div id="user-ladder">
-				<span>#2</span>
+				<span>#<%= data.ladder_ranking %></span>
 				<span>on the ladder</span>
 			</div>
 			<div id="user-name-container">

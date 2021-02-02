@@ -12,7 +12,7 @@ import { Notification, NotificationCollection } from "./models/Notification";
 import { Game, GameCollection } from "./models/Game";
 import ChatPanel from "./views/Chat";
 import { Chat } from "./models/Chat";
-import { Tournaments } from "./models/Tournaments";
+import { Tournaments, PermanentTournament } from "./models/Tournaments";
 import $ from "jquery";
 import Cookies from "js-cookie";
 import { loadCurrentUser, loadUsers, loadGuilds } from "./utils/globals";
@@ -53,7 +53,6 @@ loadUsers();
 window.guilds = new Guilds();
 loadGuilds();
 
-
 window.liveGames = new GameCollection();
 window.liveGames.add(
   new Game({
@@ -78,8 +77,9 @@ window.liveGames.add(
 );
 
 if (token) {
-	window.chat = new Chat();
-	window.tournaments = new Tournaments();
+  window.chat = new Chat();
+  window.tournaments = new Tournaments();
+  window.permanentTournament = new PermanentTournament();
 }
 
 window.notifications = new NotificationCollection();
