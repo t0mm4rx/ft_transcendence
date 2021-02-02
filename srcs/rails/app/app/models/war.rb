@@ -26,10 +26,10 @@ class War < ApplicationRecord
 	def self.update_guilds_score(war)
 		guild1 = Guild.find_by(id: war.guild1_id)
 		guild2 = Guild.find_by(id: war.guild2_id)
-		if war.guild_win == guild1.id
+		if war.guild_win && war.guild_win == guild1.id
 			guild1.score += war.prize
 			guild2.score -= war.prize
-		else
+		elsif war.guild_win
 			guild2.score += war.prize
 			guild1.score -= war.prize
 		end
@@ -38,13 +38,13 @@ class War < ApplicationRecord
 	end
 
 	def self.check_no_answer(war)
-		if war.guild1.wt_date_to_answer < DateTime.now
+		if war.guild1.wt_date_to_answer && war.guild1.wt_date_to_answer < DateTime.now
 			war.guild1_unanswers += 1
 			war.guild2_score += 1
 			war.guild1.wt_date_to_answer = war.end_date + 1
 			war.guild1.wt_game_invite = 0
 			check_max_unanswered(war)
-		elsif war.guild2.wt_date_to_answer < DateTime.now
+		elsif war.guild1.wt_date_to_answer && war.guild2.wt_date_to_answer < DateTime.now
 			war.guild2_unanswers += 1
 			war.guild1_score += 1
 			war.guild2.wt_date_to_answer = war.end_date + 1
