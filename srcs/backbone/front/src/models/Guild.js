@@ -6,7 +6,7 @@ import $ from 'jquery';
 const Guild = Backbone.Model.extend({
 	declareWar: function (options) {
 		$.ajax({
-			url: 'http://localhost:3000/api/wars/send_request',
+			url: `http://${window.location.hostname}:3000/api/wars/send_request`,
 			type: 'POST',
 			data: `target_id=${this.get('id')}`,
 			success: (res) => {
@@ -51,7 +51,7 @@ const Guilds = Backbone.Collection.extend({
 	},
 	acceptWar: function () {
 		$.ajax({
-			url: 'http://localhost:3000/api/wars/accept_invitation',
+			url: `http://${window.location.hostname}:3000/api/wars/accept_invitation`,
 			type: 'POST',
 			success: () => {
 				toasts.notifySuccess('The war has been declared!');
@@ -64,7 +64,7 @@ const Guilds = Backbone.Collection.extend({
 	},
 	declineWar: function () {
 		$.ajax({
-			url: 'http://localhost:3000/api/wars/ignore_invitation',
+			url: `http://${window.location.hostname}:3000/api/wars/ignore_invitation`,
 			type: 'POST',
 			success: () => {
 				toasts.notifySuccess('You declined the war.');
