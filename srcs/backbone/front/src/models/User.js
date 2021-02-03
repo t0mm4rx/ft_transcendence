@@ -122,11 +122,6 @@ const User = Backbone.Model.extend({
         toasts.notifyError(`Could not ban ${this.escape("username")}`),
     });
   },
-  fetchGames() {
-    const games = new UserGames({ id: this.id });
-    this.set("games", games);
-    games.fetch();
-  },
 });
 
 const Users = Backbone.Collection.extend({
@@ -141,4 +136,4 @@ const Users = Backbone.Collection.extend({
 
 const Friends = Backbone.Collection.extend({});
 
-export { User, Friends, Users };
+export { User, Friends, Users, UserGames };

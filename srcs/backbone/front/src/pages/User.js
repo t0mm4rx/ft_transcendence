@@ -2,7 +2,7 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import template from "../../templates/user.html";
-import { User } from "../models/User";
+import { User, UserGames } from "../models/User";
 import _ from "underscore";
 import { showModal } from "../utils/modal";
 import toasts from "../utils/toasts";
@@ -86,7 +86,6 @@ export default Backbone.View.extend({
     this.listenTo(window.currentUser, "change", this.fetchUser);
     this.listenTo(window.users, "add", this.fetchUser);
     this.listenTo(this.user, "change", this.render);
-    this.listenTo(this.user.get("games"), "sync", this.renderHistoryList);
     this.fetchUser();
     loadUsers();
   },
@@ -97,11 +96,12 @@ export default Backbone.View.extend({
     if (this.preview) {
       this.user.set("id", this.preview.id);
       this.user.fetch();
-      this.user.fetchGames();
+      this.games = new UserGames({ id: this.preview.id });
+      this.games.fetch({ success: () => this.renderHistoryList() });
     }
   },
   render: function () {
-	console.log(this.user.toJSON());
+    console.log(this.user.toJSON());
     this.$el.html(_.template(template)({ data: this.user.toJSON() }));
     this.renderFriendsList();
   },
@@ -134,9 +134,22 @@ export default Backbone.View.extend({
     });
   },
   renderHistoryList() {
-    const template = `<div class="history-item">
+    // const template = _.template(`<div class="history-item">
+    // <span><b><%= game.player.username %></b> <span class="history-item-win"><%= game.player_score %></span> - <span><%= game.opponent_score %></span> <%= game.opponent.username %><span class="history-item-info"> - direct game</span></span>
+    // <span class="history-item-win"><%= game.winner_id == this.user.id ? "Win" : "Loss" %></span>
+    // </div>`);
+    const template = _.template(`<div class="history-item">
     <span><b><%= game.get("player").username %></b> <span class="history-item-win"><%= game.escape("player_score") %></span> - <span><%= game.escape("opponent_score") %></span> <%= game.get("opponent").username %><span class="history-item-info"> - direct game</span></span>
-    <span class="history-item-win"><%= winner_id == this.user.id ? "Win" : "Loss" %></span>
-    </div>`;
+    <span class="history-item-win"><%= game.get("winner_id") == user_id ? "Win" : "Loss" %></span>
+    </div>`);
+    console.log("GAMES", this.games);
+
+    let html = "";
+    this.games.each((game) => {
+      console.log("USER GAME", game);
+      if (game.get("player") && game.get("opponent"))
+        html += template({ game: game, user_id: this.user.id });
+    });
+    this.$("#history-panel-content").html(html);
   },
 });
