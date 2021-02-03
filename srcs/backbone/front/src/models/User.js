@@ -3,6 +3,12 @@ import Backbone from "backbone";
 import $ from "jquery";
 import toasts from "../utils/toasts";
 
+const UserGames = Backbone.Collection.extend({
+  initialize(props) {
+    this.url = `http://localhost:3000/api/users/${props.id}/games`;
+  },
+});
+
 const User = Backbone.Model.extend({
   urlRoot: `http://localhost:3000/api/users/`,
   save: function (key, value) {
@@ -116,6 +122,11 @@ const User = Backbone.Model.extend({
       error: () =>
         toasts.notifyError(`Could not ban ${this.escape("username")}`),
     });
+  },
+  fetchGames() {
+    const games = new UserGames({ id: this.id });
+    this.set("games", games);
+    games.fetch();
   },
 });
 

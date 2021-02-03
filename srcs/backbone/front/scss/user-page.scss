@@ -83,7 +83,11 @@
 		}
 
 		#user-name-container {
-			span:nth-child(1) {
+			#title {
+				font-size: $m;
+			}
+
+			span:nth-child(2) {
 				font-size: $xl;
 				font-weight: 800;
 			}

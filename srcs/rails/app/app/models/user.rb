@@ -97,6 +97,10 @@ class User < ApplicationRecord
 		save
 	end
 
+	def find_higher_ranked_user
+		User.where("online = true AND ladder_score > ?", ladder_score).order(ladder_score: :asc).first
+	end
+
 	private
 
     def set_defaults
@@ -107,7 +111,6 @@ class User < ApplicationRecord
 		self.online ||= false
 		self.avatar_url ||= "https://cdn.intra.42.fr/users/small_#{self.login}.jpg"
 		self.tfa ||= false
-		self.admin ||= false
 		self.guild_id ||= nil
 		self.guild_owner ||= false
 		self.guild_officer ||= false

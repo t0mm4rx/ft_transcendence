@@ -59,9 +59,16 @@ module Api
     end
 
     def show
+      # @user.update_attribute(:title, "SMASHER")
       # @user.update(admin: true);
       # @user.save();
       render json: @user
+    end
+
+    def games
+      user = User.find(params[:id])
+      games = user.games.reverse # todo: order by updated_at
+      render json: games
     end
 
     private

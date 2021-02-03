@@ -10,22 +10,28 @@ class GameRoom < ApplicationRecord
 	def game_over?
 		player_score >= 11 || opponent_score >= 11
 	end
-
-	def winner
-		if game_over?
-			player_score > opponent_score ? player : opponent
-		end
-	end
 	
 	def update_scores
-		if player_score > opponent_score
-			player.has_won
-			opponent.has_lost
-		else
-			opponent.has_won
-			player.has_lost
-		end
+		set_winner_and_loser
+		@winner.has_won
+		@loser.has_lost
 		calculate_new_user_score if self.ladder
+		update_tournament if tournament
+	end
+
+	def update_tournament
+		tournament.calculate_new_game(@winner)
+		eliminate_loser
+	end
+
+	def eliminate
+		tournament_user = TournamentUser.find_by(tournament_id: tournament_id, user_id: @loser.id)
+		tournament_user.update(eliminated: true)
+		if tournament_user.save
+			render json: {}
+		else
+			render json: tournament_user.errors, status: :unprocessable_entity
+		end
 	end
 
 	# after a ladder game is finished we need to update the users' scores
@@ -40,16 +46,14 @@ class GameRoom < ApplicationRecord
 	end
 
 	def update_war_scores(current_user)
-		if current_user.guild.present_war_id != 0
+		if current_user.guild && current_user.guild.present_war_id
 			war = War.find(current_user.guild.present_war_id)
 			guild1 = Guild.find_by(id: war.guild1_id)
 			guild2 = Guild.find_by(id: war.guild2_id)
 			if war.add_count_all == true || game_type == 'war' || game_type == 'war_time'
-				# winner = User.find(winner_id)
-				winner = player_score > opponent_score ? player : opponent
 				guild1.isinwtgame = false
 				guild2.isinwtgame = false
-				if winner.guild_id == war.guild1_id
+				if @winner.guild_id == war.guild1_id
 					war.guild1_score += 1
 				else
 					war.guild2_score += 1
@@ -69,5 +73,13 @@ class GameRoom < ApplicationRecord
 		self.player_score ||= 0
 		self.opponent_score ||= 0
 		self.number_player ||= opponent ? 2 : 1
+	end
+
+	def set_winner_and_loser
+		if game_over?
+			@winner = player_score > opponent_score ? player : opponent
+			@loser = player_score < opponent_score ? player : opponent
+			update_attribute(:winner_id, @winner.id)
+		end
 	end
 end

@@ -71,8 +71,8 @@ export default Backbone.View.extend({
       reader.readAsDataURL(file);
       reader.onload = function () {
         const b64 = reader.result;
-		document.querySelector(".avatar-current-user").src = b64;
-		window.currentUser.save('avatar_url', b64);
+        document.querySelector(".avatar-current-user").src = b64;
+        window.currentUser.save("avatar_url", b64);
       };
       reader.onerror = function (error) {
         console.log(error);
@@ -86,6 +86,7 @@ export default Backbone.View.extend({
     this.listenTo(window.currentUser, "change", this.fetchUser);
     this.listenTo(window.users, "add", this.fetchUser);
     this.listenTo(this.user, "change", this.render);
+    this.listenTo(this.user.get("games"), "sync", this.renderHistoryList);
     this.fetchUser();
     loadUsers();
   },
@@ -96,6 +97,7 @@ export default Backbone.View.extend({
     if (this.preview) {
       this.user.set("id", this.preview.id);
       this.user.fetch();
+      this.user.fetchGames();
     }
   },
   render: function () {
@@ -131,5 +133,11 @@ export default Backbone.View.extend({
 				</div>`
       );
     });
+  },
+  renderHistoryList() {
+    const template = `<div class="history-item">
+    <span><b><%= game.get("player").username %></b> <span class="history-item-win"><%= game.escape("player_score") %></span> - <span><%= game.escape("opponent_score") %></span> <%= game.get("opponent").username %><span class="history-item-info"> - direct game</span></span>
+    <span class="history-item-win"><%= winner_id == this.user.id ? "Win" : "Loss" %></span>
+    </div>`;
   },
 });

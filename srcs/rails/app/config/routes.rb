@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     resources :users do
       resources :friends, controller: 'friendships', only: :index
     end
+    get '/users/:id/games', to: 'users#games'
 
     resources :friends, controller: 'friendships', only: [:create, :update, :destroy]
 
@@ -20,7 +21,10 @@ Rails.application.routes.draw do
       post '/guilds/accept_invitation', to: 'guilds#accept_invitation'
       post '/guilds/delete_member', to: 'guilds#delete_member'
 
-    resources :tournaments
+    resources :tournaments, only: [:index, :create, :update, :destroy]
+    get 'ladder_games', to: 'game_rooms#ladder_games'
+    get 'tournaments/:id/games', to: 'tournaments#games'
+    get 'tournaments/:id/users', to: 'tournaments#users'
     post '/tournaments/:id/register', to: 'tournaments#register'
     delete '/tournaments/:id/unregister', to: 'tournaments#unregister'
 
