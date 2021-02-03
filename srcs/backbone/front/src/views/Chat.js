@@ -12,6 +12,7 @@ export default Backbone.View.extend({
     this.$el.html(template);
     this.listenTo(this.collection, "sync", this.render);
     this.listenTo(this.collection, "change", this.render);
+    this.listenTo(this.collection, "block", this.onBlock);
     $(document).on("chat", (_, { chat }) => {
       $("#chat-panel").addClass("chat-panel-open");
       this.collection.addChannel(chat, "");
@@ -38,6 +39,7 @@ export default Backbone.View.extend({
     },
   },
   render() {
+    this.channelViews = [];
     let current = "public"; // todo: enum
     this.$("#channels-list").html(
       `<div id="input-container">
@@ -60,6 +62,7 @@ export default Backbone.View.extend({
         model: channel,
         id: channel.id,
       });
+      this.channelViews.push(channelView);
       this.$("#channels-list").append(channelView.render().el);
     });
     this.$("#channels-list").append(`<div id="autocomplete-container"></div>`);
@@ -125,5 +128,12 @@ export default Backbone.View.extend({
       $("#autocomplete-container").hide();
       $("#input-container .fa-times").addClass("fa-search");
     }, 100);
+  },
+  onBlock() {
+    this.channelViews.forEach((channel) => {
+      channel.remove();
+      $(".chat-chat").html("");
+    });
+    this.render();
   },
 });

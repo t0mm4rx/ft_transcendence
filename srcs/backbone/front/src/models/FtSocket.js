@@ -68,7 +68,7 @@ const FtSocket = Backbone.Model.extend({
      *  Where : action = def "pef" in blabla_channel.rb
      *          content = the content).
      */
-    sendMessage: function(msg_data, output, waitco)
+    sendMessage: async function(msg_data, output, waitco)
     {
         const msg = {
             command: 'message',

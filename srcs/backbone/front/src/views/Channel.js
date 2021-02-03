@@ -18,7 +18,7 @@ export default Backbone.View.extend({
   <% if (model.escape('avatar')) { %>
   <div class="button-icon" id="start-game"><i class="fas fa-gamepad"></i></div>
   <div class="button-icon" id="block-user"><i class="fas fa-ban"></i></div>
-  <% } else { if (model.get("admin") === true) { %>
+  <% } else { if (model.get("admin") === true || model.get("owner") === true) { %>
     <div class="button-icon" id="edit-channel"><i class="fas fa-cog"></i></div>
    <% } if (window.currentUser.get("admin") === false) {%>
     <div class="button-icon" id="leave-channel"><i class="fas fa-sign-out-alt"></i></div>
@@ -27,7 +27,7 @@ export default Backbone.View.extend({
   messageTemplate: _.template(`<div class="chat-message-container<%= (sentByMe) ? " chat-message-container-me" : "" %><%= sentByLast ? " chat-message-container-no-margin": "" %>" id="<%= model.username %>">
   <% if (!sentByLast)  { %>
   <div class="chat-message-infos">
-  <a href="/#user/<%= login %>/" class="chat-message-username" id="<%= model.login %>"><%= model.username %></a><span><%= model.date %></span>
+  <a href="/#user/<%= model.login %>/" class="chat-message-username" id="<%= model.login %>"><%= model.username %></a><span><%= date %></span>
   </div>
   <% } %>
     <div class="chat-message"><%= model.body %></div>
@@ -39,6 +39,10 @@ export default Backbone.View.extend({
     this.listenTo(this.collection, "join", this.joinChannel);
     this.listenTo(this.collection, "newMessage", this.onNewMessage);
     this.listenTo(this.collection, "load", this.onLoadMessages);
+
+    this.channelUsers = new ChannelUsers({
+      channel_id: this.model.id,
+    });
 
     this.lastUser = null;
   },
@@ -97,31 +101,45 @@ export default Backbone.View.extend({
     ).scrollHeight;
   },
   messagesToHTML(messages) {
+    const options = {
+      // weekday: "long",
+      // year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+    };
     console.log("MSG -> HTML", messages.length);
     if (messages.length > 0) this.firstUser = messages[0].get("username");
     let html = "";
     messages.forEach((message) => {
       const username = message.get("username");
-      this.lastUser = username;
+      const date = new Date(message.get("date")).toLocaleString(
+        "en-US",
+        options
+      );
       html += this.messageTemplate({
         model: message.toJSON(),
+        date: date,
         sentByMe: username == window.currentUser.get("username"),
-        sentByLast: this.lastUser === username,
+        sentByLast: this.lastUser == username,
       });
+
+      this.lastUser = username;
     });
     return html;
   },
   editChannel() {
-    const channelUsers = new ChannelUsers({
-      channel_id: this.model.id,
-    });
-    const editView = new EditChat({
+    this.editView = new EditChat({
       model: this.model,
-      collection: channelUsers,
+      collection: this.channelUsers,
     });
-    channelUsers.fetch({
+    this.channelUsers.fetch({
       success: () => {
-        editView.render(this.model.get("owner"));
+        console.log("Successfully fetched channel users");
+
+        this.editView.render(this.model.get("owner"));
       },
       error: () => toasts.notifyError("Failed to get channel data."),
     });

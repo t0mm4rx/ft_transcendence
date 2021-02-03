@@ -13,7 +13,7 @@
 				<span <%= data.relation_to_user === "current_user" ? "class=\"user-editable-field\"" : "" %>><%= data.username || "..." %><%= data.relation_to_user === "current_user" ? "<div class=\"button-icon\" id=\"edit-username\"><i class=\"fas fa-user-edit\"></i></div>" : "" %></span>
 				<div id="user-name-buttons">
 					<% if (!data.relation_to_user) { %><div id="user-add-friend" class="button-icon"><i class="fas fa-user-plus"></i></div> <% } %> 
-					<div class="button-icon"><i class="fas fa-gamepad"></i></div>
+					<div id="game-request-button" class="button-icon"><i class="fas fa-gamepad"></i></div>
 					<div class="button-icon message-button" id="message-<%= data.login %>"><i class="far fa-comment"></i></div>
 					<% if (data.relation_to_user !== "current_user") { %>
 						<div class="button-icon" id="<%= data.id %>"><i class="fas fa-ban" id="<%= data.blocked ? `un` : `` %>block-button" title="<%= data.blocked ? `un` : `` %>block"></i></div> 

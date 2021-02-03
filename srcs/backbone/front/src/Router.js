@@ -4,6 +4,7 @@ import Backbone from "backbone";
 import Guilds from "./pages/Guilds";
 import Home from "./pages/Home";
 import Game from "./pages/Game";
+import GameLive from "./pages/GameLive";
 import Tournaments from "./pages/Tournaments";
 import Test from "./pages/Test";
 import Auth from "./pages/Auth";
@@ -16,6 +17,7 @@ import User from "./pages/User";
 import Livestream from "./pages/Livestream";
 import Guild from "./pages/Guild";
 import Admin from "./pages/Admin";
+import toasts from "./utils/toasts";
 
 export default Backbone.Router.extend({
   routes: {
@@ -28,10 +30,14 @@ export default Backbone.Router.extend({
     "guilds/": "guilds",
     game: "game",
     "game/": "game",
+    game_live: "game_live",
+    "game_live/:id": "game_live",
+    "game_live/:id/": "game_live",
     "livestream/:id": "livestream",
     "livestream/:id/": "livestream",
     tournaments: "tournaments",
-    "tournaments/": "tournaments",
+    "tournaments/(:id)": "tournaments",
+    "tournaments/:id/": "tournaments",
     "guild/:id": "guild",
     "guild/:id/": "guild",
     test: "test",
@@ -92,6 +98,17 @@ export default Backbone.Router.extend({
     window.currentView = new Game();
     window.currentView.render();
   },
+  game_live: function () {
+    this.checkLogged();
+    this.showLayout();
+    if (window.currentView) {
+      window.currentView.undelegateEvents();
+      window.currentView.unbind();
+      window.currentView.stopListening();
+    }
+    window.currentView = new GameLive();
+    window.currentView.render();
+  },
   livestream: function () {
     this.checkLogged();
     this.showLayout();
@@ -103,7 +120,7 @@ export default Backbone.Router.extend({
     window.currentView = new Livestream();
     window.currentView.render();
   },
-  tournaments: function () {
+  tournaments: function (id) {
     this.checkLogged();
     this.showLayout();
     if (window.currentView) {
@@ -111,8 +128,11 @@ export default Backbone.Router.extend({
       window.currentView.unbind();
       window.currentView.stopListening();
     }
-    window.currentView = new Tournaments();
-    window.currentView.render();
+    window.currentView = new Tournaments({ collection: window.tournaments });
+    window.tournaments.fetch({
+      success: () => window.currentView.render(id),
+      error: () => toasts.notifyError("Could not load tournaments."),
+    });
   },
   guild: function (id) {
     this.checkLogged();

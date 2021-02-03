@@ -12,6 +12,7 @@
 @import './guild-page.scss';
 @import './guilds-page.scss';
 @import './admin.scss';
+@import './tournaments.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html,
@@ -59,7 +60,9 @@ a {
 	align-items: center;
 	font-weight: 600;
 	font-size: $xl;
-	i, svg {
+
+	i,
+	svg {
 		margin-right: 10px;
 	}
 }
@@ -280,6 +283,7 @@ a {
 input[type="text"],
 input[type="password"],
 input[type="number"],
+input[type="datetime-local"],
 [type="date"] {
 	padding: 10px;
 	background-color: $grey_dark_light;
@@ -298,7 +302,8 @@ input[type="number"],
 	display: flex;
 	align-items: center;
 	width: 100%;
-	> * {
+
+	>* {
 		flex: 1;
 		margin: 5px;
 	}
@@ -373,5 +378,32 @@ input[type="number"],
 
 	100% {
 		opacity: 0;
+	}
+}
+
+/*
+- Common Game --------------------------------------------------------------------
+*/
+
+#game-canvas-div
+{
+	display: flex;
+	flex-direction: column;
+	border-radius: 10px;
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+	background-color: $grey;
+	overflow: hidden;
+	
+	.top-part
+	{
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		.top-text
+		{
+			text-align: center;
+			width: 100%;
+		}
 	}
 }

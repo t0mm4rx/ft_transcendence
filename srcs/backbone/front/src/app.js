@@ -12,6 +12,7 @@ import { Notification, NotificationCollection } from "./models/Notification";
 import { Game, GameCollection } from "./models/Game";
 import ChatPanel from "./views/Chat";
 import { Chat } from "./models/Chat";
+import { Tournaments } from "./models/Tournaments";
 import $ from "jquery";
 import Cookies from "js-cookie";
 import { loadCurrentUser, loadUsers, loadGuilds } from "./utils/globals";
@@ -119,6 +120,7 @@ window.liveGames.add(
 );
 
 window.chat = new Chat();
+window.tournaments = new Tournaments();
 
 window.notifications = new NotificationCollection();
 window.notifications.add(
@@ -136,31 +138,39 @@ window.layoutView = new PageLayout().render();
 
 // Global socket
 var globalSocket = new FtSocket({
-  channel: 'GlobalChannel',
+  channel: "GlobalChannel",
 });
 
-globalSocket.socket.onmessage = function(event) { 
-			
+globalSocket.socket.onmessage = function (event) {
   const event_res = event.data;
   const msg = JSON.parse(event_res);
 
   // Ignores pings.
-  if (msg.type === "ping")
-    return;
+  if (msg.type === "ping") return;
 
-  if (msg.message)
-  {
-    if (msg.message.message == "new_client")
-    {
+  if (msg.message) {
+    if (msg.message.message == "new_client") {
       // Refresh HERE
       console.log("[TMP] New client.");
     }
     else if (msg.message.content.request_to == window.currentUser.get("id"))
     {
+      console.log("(2) MSG : ", msg.message.message);
+      console.log("(2) CONTENT : ", msg.message.content);
+      //add if accept or not for game & friend request
+      if (msg.message.message == "game_request_reply")
+      {
+          toasts.notifySuccess("Game request accepted.")
+          console.log("msg : ", msg.message);
+          window.location.hash = "game_live/" + msg.message.content.gameid;
+          return;
+      }
       window.currentUser.fetch();
       console.log("From : ", msg.message.content.from);
       if (msg.message.message == "friend_request")
         toasts.notifySuccess("Friend request received from " + msg.message.content.from.login);
+      else if (msg.message.message == "game_request")
+        toasts.notifySuccess("Game request received from " + msg.message.content.from.login);  
     }
     else 
     {
@@ -171,12 +181,19 @@ globalSocket.socket.onmessage = function(event) {
 };
 
 // Send message to everyone
-globalSocket.sendMessage({
-  action: "to_broadcast",
-  infos: {
-    message: "new_client",
-    content: {}
-}}, false, true);
+globalSocket.sendMessage(
+  {
+    action: "to_broadcast",
+    infos: {
+      message: "new_client",
+      content: {},
+    },
+  },
+  false,
+  true
+);
+
+console.log(window.currentUser);
 
 export default globalSocket;
 

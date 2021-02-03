@@ -4,10 +4,7 @@ module Api
 
 	def authenticate
 	  command = AuthenticateUser.call(params[:login], params[:password])
-
-	  puts "AAAAAA"
-	  puts command
-	  puts "AAAAAA"
+	  
 	  if command.success?
 		render json: { auth_token: command.result }, status: :created
 	  else

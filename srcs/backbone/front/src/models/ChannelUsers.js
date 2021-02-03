@@ -1,8 +1,25 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import toasts from "../utils/toasts";
+import _ from "underscore";
+
+const ChannelUser = Backbone.Model.extend({
+  rollback(prev) {
+    if (!prev) {
+      const changed = this.changedAttributes();
+      console.log("ROLLBACK:", this, changed);
+      if (!changed) return;
+
+      const keys = _.keys(changed);
+      prev = _.pick(this.previousAttributes(), keys);
+    }
+    this.set(prev, { silent: true }); // "silent" is optional; prevents change event
+    console.log("AFTER ROLLBACK:", this);
+  },
+});
 
 const ChannelUsers = Backbone.Collection.extend({
+  model: ChannelUser,
   url() {
     return `http://` + window.location.hostname + `:3000/api/channels/${this.channel_id}/channel_users/`;
   },
@@ -14,44 +31,60 @@ const ChannelUsers = Backbone.Collection.extend({
     console.log(this.models);
 
     const user = this.findWhere({ username: username });
-    console.log("USER", user);
 
-    // if (user.get("admin") == true && type != "admin") return null;
     if (user) {
-      user.set(type, true);
+      const params = {};
+      params[type] = true;
       if (type == "banned" || type == "muted") {
         const dateType = type == "banned" ? "ban_date" : "mute_date";
-        user.set(dateType, date);
+        params[dateType] = date;
       }
       console.log(user, "SET", type, "TO TRUE");
+      user.set(params);
     }
     return user;
   },
   removeAs(type, userId) {
-    console.log(`REMOVE ${userId} AS ${type}`);
-
     const user = this.findWhere({ user_id: parseInt(userId) });
-    console.log("USER", user);
-
-    user.set(type, false);
-    if (type !== "admin") {
+    const params = {};
+    params[type] = false;
+    if (type == "banned" || type == "muted") {
       const dateType = type == "banned" ? "ban_date" : "mute_date";
-      user.set(dateType, null);
+      params[dateType] = null;
     }
+    user.set(params);
     return user;
   },
   saveChanges() {
-    this.models.forEach((channelUser) => {
+    console.log("SAVE CHANGES");
+
+    this.each((channelUser) => {
+      console.log("1", channelUser);
+
       if (channelUser.hasChanged()) {
-        console.log(channelUser, "has changed");
-        channelUser.save({
-          success: () => console.log("Successfully updated user"),
-          error: () =>
-            console.log("Error when saving " + channelUser.get("username")),
+        console.log("2", channelUser, channelUser.changedAttributes());
+
+        const changed = channelUser.changedAttributes();
+        const keys = _.keys(changed);
+        const prev = _.pick(channelUser.previousAttributes(), keys);
+
+        channelUser.save(channelUser.changedAttributes(), {
+          patch: true,
+          success: () => console.log("Successfully saved user"),
+          error: (data, state) => {
+            console.log("CHANGED ", changed, prev);
+
+            channelUser.rollback(prev);
+            toasts.notifyError(state.responseJSON.error);
+          },
         });
       }
     });
-    // Backbone.sync("PUT", this);
+  },
+  rollbackChanges() {
+    this.each((channelUser) => {
+      channelUser.rollback();
+    });
   },
 });
 

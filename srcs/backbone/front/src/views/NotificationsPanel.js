@@ -28,13 +28,18 @@ export default Backbone.View.extend({
 			this.model.remove(el.currentTarget.getAttribute("notification-id"));
 		},
 		'click .notification-accept': function (el) {
+			console.log("EL : ", el.currentTarget);
 			const elId = el.currentTarget.id;
 			const type = elId.split('-')[0];
 			const id = parseInt(elId.split('-')[1]);
-			console.log(id);
+			const username = elId.split('-')[2];
 			if (type === 'friend') {
-				const target = new User({id: id});
+				const target = new User({id: id, username: username});
 				target.acceptFriend();
+			}
+			else if (type === 'game') {
+				const target = new User({id: id, username: username});
+				target.acceptGame();
 			}
 		}
 	},
@@ -52,7 +57,19 @@ export default Backbone.View.extend({
 				this.notifs.push({
 					title: `${user[0].get('username')} sent you a friend request`,
 					type: 'friend',
-					id: user[0].get('id')
+					id: user[0].get('id'),
+					name: user[0].get('username')
+				});
+			}
+		});
+		window.currentUser.get('game_pending_requests').forEach(req => {
+			const user = window.users.where({id: req.user_id});
+			if (user.length) {
+				this.notifs.push({
+					title: `${user[0].get('username')} sent you a game request`,
+					type: 'game',
+					id: user[0].get('id'),
+					name: user[0].get('username')
 				});
 			}
 		});
