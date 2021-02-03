@@ -16,8 +16,6 @@ module Api
     def create
       @user = User.new(user_params_init)
       if @user.save
-        User.set_first_admin(@user)
-       @user.save
         render json: @user, status: :created
       else
         render json: @user.errors, status: :unprocessable_entity # 422
