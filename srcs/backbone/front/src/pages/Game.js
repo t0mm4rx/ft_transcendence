@@ -3,7 +3,6 @@ import Backbone, { View } from 'backbone';
 import $ from 'jquery';
 import _, { create } from 'underscore'
 import template from '../../templates/game.html';
-import p5 from 'p5';
 import {Game, GameCollection} from '../models/Game';
 import GameCanvas from '../views/GameCanvas';
 import {FtSocket} from '../models/FtSocket'

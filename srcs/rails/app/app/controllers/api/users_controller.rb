@@ -8,7 +8,8 @@ module Api
     def index
       # users = User.where(online: true).limit(limit).offset(params[:offset])
       # users = User.limit(limit).offset(params[:offset])
-      users = User.order(online: :desc).limit(limit).offset(params[:offset])
+      users = User.order(ladder_score: :desc).limit(limit).offset(params[:offset])
+      # users = User.order(online: :desc).limit(limit).offset(params[:offset])
       render json: users, each_serializer: FriendSerializer
     end
 
@@ -58,9 +59,16 @@ module Api
     end
 
     def show
+      # @user.update_attribute(:title, "SMASHER")
       # @user.update(admin: true);
       # @user.save();
       render json: @user
+    end
+
+    def games
+      user = User.find(params[:id])
+      games = user.games.reverse # todo: order by updated_at
+      render json: games
     end
 
     private

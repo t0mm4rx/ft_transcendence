@@ -8,9 +8,14 @@ class Api::TournamentsController < ApplicationController
 		render json: @tournaments
 	end
 
-	def show
-		@reg_users = TournamentUser.where(tournament_id: params[:id]).order(:level)
-		render json: @reg_users
+	def users
+		@users = TournamentUser.where(tournament_id: params[:id])
+		render json: @users
+	end
+
+	def games
+		@games = GameRoom.where(tournament_id: params[:id])
+		render json: @games
 	end
 	
 	def create
@@ -23,7 +28,8 @@ class Api::TournamentsController < ApplicationController
 	end
 	
 	def update
-		if @tournament.update_attributes(tournament_params)
+		@tournament.update(tournament_params)
+		if @tournament.save
 		  render json: @tournament
 		else
 		  render json: {}, status: :unprocessable_entity
@@ -62,7 +68,7 @@ class Api::TournamentsController < ApplicationController
 	private
 
 	def tournament_params
-		params.permit(:name, :registration_start, :start_date, :end_date)
+		params.permit(:name, :registration_start, :start_date, :title)
 		# params.require(:name, :registration_start, :start_date, :end_date).permit(:name, :registration_start, :start_date, :end_date)
 	end
 

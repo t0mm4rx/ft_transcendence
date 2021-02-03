@@ -5,6 +5,12 @@ import toasts from "../utils/toasts";
 import globalSocket from "../app"
 import { create } from "underscore";
 
+const UserGames = Backbone.Collection.extend({
+  initialize(props) {
+    this.url = `http://localhost:3000/api/users/${props.id}/games`;
+  },
+});
+
 const User = Backbone.Model.extend({
   urlRoot: `http://` + window.location.hostname + `:3000/api/users/`,
   save: function (key, value) {
@@ -100,7 +106,6 @@ const User = Backbone.Model.extend({
   },
   block() {
     console.log(this);
-
     $.ajax({
       url: "http://" + window.location.hostname + ":3000/api/blocked",
       type: "POST",
@@ -186,14 +191,8 @@ const User = Backbone.Model.extend({
             'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
           },
           body: JSON.stringify({
-            player: JSON.stringify({
-              name: window.currentUser.get('username'),
-              id: window.currentUser.get('id')
-            }),
-            opponent:JSON.stringify({
-              name: this.get('username'),
-              id: this.get('id')
-            }),
+            player_id: window.currentUser.get('id'),
+            opponent_id: this.get('id'),
             status: "notstarted",
             number_player: 0
           })
@@ -216,41 +215,6 @@ const User = Backbone.Model.extend({
           }}, false, true);
           
           window.location.hash = "game_live/" + createResult.id;
-
-          // self.gameinfos.player = JSON.parse(self.gameinfos.player);
-          // self.gameinfos.opponent = JSON.parse(self.gameinfos.opponent);
-      
-          // console.log("Game info :", self.gameinfos);
-      
-          // self.ftsocket = new FtSocket({
-          //   id: self.gameinfos.id,
-          //   channel: 'GameRoomChannel',
-          //   connect_type: 'normal'
-          // });
-
-          // this.html(`
-          //   <div id="game-canvas-div">
-          //     <div class="top-part">
-          //     <div class="top-text" id="left-player">
-          //       <h3>` + self.gameinfos.player.name + `</h3>
-          //     </div>
-          //     <div class="top-text" id="vs">
-          //       <h3>vs</h3>
-          //     </div>
-          //     <div class="top-text" id="right-player">
-          //       <h3>` + self.gameinfos.opponent.name + `</h3>
-          //     </div>
-          //   </div>
-          //   <canvas id="game-canvas" width="600" height="400"></canvas>
-          //   </div>
-          // `);
-          
-          // self.gameinfos.player.side = "left";
-          // self.gameinfos.opponent.side = "right";
-      
-          // setTimeout(function() {
-          //   self.game = new GameCanvas(self.ftsocket, self.gameinfos, "normal");
-          // }, 1000);
         });
 
         window.currentUser.fetch();
@@ -275,4 +239,4 @@ const Users = Backbone.Collection.extend({
 
 const Friends = Backbone.Collection.extend({});
 
-export { User, Friends, Users };
+export { User, Friends, Users, UserGames };

@@ -17,13 +17,18 @@ export default Backbone.View.extend({
     this.$el.html(template);
     this.renderTournamentList(id);
     if (id) this.renderTournament(id);
+    else this.renderPermanent();
   },
   renderTournamentList(id) {
     console.log("ID1 :", id);
 
     const now = new Date();
-    this.$(".tournament-listing#current").html("<h3>Tournaments</h3>");
-    this.$(".tournament-listing#future").html("<h3>Upcoming</h3>");
+    this.$(".tournament-listing#current")
+      .html(`<h3>Tournaments</h3><a href="/#tournaments">
+    <h4 class="tournament-item permanent${
+      !id ? " current" : ""
+    }  id="permanent">PERMANENT</h4></a>`);
+    this.$(".tournament-listing#future").html("<h3>Upcoming</h4>");
     this.collection.each((tournament) => {
       console.log("TOURNAMENT :", tournament);
 
@@ -54,16 +59,24 @@ export default Backbone.View.extend({
     console.log("ID:", id);
     const model = this.collection.get(id);
     model.getUsers();
-    // $(`.tournament-item.current`).removeClass("current");
-    // $(`.tournament-item#${id}`).addClass("current");
+    this.stopListening();
+    this.tournamentView = new TournamentView({
+      model: model,
+    });
+    $(".tournament").replaceWith(this.tournamentView.render().el);
+  },
+  stopListening() {
     if (this.tournamentView) {
       this.tournamentView.undelegateEvents();
       this.tournamentView.unbind();
       this.tournamentView.stopListening();
     }
+  },
+  renderPermanent() {
+    this.stopListening();
     this.tournamentView = new TournamentView({
-      model: model,
+      model: window.permanentTournament,
     });
-    $(".tournament").replaceWith(this.tournamentView.render().el);
+    $(".tournament").replaceWith(this.tournamentView.renderPermanent().el);
   },
 });

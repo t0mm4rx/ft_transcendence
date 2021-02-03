@@ -4,9 +4,28 @@ import toasts from "../utils/toasts";
 
 const TournamentUsers = Backbone.Collection.extend({
   initialize(props) {
-    this.url = `http://localhost:3000/api/tournaments/${props.id}`;
+    this.url = `http://localhost:3000/api/tournaments/${props.id}/users`;
   },
 });
+const TournamentGames = Backbone.Collection.extend({
+  url: `http://localhost:3000/api/ladder_games`,
+  initialize(props) {
+    if (props)
+      this.url = `http://localhost:3000/api/tournaments/${props.id}/games`;
+  },
+});
+
+const PermanentTournament = Backbone.Model.extend({
+  initialize() {
+    this.set("users", window.users);
+  },
+  getGames() {
+    const games = new TournamentGames();
+    this.set("games", games);
+    games.fetch();
+  },
+});
+
 const Tournament = Backbone.Model.extend({
   // initialize() {
   //   const users = new TournamentUsers({ id: this.id });
@@ -17,6 +36,11 @@ const Tournament = Backbone.Model.extend({
     const users = new TournamentUsers({ id: this.id });
     this.set("users", users);
     users.fetch();
+  },
+  getGames() {
+    const games = new TournamentGames({ id: this.id });
+    this.set("games", games);
+    games.fetch();
   },
   register() {
     console.log("REGISTER");
@@ -62,4 +86,4 @@ const Tournaments = Backbone.Collection.extend({
   model: Tournament,
 });
 
-export { Tournaments };
+export { Tournaments, PermanentTournament };

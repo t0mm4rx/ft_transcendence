@@ -13,6 +13,9 @@ class User < ApplicationRecord
 	has_many :messages, dependent: :destroy
 
 	has_many :game_pending_requests, -> {where accepted: false}, class_name: 'GameRequest', foreign_key: "opponent_id"
+	has_many :game_player, class_name: 'GameRoom', foreign_key: "player_id", dependent: :destroy
+	has_many :game_opponent, class_name: 'GameRoom', foreign_key: "opponent_id", dependent: :destroy
+
 	has_many :blocked, class_name: 'BlockedUser', dependent: :destroy
 
 	belongs_to :guild, optional: true
@@ -21,14 +24,21 @@ class User < ApplicationRecord
 	validates :login, presence: true, length: { minimum:2, maximum: 30 }, uniqueness: { case_sensitive: false }
 	validates :avatar_url, presence: true, length: { minimum:5, maximum: 255 } # format: { with: ConstantData::VALID_EMAIL_REGEX }
 
+	# has_many :games, class_name: 'GameRoom'
+
 	after_initialize :set_defaults
 
-	def friendships_
+	def games
+		# GameRoom.where("player_id = ? OR opponent_id = ?", id, id)
+		game_player + game_opponent
+	end
+
+	def friendships
 		Friendship.where("user_id = ? OR friend_id = ?", id, id)
 	end
 
 	def friends
-		friendships_.filter_map do |friendship|
+		friendships.filter_map do |friendship|
 			if friendship.accepted
 				friendship.user_id == id ? friendship.friend : friendship.user
 			end
@@ -73,21 +83,36 @@ class User < ApplicationRecord
 	# 		end
 	# 	end
 	# end
+
 	def banned
 		return false if !banned_until
 		banned_until > DateTime.now
 	end
 
+	def has_won
+		update(wins: wins + 1)
+		save
+	end
+
+	def has_lost
+		update(losses: losses + 1)
+		save
+	end
+
+	def find_higher_ranked_user
+		User.where("online = true AND ladder_score > ?", ladder_score).order(ladder_score: :asc).first
+	end
+
 	private
 
     def set_defaults
+		# self.ladder_score ||= 1000
 		self.wins ||= 0
 		self.losses ||= 0
 		self.admin ||= false
 		self.online ||= false
 		self.avatar_url ||= "https://cdn.intra.42.fr/users/small_#{self.login}.jpg"
 		self.tfa ||= false
-		self.admin ||= false
 		self.guild_id ||= nil
 		self.guild_owner ||= false
 		self.guild_officer ||= false

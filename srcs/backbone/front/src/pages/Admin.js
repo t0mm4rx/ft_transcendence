@@ -86,11 +86,11 @@ export default Backbone.View.extend({
     const name = $("#tournament-name-input").val();
     const regStart = $("#registration-start-input").val();
     const start = $("#tournament-start-input").val();
-    const end = $("#tournament-end-input").val();
+    const title = $("#tournament-title-input").val();
 
-    console.log("CREATE TOURNAMENT", name, regStart, start, end);
+    console.log("CREATE TOURNAMENT", name, regStart, start);
 
-    if (name == "" || regStart == "" || start == "" || end == "") {
+    if (name == "" || regStart == "" || start == "") {
       toasts.notifyError("Inputs can't be left blank");
       return;
     }
@@ -101,14 +101,14 @@ export default Backbone.View.extend({
         name: name,
         registration_start: regStart,
         start_date: start,
-        end_date: end,
+        title: title,
       },
       success: () => {
         toasts.notifySuccess(`The tournament has been created`);
         $("#tournament-name-input").val("");
         $("#registration-start-input").val("");
         $("#tournament-start-input").val("");
-        $("#tournament-end-input").val("");
+        $("#tournament-title-input").val("");
       },
       error: (data, state) => toasts.notifyError(state.responseJSON.error),
     });

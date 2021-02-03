@@ -6,10 +6,12 @@
 			<% if (data.relation_to_user === "friends") { %><div id="user-friend-badge"><div class="user-friend-overlay"><i class="fas fa-users-slash"></i></div><i class="fas fa-user-friends"></i> Friend</div><% } %>
 			<% if (data.relation_to_user === "request sent") { %><div id="user-friend-badge"><div class="user-friend-overlay"><i class="fas fa-users-slash"></i></div><i class="fas fa-hourglass-start"></i> Friend request sent</div><% } %>
 			<div id="user-ladder">
-				<span>#2</span>
+				<span>#<%= data.ladder_ranking %></span>
 				<span>on the ladder</span>
 			</div>
+
 			<div id="user-name-container">
+				<span id="title"><%= data.title %></span>
 				<span <%= data.relation_to_user === "current_user" ? "class=\"user-editable-field\"" : "" %>><%= data.username || "..." %><%= data.relation_to_user === "current_user" ? "<div class=\"button-icon\" id=\"edit-username\"><i class=\"fas fa-user-edit\"></i></div>" : "" %></span>
 				<div id="user-name-buttons">
 					<% if (!data.relation_to_user) { %><div id="user-add-friend" class="button-icon"><i class="fas fa-user-plus"></i></div> <% } %> 
@@ -23,7 +25,7 @@
 			<div id="user-name-infos">
 				<div class="user-info">
 					<span>Guild</span>
-					<span><%= data.guild || "None" %></span>
+					<span><%= data.guild ? data.guild.name : "None" %></span>
 				</div>
 				<div class="user-info">
 					<span># of tournaments</span>
@@ -51,7 +53,7 @@
 		<div class="panel" id="history-panel">
 			<div class="panel-header"><span>History</span></div>
 			<div id="history-panel-content">
-				<div class="history-item">
+				<!-- <div class="history-item">
 					<span><b>Romain</b> <span class="history-item-win">3</span> - <span>0</span> Tom<span class="history-item-info"> - war game</span></span>
 					<span class="history-item-win">Win</span>
 				</div>
@@ -66,7 +68,7 @@
 				<div class="history-item">
 					<span><b>Romain</b> <span class="history-item-win">3</span> - <span>1</span> Manu<span class="history-item-info"> - direct game</span></span>
 					<span class="history-item-win">Win</span>
-				</div>
+				</div> -->
 			</div>
 		</div>
 		<div class="panel" id="friends-panel">

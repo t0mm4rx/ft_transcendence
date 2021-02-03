@@ -283,7 +283,6 @@ export default Backbone.View.extend({
         }
 	
 		let player = (ball_update.x < this.canvas.width / 2) ? this.left : this.right;
-        console.log("PLayer : ", this.left);
         if (this.collision(ball_update, player))
         {
             // Where the ball hit the player
@@ -337,12 +336,12 @@ export default Backbone.View.extend({
         this.context.globalAlpha = 1.0;
 
         // Width of left/right player and of "vs" strings.
-        var textWidthT = this.context.measureText(this.left.player.name);
+        var textWidthT = this.context.measureText(this.left.player.username);
         var textWidthV = this.context.measureText("vs");
-        var textWidthM = this.context.measureText(this.right.player.name);
+        var textWidthM = this.context.measureText(this.right.player.username);
 
         // Draw left player name.
-        this.drawText(this.left.player.name,
+        this.drawText(this.left.player.username,
             (this.canvas.width / 2) - (textWidthT.width/2), // Position in x.
             this.canvas.height / 4, // Position in y.
             "WHITE"); // Color.
@@ -354,7 +353,7 @@ export default Backbone.View.extend({
             "WHITE");
 
         // Draw right player name.
-        this.drawText(this.right.player.name,
+        this.drawText(this.right.player.username,
             (this.canvas.width / 2) - (textWidthM.width/2),
             (this.canvas.height / 4) + 90,
             "WHITE");
@@ -395,7 +394,7 @@ export default Backbone.View.extend({
         var looser = (winner == this.left) ? this.right : this.left;
 
         // End title.
-        var end_title = winner.player.name + " win !"
+        var end_title = winner.player.username + " win !"
 
         // Width of "end title", winner/looser score and of "-" strings.
         var textWidthWin = this.context.measureText(end_title);
@@ -435,13 +434,13 @@ export default Backbone.View.extend({
             game_id: this.game_id,
             left: {
                 player_id: this.left.id,
-                player_name: this.left.name,
+                player_name: this.left.username,
                 score: this.left.score,
                 status: ((this.left.score >= 11) ? "winner" : "looser")
             },
             right: {
                 player_id: this.right.id,
-                player_name: this.right.name,
+                player_name: this.right.username,
                 score: this.right.score,
                 status: ((this.right.score >= 11) ? "winner" : "looser")
             }
@@ -530,9 +529,41 @@ export default Backbone.View.extend({
 
             if (msg.message)
             {
-                if (msg.message.message == "update_y"
+                if ((msg.message.message == "update_y"
+                    || msg.message.message == "ball_update")
                     && msg.message.sender == self.player_info.id)
                     return;
+                
+                if (self.state != state_enum["DISCONNECTION"]
+                    && (msg.message.message == "update_y"
+                    || msg.message.message == "ball_update"))
+                {
+                    // Update opponent paddle position
+                    if (msg.message.message == "update_y")
+                    {
+                        // It's not a livestream connection
+                        if (self.connection_type != "live"
+                            && msg.message.content.player_id == self.opponent_info.id)
+                            {
+                                console.log("plop");
+                                self.opponent_info.is.y = msg.message.content.y;
+                            }
+
+                        // It's a livestream connection
+                        else
+                        {
+                            if (self.left && msg.message.content.player_id == self.left.player.id)
+                                self.left.y = msg.message.content.y;
+                            else if (self.right && msg.message.content.player_id == self.right.player.id)
+                                self.right.y = msg.message.content.y;
+                        }
+                    }
+
+                    // Update ball position.
+                    else if (msg.message.message == "update_ball"
+                        && self.player_info.side != "left")
+                        self.ball = msg.message.content;
+                }
 
                 // Update state.
                 else if (msg.message.message == "update_state")
@@ -542,7 +573,7 @@ export default Backbone.View.extend({
                         self.begin_date = new Date();
                 }
 
-                else  if (msg.message.message == "amipresent")
+                else if (msg.message.message == "amipresent")
 				{
 					if (msg.message.sender.id == window.currentUser.get('id')
 						&& msg.message.sender.connection_type != "live"
@@ -561,7 +592,7 @@ export default Backbone.View.extend({
                     && self.connection_type == "normal")
                 {
                     var left_values = {
-                        player: {id: self.left.player.id, name: self.left.player.name},
+                        player: {id: self.left.player.id, name: self.left.player.username},
                         x: self.left.x,
                         y: self.left.y,
                         width: self.left.width,
@@ -571,7 +602,7 @@ export default Backbone.View.extend({
                     }
 
                     var right_values = {
-                        player: {id: self.right.player.id, name: self.right.player.name},
+                        player: {id: self.right.player.id, name: self.right.player.username},
                         x: self.right.x,
                         y: self.right.y,
                         width: self.right.width,
@@ -595,6 +626,36 @@ export default Backbone.View.extend({
                                 reply_to: msg.message.sender
                             }
                     }}, true, true);
+                }
+
+                else if (self.state != state_enum["DISCONNECTION"])
+                {
+                    // Update ball position.
+                    if (msg.message.message == "update_ball"
+                        && self.player_info.side != "left")
+                        self.ball = msg.message.content;
+                    
+                    // Update score.
+                    else if (msg.message.message == "update_score")
+                    {
+                        if (msg.message.content.side == "left")
+                            self.left.score = msg.message.content.score;
+                        else if (msg.message.content.side == "right")
+                            self.right.score = msg.message.content.score;
+                    }
+
+                    // A client leave
+                    else if (msg.message.message == "client_quit")
+                    {
+                        self.disconnect_values = JSON.parse(msg.message.content);
+                        console.log("Message : ", msg.message);
+                        console.log("Disco value : ", self.disconnect_values);
+                        if (self.disconnect_values.connection_type == "normal")
+                        {
+                            self.state = state_enum["DISCONNECTION"];
+                            self.messageTreatment(self);
+                        }
+                    }
                 }
 
                 else if (msg.message.message == "force_infos"
@@ -652,57 +713,6 @@ export default Backbone.View.extend({
                         self.ftsocket.sendMessage({
                             action: "reco_to_normal"
                         }, true);
-                    }
-                }
-                    
-                else if (self.state != state_enum["DISCONNECTION"])
-                {
-                    // Update opponent paddle position
-                    if (msg.message.message == "update_y")
-                    {
-                        // It's not a livestream connection
-                        if (self.connection_type != "live"
-                            && msg.message.content.player_id == self.opponent_info.id)
-                            {
-                                console.log("plop");
-                                self.opponent_info.is.y = msg.message.content.y;
-                            }
-
-                        // It's a livestream connection
-                        else
-                        {
-                            if (self.left && msg.message.content.player_id == self.left.player.id)
-                                self.left.y = msg.message.content.y;
-                            else if (self.right && msg.message.content.player_id == self.right.player.id)
-                                self.right.y = msg.message.content.y;
-                        }
-                    }
-
-                    // Update ball position.
-                    else if (msg.message.message == "update_ball"
-                        && self.player_info.side != "left")
-                        self.ball = msg.message.content;
-
-                    // Update score.
-                    else if (msg.message.message == "update_score")
-                    {
-                        if (msg.message.content.side == "left")
-                            self.left.score = msg.message.content.score;
-                        else if (msg.message.content.side == "right")
-                            self.right.score = msg.message.content.score;
-                    }
-
-                    // A client leave
-                    else if (msg.message.message == "client_quit")
-                    {
-                        self.disconnect_values = JSON.parse(msg.message.content);
-                        console.log("Message : ", msg.message);
-                        console.log("Disco value : ", self.disconnect_values);
-                        if (self.disconnect_values.connection_type == "normal")
-                        {
-                            self.state = state_enum["DISCONNECTION"];
-                            self.messageTreatment(self);
-                        }
                     }
                 }
             }

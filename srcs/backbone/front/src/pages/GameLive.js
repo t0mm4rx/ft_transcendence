@@ -39,11 +39,8 @@ export default Backbone.View.extend({
 			return;
 		}
 
-		self.gameinfos.player = JSON.parse(self.gameinfos.player);
-        self.gameinfos.opponent = JSON.parse(self.gameinfos.opponent);
-
-		$("#player-name").text(self.gameinfos.player.name);
-		$("#opponent-name").text(self.gameinfos.opponent.name);
+		$("#player-name").text(self.gameinfos.player.username);
+		$("#opponent-name").text(self.gameinfos.opponent.username);
 
         self.gameinfos.player.side = "left";
         self.gameinfos.opponent.side = "right";
@@ -51,12 +48,21 @@ export default Backbone.View.extend({
 		self.ftsocket = new FtSocket({
 			id: self.gameinfos.id,
 			channel: 'GameRoomChannel',
+			player_id: window.currentUser.get('id'),
+			display_name: window.currentUser.get('username'),
 			connect_type: 'normal'
 		});
 
 		setTimeout(function() {
-			self.gamelive.active(self.game_id);
-			self.game = new GameCanvas(self.ftsocket, self.gameinfos, "normal");
+
+			if (self.gameinfos.status == "active")
+				self.game = new GameCanvas(self.ftsocket, self.gameinfos, "reconnection");
+			else if (self.gameinfos.status == "notstarted")
+			{
+				self.gamelive.active(self.game_id);
+				self.game = new GameCanvas(self.ftsocket, self.gameinfos, "normal");
+			}
+			
 		}, 1000);
 	},
 

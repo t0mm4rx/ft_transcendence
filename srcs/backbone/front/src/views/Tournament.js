@@ -12,22 +12,24 @@ export default Backbone.View.extend({
     <i id="img1" class="tournament-symbol fas fa-child"></i>
     <i id="img2" class="tournament-symbol fas fa-hourglass-half"></i>
     <i id="img3" class="tournament-symbol fas fa-award"></i>
-    <span id="players">players:</span><h3 id="players"><%= model.get("users").length %></h3>
-    <span id="time"><%= timeTitle %>:</span><h3 id="time"><%= (new Date(model.escape(timeTitle).replace(/-/g, "/"))).toLocaleString(
-      "en-US",
-      {
-        month: "numeric",
-        day: "numeric",
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-      }
-    ) %></h3>
-    <span id="prize">title: </span><h3 id="prize">SMASHER</h3>
+    
+    <span id="players">players:</span><h3 id="players"><%= model.get("users").length || 0 %></h3>
+
+    <% if (time) { %>
+    <span id="time">Start:</span><h3 id="time"><%= time %></h3>
+    <% } else { %> 
+      <span id="time">Ongoing</span>
+    <% } %>
+    <span id="prize">title: </span><h3 id="prize"><%= model.escape("title") %></h3>
   </div>
   <div class="current-tournament" id="ranking"></div>
   <div class="current-tournament" id="games"></div>`
   ),
+  permanentTemplate: `<div class="current-tournament" id="information">
+    <h1>PERMANENT</h1>
+    </div>
+    <div class="current-tournament" id="ranking"></div>
+    <div class="current-tournament" id="games"></div>`,
   userTemplate: _.template(
     `<div class="tournament-item"><% if (rank) {%> <span class="rank"><%= rank %>. </span><%} %>
     <a href="/#user/<%= model.login %>/"><img class="tournament-avatar" src="<%= model.avatar_url %>" /></a><span><%= model.username %></span>
@@ -35,15 +37,17 @@ export default Backbone.View.extend({
   ),
   gameTemplate: _.template(
     `<div class="tournament-item"><span id="#user-1"><%= 
-    model.username
-    %><span class="score">15</span></span><span>-</span><span id="#user-2"><span class="score">4</span><%= 
-    model.username 
+    model.get("player").username
+    %><span class="score"><%= model.escape("player_score") %></span></span><span>-</span><span id="#user-2"><span class="score"><%= model.escape("opponent_score") %></span><%= 
+    model.get("opponent").username
     %></span></div>`
   ),
   className: "tournament panel",
   initialize() {
+    this.model.getGames();
     // this.listenTo(this.model, "change", this.render);
     this.listenTo(this.model.get("users"), "sync", this.render);
+    this.listenTo(this.model.get("games"), "sync", this.renderGames);
   },
   events: {
     "click #tournament-badge": "register",
@@ -54,42 +58,62 @@ export default Backbone.View.extend({
     const registrationOpen =
       new Date(this.model.get("start").replace(/-/g, "/")) > now &&
       new Date(this.model.get("registration_start").replace(/-/g, "/")) < now;
+    const time = registrationOpen
+      ? new Date(this.model.get("start").replace(/-/g, "/")).toLocaleString(
+          "en-US",
+          {
+            month: "numeric",
+            day: "numeric",
+            hour12: false,
+            hour: "2-digit",
+            minute: "2-digit",
+          }
+        )
+      : null;
     this.$el.html(
       this.template({
         model: this.model,
         registrationOpen: registrationOpen,
-        timeTitle: registrationOpen ? "start" : "end",
+        time: time,
       })
     );
-    this.renderUsers(!registrationOpen);
-    this.renderGames();
+    this.renderUsers(
+      this.model.get("users").map((user) => (user ? user.get("user") : user)),
+      !registrationOpen
+    );
+    // this.renderGames();
     return this;
   },
-  renderUsers(putRank) {
-    console.log("MODEL:", this.model.get("users"));
+  renderPermanent() {
+    this.$el.html(this.permanentTemplate);
+    this.renderUsers(
+      this.model.get("users").map((user) => user.toJSON()),
+      true
+    );
+    return this;
+  },
+  renderUsers(users, putRank) {
     let html = "";
     let rank;
     if (putRank) {
       rank = 1;
     }
-    this.model.get("users").each((user) => {
-      if (user.get("user")) {
-        console.log("USER", user.get("user"));
-        html += this.userTemplate({ model: user.get("user"), rank: rank });
-        rank++;
+    users.forEach((user) => {
+      if (user) {
+        console.log("User", user);
+        html += this.userTemplate({ model: user, rank: rank });
+        if (rank) rank++;
       }
     });
     this.$("#ranking").html(html);
   },
   renderGames() {
     // todo
-    console.log("MODEL:", this.model.get("users"));
+    console.log("GAMES:", this.model.get("games"));
     let html = "";
-    this.model.get("users").each((user) => {
-      console.log("USER", user.get("user"));
-      if (user.get("user")) {
-        html += this.gameTemplate({ model: user.get("user") });
-      }
+    this.model.get("games").each((game) => {
+      if (game.get("player") != null && game.get("opponent") != null)
+        html += this.gameTemplate({ model: game });
     });
     this.$("#games").html(html);
   },

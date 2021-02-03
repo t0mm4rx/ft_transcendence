@@ -2,7 +2,7 @@ class TournamentUser < ApplicationRecord
   belongs_to :user
   belongs_to :tournament
 
-  validate :unique_combination, :on => :create
+  validate :unique_combination, on: :create
 
   private
   def unique_combination

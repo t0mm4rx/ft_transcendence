@@ -2,8 +2,8 @@
 	<div class="notification">
 		<span><%= item.title %></span>
 		<div class="notification-controls">
-			<div class="button-icon button-icon-accent notification-accept" id="<%= item.type %>-<%= item.id %>-<%= item.name %>"><i class="fas fa-check"></i></div>
-			<div class="button-icon notification-delete" notification-id="<%= item.created_at %>"><i class="fas fa-times"></i></div>
+			<div class="button-icon button-icon-accent notification-accept" notification-id="<%= item.type %>-<%= item.id %>-<%= item.name %>"><i class="fas fa-check"></i></div>
+			<div class="button-icon notification-delete" notification-id="<%= item.type %>-<%= item.id %>"><i class="fas fa-times"></i></div>
 		</div>
 	</div>
 <% }) %>

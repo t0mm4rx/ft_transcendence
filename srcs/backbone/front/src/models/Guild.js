@@ -11,11 +11,14 @@ const Guilds = Backbone.Collection.extend({
 		$.ajax({
 			url: 'http://' + window.location.hostname + ':3000/api/guilds/',
 			type: 'POST',
+			data: `name=${name}&anagram=${anagram}`,
 			success: () => {
 				toasts.notifySuccess(`Your guild ${name} has been created!`);
 				window.guilds.fetch();
+				window.currentUser.fetch();
 			},
 			error: (error) => {
+				console.log(error);
 				if (error.responseJSON.anagram) {
 					let msg = "The anagram ";
 					msg += error.responseJSON.anagram.join(", ");
@@ -30,7 +33,37 @@ const Guilds = Backbone.Collection.extend({
 				}
 			}
 		});
+	},
+	acceptWar: function () {
+		$.ajax({
+			url: 'http://localhost:3000/api/wars/accept_invitation',
+			type: 'POST',
+			success: () => {
+				toasts.notifySuccess('The war has been declared!');
+				window.currentUser.fetch();
+			},
+			error: () => {
+				toasts.notifyError('Unable to accept the request.');
+			}
+		});
+	},
+	declineWar: function () {
+		$.ajax({
+			url: 'http://localhost:3000/api/wars/ignore_invitation',
+			type: 'POST',
+			success: () => {
+				toasts.notifySuccess('You declined the war.');
+				window.currentUser.fetch();
+			},
+			error: () => {
+				toasts.notifyError('Unable to decline the request.');
+			}
+		});
 	}
 });
 
-export {Guild, Guilds};
+const getGuildMembers = (guildId) => {
+	return window.users.filter(a => !!a.get('guild') && a.get('guild').id == guildId);
+}
+
+export {Guild, Guilds, getGuildMembers};

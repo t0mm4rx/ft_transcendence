@@ -48,7 +48,13 @@ export default Backbone.View.extend({
   },
   events: {
     "click #edit-channel": "editChannel",
-    "click #leave-channel": "leaveChannel",
+	"click #leave-channel": "leaveChannel",
+	'click #chat-title': function () {
+		this.getUserProfile();
+	},
+	'click #chat-avatar': function () {
+		this.getUserProfile();
+	}
   },
   render() {
     this.messagesLength = this.collection.length;
@@ -193,6 +199,13 @@ export default Backbone.View.extend({
   onKeyUp(event) {
     if (event.keyCode == 13) {
       if (event.target.id == this.model.id) this.readMessage();
+    }
+  },
+  getUserProfile() {
+    const login = this.model.get("name");
+    console.log(login);
+    if (window.users.find((a) => a.get("login") === login)) {
+      window.location.hash = `user/${login}/`;
     }
   },
 });

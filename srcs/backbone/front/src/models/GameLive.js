@@ -1,6 +1,8 @@
 /* The game model and collection. */
 import Backbone from 'backbone';
 import toast from "../utils/toasts"
+import $ from 'jquery';
+import toasts from "../utils/toasts";
 
 const GameLive = Backbone.Model.extend({
     urlRoot: `http://` + window.location.hostname + `:3000/api/game_rooms/`,
@@ -27,57 +29,38 @@ const GameLive = Backbone.Model.extend({
 		return (rtn);
     },
 
-    active: async function (id)
+    sleep: function (ms)
     {
-        var gameinfos = await this.gamebyid(id);
-
-        if (gameinfos == null)
-        {
-            toast.notifyError("Game error. (active)");
-            window.location.hash = "home";
-        }
-
-        console.log("Gameinfos : ", gameinfos);
-
-		fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + id,{
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json',
-				'Accept': 'application/json',
-				'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
-			},
-			body: JSON.stringify({
-                player: gameinfos.player,
-                opponent: gameinfos.opponent,
-                status: "active",
-                number_player: 2
-			})
-		});
+        return new Promise(resolve => setTimeout(resolve, ms));
     },
 
-    ended: async function (id)
+    active: function (id)
     {
-        var gameinfos = await this.gamebyid(id);
-
-        if (gameinfos == null)
-        {
-            toast.notifyError("Game error. (ended)");
-            window.location.hash = "home";
-        }
-
-        fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + id,{
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+        $.ajax({
+            url: `http://` + window.location.hostname + `:3000/api/game/` + id + `/update_status`,
+            type: "POST",
+            data: `id=${id}&status=active`,
+            success: () => {
             },
-            body: JSON.stringify({
-                player: gameinfos.player,
-                opponent: gameinfos.opponent,
-                status: "ended",
-                number_player: 0
-            })
+            error: (err) => {
+              toasts.notifyError("Set active problem.");
+              console.log(err);
+            },
+        });
+    },
+
+    ended: function (id)
+    {
+        $.ajax({
+            url: `http://` + window.location.hostname + `:3000/api/game/` + id + `/update_status`,
+            type: "POST",
+            data: `id=${id}&status=ended`,
+            success: () => {
+            },
+            error: (err) => {
+              toasts.notifyError("Set ended problem.");
+              console.log(err);
+            },
         });
     }
 });

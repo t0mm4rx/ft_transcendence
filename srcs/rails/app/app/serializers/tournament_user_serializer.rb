@@ -1,4 +1,4 @@
 class TournamentUserSerializer < ActiveModel::Serializer
-	attributes :id, :level
+	attributes :id
 	belongs_to :user, serializer: FriendSerializer
 end

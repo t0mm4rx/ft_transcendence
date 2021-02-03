@@ -1,280 +1,284 @@
 #user-page-container {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 #user-page-bottom-container {
-	display: flex;
+  display: flex;
 }
 
 #top-panel {
-	display: flex;
-	flex-direction: column;
-	padding: 20px;
-	padding-top: 40px;
-	overflow: visible !important;
-	width: 60%;
-	max-width: 800px;
-	margin-top: 50px;
-	position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  padding-top: 40px;
+  overflow: visible !important;
+  width: 60%;
+  max-width: 800px;
+  margin-top: 50px;
+  position: relative;
 
-	#user-friend-badge {
-		position: absolute;
-		background-color: $blue;
-		top: 0;
-		right: 0;
-		transform: translate(50%, -50%);
-		padding: 10px;
-		border-radius: 10px;
-		display: flex;
-		flex-direction: row !important;
-		align-items: center !important;
-		overflow: hidden;
-		cursor: pointer;
+  #user-friend-badge {
+    position: absolute;
+    background-color: $blue;
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row !important;
+    align-items: center !important;
+    overflow: hidden;
+    cursor: pointer;
 
-		>svg {
-			margin: 5px;
-		}
+    > svg {
+      margin: 5px;
+    }
 
-		.user-friend-overlay {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background-color: $red;
-			transform: scale(0);
-			opacity: 0;
-			transition: .3s ease all;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			border-radius: 10px;
-		}
-	}
+    .user-friend-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: $red;
+      transform: scale(0);
+      opacity: 0;
+      transition: 0.3s ease all;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+    }
+  }
 
-	#user-friend-badge:hover {
-		.user-friend-overlay {
-			transform: scale(1);
-			opacity: 1;
-		}
-	}
+  #user-friend-badge:hover {
+    .user-friend-overlay {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 
-	#top-panel-container {
-		display: flex;
-		align-items: center;
+  #top-panel-container {
+    display: flex;
+    align-items: center;
 
-		* {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-		}
+    * {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-		#user-ladder {
-			span:nth-child(1) {
-				font-size: $xxl;
-				font-weight: 800;
-			}
-		}
+    #user-ladder {
+      span:nth-child(1) {
+        font-size: $xxl;
+        font-weight: 800;
+      }
+    }
 
-		#user-name-container {
-			span:nth-child(1) {
-				font-size: $xl;
-				font-weight: 800;
-			}
+    #user-name-container {
+      #title {
+        font-size: $m;
+      }
 
-			#user-name-buttons {
-				display: flex;
-				flex-direction: row;
+      span:nth-child(2) {
+        font-size: $xl;
+        font-weight: 800;
+      }
 
-				.button-icon {
-					margin: 10px;
+      #user-name-buttons {
+        display: flex;
+        flex-direction: row;
 
-					svg {
-						font-size: $xl;
-					}
+        .button-icon {
+          margin: 10px;
 
-					svg#block-button>* {
-						color: red;
-					}
+          svg {
+            font-size: $xl;
+          }
 
-					svg#unblock-button>* {
-						color: green;
-					}
-				}
+          svg#block-button > * {
+            color: red;
+          }
 
+          svg#unblock-button > * {
+            color: green;
+          }
+        }
+      }
+    }
 
-			}
-		}
+    #user-name-infos {
+      align-items: flex-start;
 
-		#user-name-infos {
-			align-items: flex-start;
+      .user-info {
+        align-items: flex-start;
+        margin: 5px;
+      }
 
-			.user-info {
-				align-items: flex-start;
-				margin: 5px;
-			}
+      .user-info span:nth-child(2) {
+        font-size: $l;
+        font-weight: 800;
+      }
+    }
+  }
 
-			.user-info span:nth-child(2) {
-				font-size: $l;
-				font-weight: 800;
-			}
-		}
-	}
+  img {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 100%;
+    background-color: $grey_dark;
+    border: none;
+    transform: translate(-50%, -50%) scale(0);
+    transition: filter 0.3s ease;
+  }
 
-	img {
-		position: absolute;
-		left: 50%;
-		top: 0;
-		width: 100px;
-		height: 100px;
-		border-radius: 100%;
-		background-color: $grey_dark;
-		border: none;
-		transform: translate(-50%, -50%) scale(0);
-		transition: filter .3s ease;
-	}
+  img.avatar-current-user {
+    cursor: pointer;
+  }
 
-	img.avatar-current-user {
-		cursor: pointer;
-	}
+  img.avatar-current-user:hover {
+    filter: blur(3px);
+  }
 
-	img.avatar-current-user:hover {
-		filter: blur(3px);
-	}
+  img.avatar-current-user::after {
+    content: " ";
+    position: absolute;
+    display: flex;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%);
+  }
 
-	img.avatar-current-user::after {
-		content: ' ';
-		position: absolute;
-		display: flex;
-		top: 50%;
-		left: 50%;
-		width: 200px;
-		height: 200px;
-		transform: translate(-50%, -50%);
-	}
+  img[src] {
+    animation: avatar-animation 0.3s ease;
+    transform: translate(-50%, -50%) scale(1);
+  }
 
-	img[src] {
-		animation: avatar-animation .3s ease;
-		transform: translate(-50%, -50%) scale(1);
-	}
+  #avatar-file {
+    transform: scale(0);
+  }
 
-	#avatar-file {
-		transform: scale(0);
-	}
+  #user-level-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-	#user-level-container {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
+    #user-progress-container {
+      background-color: $grey_dark;
+      width: 80%;
+      height: 30px;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
 
-		#user-progress-container {
-			background-color: $grey_dark;
-			width: 80%;
-			height: 30px;
-			border-radius: 10px;
-			overflow: hidden;
-			display: flex;
+      #user-progress-container-fill {
+        height: 100%;
+        background-color: $blue;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: width 0.3s ease;
+      }
 
-			#user-progress-container-fill {
-				height: 100%;
-				background-color: $blue;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				transition: width .3s ease;
-			}
+      #user-progress-container-free-space {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
 
-			#user-progress-container-free-space {
-				flex: 1;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-		}
-	}
+  .user-editable-field {
+    position: relative;
+    cursor: pointer;
 
-	.user-editable-field {
-		position: relative;
-		cursor: pointer;
+    > .button-icon {
+      position: absolute;
+      left: 0px;
+      top: 50%;
+      transform: translate(0px, -50%) scale(0);
+      opacity: 0;
+      transition: 0.3s all ease;
+    }
+  }
 
-		>.button-icon {
-			position: absolute;
-			left: 0px;
-			top: 50%;
-			transform: translate(0px, -50%) scale(0);
-			opacity: 0;
-			transition: .3s all ease;
-		}
-	}
-
-	.user-editable-field:hover {
-		>.button-icon {
-			transform: translate(-120%, -50%) scale(1);
-			opacity: 1;
-		}
-	}
+  .user-editable-field:hover {
+    > .button-icon {
+      transform: translate(-120%, -50%) scale(1);
+      opacity: 1;
+    }
+  }
 }
 
 #user-page-bottom-container {
-	width: 100%;
+  height: 300px;
+  width: 100%;
 
-	>* {
-		margin: 10px 5px;
-		flex: 1;
-	}
+  > * {
+    margin: 10px 5px;
+    flex: 1;
+    overflow-y: auto;
+  }
 
-	#history-panel-container,
-	#friends-panel-content {
-		display: flex;
-		flex-direction: column;
-		overflow: auto;
-		max-height: 100%;
-	}
+  #history-panel-container,
+  #friends-panel-content {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    //   height: 100%;
+  }
 
-	.history-item {
-		background-color: $grey_dark_light;
-		padding: 20px;
-		display: flex;
-		align-items: center;
+  .history-item {
+    background-color: $grey_dark_light;
+    padding: 20px;
+    display: flex;
+    align-items: center;
 
-		span:nth-child(1) {
-			flex: 1;
-		}
+    span:nth-child(1) {
+      flex: 1;
+    }
 
-		.history-item-win {
-			color: $blue;
-		}
+    .history-item-win {
+      color: $blue;
+    }
 
-		.history-item-info {
-			color: $grey_accent;
-		}
+    .history-item-info {
+      color: $grey_accent;
+    }
 
-		.history-item-loss {
-			color: $red;
-		}
-	}
+    .history-item-loss {
+      color: $red;
+    }
+  }
 }
 
 #user-modal-edit {
-	padding: 20px;
+  padding: 20px;
 }
 
 @keyframes avatar-animation {
-	from {
-		transform: translate(-50%, -50%) scale(0);
-		opacity: 0;
-	}
+  from {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
 
-	to {
-		transform: translate(-50%, -50%) scale(1);
-		opacity: 1;
-	}
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
 }
