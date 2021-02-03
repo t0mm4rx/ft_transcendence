@@ -39,26 +39,39 @@ module Api
 			end
 			@guild2.war_invites = current_user.guild_id
 			@guild2.save
-			return render json: @guild2, status: :created
+			@war = War.create(guild1_id: current_user.guild_id, guild2_id: @guild2.id)
+			if @war.save
+				@war.update(war_params)
+				render json: @war, status: :created
+			else
+				render json: @war.errors
+			end
 		end
 
 		#current user can accept war invitation
 		def accept_invitation
 			if current_user.guild && current_user.guild.war_invites != 0
-				guild_inviter = Guild.find_by(id: current_user.guild.war_invites)
-				current_user.guild.isinwar = true
-				current_user.guild.war_invites = 0
-				guild_inviter.isinwar = true
-				guild_inviter.war_invites = 0
-				@war = War.create(guild1_id: current_user.guild_id, guild2_id: guild_inviter.id)
-				if @war.save
-					guild_inviter.present_war_id = @war.id
-					current_user.guild.present_war_id = @war.id
-					guild_inviter.save
-					current_user.guild.save
-					render json: @war, status: :created
+				@war = War.find(params[:id])
+				if @war.nil?
+				 	return render json: { error: "War id doesn't exist"}, status: :unprocessable_entity
+				elsif @war.accepted == true
+					return render json: { error: "War is already accepted"}, status: :unprocessable_entity
 				else
-					render json: @war.errors
+					guild_inviter = Guild.find_by(id: current_user.guild.war_invites)
+					current_user.guild.isinwar = true
+					current_user.guild.war_invites = 0
+					guild_inviter.isinwar = true
+					guild_inviter.war_invites = 0
+					@war.accepted = true
+					if @war.save
+						guild_inviter.present_war_id = @war.id
+						current_user.guild.present_war_id = @war.id
+						guild_inviter.save
+						current_user.guild.save
+						render json: @war, status: :created
+					else
+						render json: @war.errors
+					end
 				end
 			else
 				return render json: { error: "You have no invitations to war bro!"}, status: :unprocessable_entity
@@ -147,9 +160,10 @@ module Api
 		end
 
 		def set_target
+			@guild1 = Guild.find_by(id:current_user.guild_id)
 			@guild2 = Guild.find_by(id: params[:target_id])
 			if @guild2.nil?
-				return render json: { error: "This guild doesn't exist"}, status: :unprocessable_entity
+				return render json: { error: "This target guild doesn't exist"}, status: :unprocessable_entity
 			end
 			@guild1 = current_user.guild
 			if @guild1.nil?
@@ -165,7 +179,6 @@ module Api
 			if @wars.empty?
 				return
 			end
-			p @wars
 			@wars.each do |war|
 				War.check_no_answer(war)
 				war.save

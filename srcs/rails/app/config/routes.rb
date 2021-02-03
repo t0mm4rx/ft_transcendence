@@ -36,7 +36,7 @@ Rails.application.routes.draw do
     resources :wars, only: [:index, :update, :create]
       post '/wars/send_request', to: 'wars#send_request'
       post '/wars/ignore_invitation', to: 'wars#ignore_invitation'
-      post '/wars/accept_invitation', to: 'wars#accept_invitation'
+      post '/wars/:id/accept_invitation', to: 'wars#accept_invitation'
       post '/wars/:id/wt_game_invite', to: 'wars#wt_game_invite'
       post '/wars/:id/wt_game_accept', to: 'wars#wt_game_accept'
 
