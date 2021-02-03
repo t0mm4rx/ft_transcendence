@@ -3,6 +3,8 @@ import Backbone from 'backbone';
 import $ from 'jquery';
 import template from '../../templates/guilds.html';
 import _ from "underscore";
+import flatpickr from "flatpickr";
+import toasts from '../utils/toasts';
 
 export default Backbone.View.extend({
 	el: "#page",
@@ -28,6 +30,9 @@ export default Backbone.View.extend({
 		},
 		"click #guild-create-button": function () {
 			window.guilds.save($("#name-input").val(), $("#anagram-input").val());
+		},
+		"click #guild-war-button": function () {
+			this.declareWar();
 		}
 	},
 	initialize: function () {
@@ -40,6 +45,42 @@ export default Backbone.View.extend({
 			isInWar: !!window.currentUser.get('guild') && !!window.currentUser.get('guild').isinwar
 		}));
 		this.renderGuildsList();
+		if (document.querySelector("#war-start-date")) {
+			this.warStart = flatpickr(document.querySelector("#war-start-date"), {
+				onChange: a => {
+					if (this.warEnd)
+						this.warEnd.set('minDate', a[0]);
+					if (this.warTimeStart)
+						this.warTimeStart.set('minDate', a[0]);
+					if (this.warTimeEnd)
+						this.warTimeEnd.set('minDate', a[0]);
+				},
+				minDate: new Date()
+			});
+		}
+		if (document.querySelector("#war-end-date")) {
+			this.warEnd = flatpickr(document.querySelector("#war-end-date"), {
+				onChange: a => {
+					if (this.warTimeStart)
+						this.warTimeStart.set('maxDate', a[0]);
+					if (this.warTimeEnd)
+						this.warTimeEnd.set('maxDate', a[0]);
+				},
+				minDate: new Date()
+			});
+		}
+		if (document.querySelector("#war-time-start")) {
+			this.warTimeStart = flatpickr(document.querySelector("#war-time-start"), {
+				onChange: a => {
+					if (this.warTimeEnd)
+						this.warTimeEnd.set('minDate', a[0]);
+				},
+				minDate: new Date()
+			});
+		}
+		if (document.querySelector("#war-time-end")) {
+			this.warTimeEnd = flatpickr(document.querySelector("#war-time-end"));
+		}
 	},
 	renderGuildsList: function () {
 		const list = $("#guilds-listing");
@@ -73,5 +114,30 @@ export default Backbone.View.extend({
 			anagram += letter;
 		}
 		return anagram;
+	},
+	declareWar: function () {
+		const opponent = document.querySelector("#anagram-input").value;
+		const stake = document.querySelector("#stake-input").value;
+		let max = parseInt(document.querySelector("#max-input").value);
+		const start = document.querySelector("#war-start-date").value;
+		const end = document.querySelector("#war-end-date").value;
+		const wtStart = document.querySelector("#war-time-start").value;
+		const wtEnd = document.querySelector("#war-time-end").value;
+		if (!opponent || !guilds.models.find(a => a.get('anagram') === opponent)) {
+			toasts.notifyError("Opponent's anagram not found.");
+			return;
+		}
+		if (!stake) {
+			toasts.notifyError("Stake cannot be empty.");
+			return;
+		}
+		if (!max) {
+			max = -1;
+		}
+		if (!start || !end || !wtStart || !wtEnd) {
+			toasts.notifyError("Dates cannot be empty.");
+			return;
+		}
+		guilds.models.find(a => a.get('anagram') === opponent).declareWar();
 	}
 });

@@ -28,12 +28,12 @@ export default Backbone.View.extend({
 		}
 	},
 	render: function () {
-		this.guild = window.guilds.where('anagram', this.anagram);
+		this.guild = window.guilds.models.find(a => a.get('anagram') === this.anagram);
 		this.$el.html(_.template(template)({guild: this.guild}));
 		this.renderUsers();
 	},
 	renderUsers: function () {
-		this.guild = window.guilds.where('anagram', 'IAKL');
+		this.guild = window.guilds.models.find(a => a.get('anagram') === this.anagram);
 		const friends = $("#guild-users-list");
 		friends.html("");
 		console.log(window.users.length);
