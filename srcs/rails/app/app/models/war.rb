@@ -81,11 +81,13 @@ class War < ApplicationRecord
 	end
 
 	def set_defaults
+
 		self.add_count_all ||= false
 		self.guild1_score ||= 0
 		self.guild2_score ||= 0
 		self.guild1_unanswers ||= 0
 		self.guild2_unanswers ||= 0
 		self.war_closed ||= false
+		self.accepted ||= false
 	end
 end
