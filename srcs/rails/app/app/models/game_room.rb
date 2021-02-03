@@ -4,13 +4,19 @@ class GameRoom < ApplicationRecord
 	belongs_to :tournament, optional: true
 
 	validates :player, presence: true
-	
+
 	after_initialize :set_defaults
 
 	def game_over?
 		player_score >= 11 || opponent_score >= 11
 	end
-	
+
+	def winner
+		if game_over?
+			player_score > opponent_score ? player : opponent
+		end
+	end
+
 	def update_scores
 		set_winner_and_loser
 		@winner.has_won
@@ -42,7 +48,7 @@ class GameRoom < ApplicationRecord
 		game = p1.versus(p2, result: player_score > opponent_score ? 1 : 0)
 		player.update(ladder_score: p1.rating)
 		opponent.update(ladder_score: p2.rating)
-		player.save && opponent.save 
+		player.save && opponent.save
 	end
 
 	def update_war_scores(current_user)
@@ -65,7 +71,7 @@ class GameRoom < ApplicationRecord
 			end
 		end
 	end
-	
+
 
 	private
 

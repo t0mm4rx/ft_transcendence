@@ -44,7 +44,7 @@ module Api
 
 		#current user can accept war invitation
 		def accept_invitation
-			if current_user.guild.war_invites != 0
+			if current_user.guild && current_user.guild.war_invites != 0
 				guild_inviter = Guild.find_by(id: current_user.guild.war_invites)
 				current_user.guild.isinwar = true
 				current_user.guild.war_invites = 0
@@ -65,11 +65,11 @@ module Api
 			end
 		end
 
-		#current user can ignore invitation to war no params needed
+		#current user can ignore4 invitation to war no params needed
 		def ignore_invitation
-			if current_user.guild.war_invites != 0
+			if current_user.guild && current_user.guild.war_invites != 0
 				current_user.guild.war_invites = 0
-				current_user.save
+				current_user.guild.save
 				return render json: current_user.guild
 			else
 				return render json: { error: "You have no invitations to war bro!"}, status: :unprocessable_entity
@@ -131,6 +131,9 @@ module Api
 
 		def set_guilds_update
 			@war = War.find_by(id: params[:id])
+			if @war.nil?
+				return render json: { error: "You have no war"}, status: :unprocessable_entity
+			end
 			if @war.war_closed == true
 				return render json: { error: "War is closed !"}, status: :unprocessable_entity
 			end
@@ -149,6 +152,9 @@ module Api
 				return render json: { error: "This guild doesn't exist"}, status: :unprocessable_entity
 			end
 			@guild1 = current_user.guild
+			if @guild1.nil?
+				return render json: { error: "You don't have guild"}, status: :unprocessable_entity
+			end
 		end
 
 		def check_if_wt_unanswered
@@ -156,6 +162,10 @@ module Api
 			if @wars.nil?
 				return
 			end
+			if @wars.empty?
+				return
+			end
+			p @wars
 			@wars.each do |war|
 				War.check_no_answer(war)
 				war.save

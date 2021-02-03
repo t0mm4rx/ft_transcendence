@@ -101,8 +101,7 @@ export default Backbone.View.extend({
     }
   },
   render: function () {
-    console.log("RENDER");
-
+	console.log(this.user.toJSON());
     this.$el.html(_.template(template)({ data: this.user.toJSON() }));
     this.renderFriendsList();
   },

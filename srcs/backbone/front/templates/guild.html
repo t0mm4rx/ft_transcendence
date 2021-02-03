@@ -15,7 +15,7 @@
 			<div id="guild-points">
 				<div class="guild-info">
 					<span>Points</span>
-					<span><%= !!guild ? guild.get('score') : '...' %></span>
+					<span><%= !!guild ? guild.get('score') ?? 0 : '...' %></span>
 				</div>
 			</div>
 			<div id="guild-infos">
