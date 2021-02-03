@@ -140,7 +140,7 @@ export default Backbone.View.extend({
     // </div>`);
     const template = _.template(`<div class="history-item">
     <span><b><%= game.get("player").username %></b> <span class="history-item-win"><%= game.escape("player_score") %></span> - <span><%= game.escape("opponent_score") %></span> <%= game.get("opponent").username %><span class="history-item-info"> - direct game</span></span>
-    <span class="history-item-win"><%= game.get("winner_id") == user_id ? "Win" : "Loss" %></span>
+    <span class="history-item-<%= result %>"><%= result %></span>
     </div>`);
     console.log("GAMES", this.games);
 
@@ -148,7 +148,10 @@ export default Backbone.View.extend({
     this.games.each((game) => {
       console.log("USER GAME", game);
       if (game.get("player") && game.get("opponent"))
-        html += template({ game: game, user_id: this.user.id });
+        html += template({
+          game: game,
+          result: game.get("winner_id") == this.user.id ? "win" : "loss",
+        });
     });
     this.$("#history-panel-content").html(html);
   },

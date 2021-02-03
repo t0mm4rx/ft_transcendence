@@ -4,4 +4,10 @@ class GameRoomSerializer < ActiveModel::Serializer
 	belongs_to :player, serializer: FriendSerializer
 	belongs_to :opponent, serializer: FriendSerializer
 	belongs_to :tournament
+
+	def winner_id
+		if object.opponent && object.player
+			object.player_score < object.opponent_score ? object.opponent.id : object.player.id
+		end
+	end
 end
