@@ -20,11 +20,11 @@ const Guild = Backbone.Model.extend({
 });
 
 const Guilds = Backbone.Collection.extend({
-	url: 'http://localhost:3000/api/guilds/',
-	model: Guild,
+	url: 'http://' + window.location.hostname + ':3000/api/guilds/',
+	mode: Guild,
 	save: function (name, anagram) {
 		$.ajax({
-			url: 'http://localhost:3000/api/guilds/',
+			url: 'http://' + window.location.hostname + ':3000/api/guilds/',
 			type: 'POST',
 			data: `name=${name}&anagram=${anagram}`,
 			success: () => {

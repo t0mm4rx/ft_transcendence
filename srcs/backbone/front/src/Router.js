@@ -4,6 +4,7 @@ import Backbone from "backbone";
 import Guilds from "./pages/Guilds";
 import Home from "./pages/Home";
 import Game from "./pages/Game";
+import GameLive from "./pages/GameLive";
 import Tournaments from "./pages/Tournaments";
 import Test from "./pages/Test";
 import Auth from "./pages/Auth";
@@ -29,6 +30,9 @@ export default Backbone.Router.extend({
     "guilds/": "guilds",
     game: "game",
     "game/": "game",
+    game_live: "game_live",
+    "game_live/:id": "game_live",
+    "game_live/:id/": "game_live",
     "livestream/:id": "livestream",
     "livestream/:id/": "livestream",
     tournaments: "tournaments",
@@ -92,6 +96,17 @@ export default Backbone.Router.extend({
       window.currentView.stopListening();
     }
     window.currentView = new Game();
+    window.currentView.render();
+  },
+  game_live: function () {
+    this.checkLogged();
+    this.showLayout();
+    if (window.currentView) {
+      window.currentView.undelegateEvents();
+      window.currentView.unbind();
+      window.currentView.stopListening();
+    }
+    window.currentView = new GameLive();
     window.currentView.render();
   },
   livestream: function () {

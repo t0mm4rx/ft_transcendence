@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_03_002320) do
+ActiveRecord::Schema.define(version: 2021_02_03_104923) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,6 +46,21 @@ ActiveRecord::Schema.define(version: 2021_02_03_002320) do
     t.boolean "direct", default: false
   end
 
+  create_table "delayed_jobs", force: :cascade do |t|
+    t.integer "priority", default: 0, null: false
+    t.integer "attempts", default: 0, null: false
+    t.text "handler", null: false
+    t.text "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string "locked_by"
+    t.string "queue"
+    t.datetime "created_at", precision: 6
+    t.datetime "updated_at", precision: 6
+    t.index ["priority", "run_at"], name: "delayed_jobs_priority"
+  end
+
   create_table "friendships", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "friend_id", null: false
@@ -54,6 +69,16 @@ ActiveRecord::Schema.define(version: 2021_02_03_002320) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["friend_id"], name: "index_friendships_on_friend_id"
     t.index ["user_id"], name: "index_friendships_on_user_id"
+  end
+
+  create_table "game_requests", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.boolean "accepted"
+    t.bigint "user_id"
+    t.bigint "opponent_id"
+    t.index ["opponent_id"], name: "index_game_requests_on_opponent_id"
+    t.index ["user_id"], name: "index_game_requests_on_user_id"
   end
 
   create_table "game_rooms", force: :cascade do |t|
@@ -65,11 +90,11 @@ ActiveRecord::Schema.define(version: 2021_02_03_002320) do
     t.integer "opponent_score"
     t.integer "winner_id"
     t.integer "winner_score"
-    t.string "game_type"
     t.bigint "player_id"
     t.bigint "opponent_id"
     t.boolean "ladder", default: false
     t.bigint "tournament_id"
+    t.string "game_type"
     t.index ["opponent_id"], name: "index_game_rooms_on_opponent_id"
     t.index ["player_id"], name: "index_game_rooms_on_player_id"
     t.index ["tournament_id"], name: "index_game_rooms_on_tournament_id"
@@ -83,9 +108,6 @@ ActiveRecord::Schema.define(version: 2021_02_03_002320) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "war_invites"
     t.boolean "isinwar"
-    t.integer "present_war_id"
-    t.integer "wt_game_invite"
-    t.boolean "isinwtgame"
     t.datetime "wt_date_to_answer"
   end
 
@@ -104,7 +126,7 @@ ActiveRecord::Schema.define(version: 2021_02_03_002320) do
     t.bigint "tournament_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.boolean "eliminated"
+    t.boolean "eliminated", default: false
     t.index ["tournament_id"], name: "index_tournament_users_on_tournament_id"
     t.index ["user_id"], name: "index_tournament_users_on_user_id"
   end
@@ -163,7 +185,6 @@ ActiveRecord::Schema.define(version: 2021_02_03_002320) do
     t.integer "guild2_unanswers"
     t.integer "guild_win"
     t.boolean "war_closed"
-    t.integer "wt_time_to_answer"
   end
 
   add_foreign_key "blocked_users", "users"

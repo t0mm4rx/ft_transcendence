@@ -2,6 +2,8 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import toasts from "../utils/toasts";
+import globalSocket from "../app"
+import { create } from "underscore";
 
 const UserGames = Backbone.Collection.extend({
   initialize(props) {
@@ -10,10 +12,10 @@ const UserGames = Backbone.Collection.extend({
 });
 
 const User = Backbone.Model.extend({
-  urlRoot: `http://localhost:3000/api/users/`,
+  urlRoot: `http://` + window.location.hostname + `:3000/api/users/`,
   save: function (key, value) {
     $.ajax({
-      url: `http://localhost:3000/api/users/${window.currentUser.get("id")}/`,
+      url: `http://` + window.location.hostname + `:3000/api/users/${window.currentUser.get("id")}/`,
       type: "PUT",
       data: `${key}=${value}`,
       success: () => {
@@ -23,11 +25,19 @@ const User = Backbone.Model.extend({
   },
   askFriend: function () {
     $.ajax({
-      url: `http://localhost:3000/api/friends/`,
+      url: `http://` + window.location.hostname + `:3000/api/friends/`,
       type: "POST",
       data: `id=${this.get("id")}`,
       success: () => {
         this.set("relation_to_user", "request sent");
+
+        globalSocket.sendMessage({
+          action: "to_broadcast",
+          infos: {
+            message: "friend_request",
+            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")} }
+        }}, false, true);
+
         toasts.notifySuccess("Friend request sent.");
       },
       error: (err) => {
@@ -38,7 +48,7 @@ const User = Backbone.Model.extend({
   },
   unfriend: function () {
     $.ajax({
-      url: `http://localhost:3000/api/friends/${this.get("id")}/`,
+      url: `http://` + window.location.hostname + `:3000/api/friends/${this.get("id")}/`,
       type: "DELETE",
       success: () => {
         this.set("relation_to_user", null);
@@ -47,6 +57,14 @@ const User = Backbone.Model.extend({
             `${this.get("login")} is not your friend anymore.`
           );
         else toasts.notifySuccess(`You're not friends anymore.`);
+
+        globalSocket.sendMessage({
+          action: "to_broadcast",
+          infos: {
+            message: "unfriend_request",
+            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")}}
+        }}, false, true);
+
         window.currentUser.fetch();
       },
       error: (err) => {
@@ -56,13 +74,21 @@ const User = Backbone.Model.extend({
   },
   acceptFriend: function () {
     $.ajax({
-      url: `http://localhost:3000/api/friends/${this.get("id")}`,
+      url: `http://` + window.location.hostname + `:3000/api/friends/${this.get("id")}`,
       type: "PUT",
       success: () => {
         this.set("relation_to_user", "friends");
         if (this.get("login"))
           toasts.notifySuccess(`${this.get("login")} is now your friend.`);
         else toasts.notifySuccess(`You have a new friend!`);
+
+        globalSocket.sendMessage({
+          action: "to_broadcast",
+          infos: {
+            message: "friend_request_reply",
+            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")}}
+        }}, false, true);
+
         window.currentUser.fetch();
       },
       error: (err) => {
@@ -73,7 +99,7 @@ const User = Backbone.Model.extend({
   },
   setTFA: function () {
     $.ajax({
-      url: "http://localhost:3000/api/tfa",
+      url: "http://" + window.location.hostname + ":3000/api/tfa",
       type: "POST",
     });
     window.currentUser.fetch();
@@ -81,7 +107,7 @@ const User = Backbone.Model.extend({
   block() {
     console.log(this);
     $.ajax({
-      url: "http://localhost:3000/api/blocked",
+      url: "http://" + window.location.hostname + ":3000/api/blocked",
       type: "POST",
       data: { target_id: this.id },
       success: () => {
@@ -96,7 +122,7 @@ const User = Backbone.Model.extend({
   unblock() {
     console.log(this);
     $.ajax({
-      url: `http://localhost:3000/api/blocked/${this.id}`,
+      url: `http://`+ window.location.hostname + `:3000/api/blocked/${this.id}`,
       type: "DELETE",
       success: () => {
         toasts.notifySuccess(`You just unblocked ${this.get("username")}`);
@@ -109,7 +135,7 @@ const User = Backbone.Model.extend({
   },
   banUntil(time) {
     $.ajax({
-      url: `http://localhost:3000/api/users/${this.id}`,
+      url: `http://` + window.location.hostname + `:3000/api/users/${this.id}`,
       type: "PUT",
       data: { banned_until: time },
       success: () => {
@@ -122,11 +148,88 @@ const User = Backbone.Model.extend({
         toasts.notifyError(`Could not ban ${this.escape("username")}`),
     });
   },
+  askGame()
+  {
+    $.ajax({
+      url: `http://` + window.location.hostname + `:3000/api/game_requests/`,
+      type: "POST",
+      data: `userid=${window.currentUser.id}&opponentid=${this.get("id")}`,
+      success: () => {
+
+        globalSocket.sendMessage({
+          action: "to_broadcast",
+          infos: {
+            message: "game_request",
+            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")}}
+        }}, false, true);
+
+        toasts.notifySuccess("Game Request send.");
+      },
+      error: (err) => {
+        toasts.notifyError("Cannot send a game request.");
+        console.log(err);
+      },
+    });
+  },
+  acceptGame()
+  {
+    $.ajax({
+      url: `http://` + window.location.hostname + `:3000/api/game_requests/${this.id}`,
+      type: "PUT",
+      data: `opponentid=${window.currentUser.id}&userid=${this.get("id")}`,
+      success: () => {
+        if (this.get("login"))
+          toasts.notifySuccess(`${this.get("login")} game request accepted.`);
+        else toasts.notifySuccess(`You accept game request!`);
+
+        console.log("This : ", this);
+        fetch(`http://` + window.location.hostname + `:3000/api/game_rooms`,{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+          },
+          body: JSON.stringify({
+            player_id: window.currentUser.get('id'),
+            opponent_id: this.get('id'),
+            status: "notstarted",
+            number_player: 0
+          })
+        })
+        .then(res => res.json())
+        .then(createResult => {
+          
+          //tmp
+          if (createResult == null)
+          {
+            toasts.notifyError("Error during game creation.");
+            return ;
+          }
+
+          globalSocket.sendMessage({
+            action: "to_broadcast",
+            infos: {
+              message: "game_request_reply",
+              content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")}, gameid: createResult.id}
+          }}, false, true);
+          
+          window.location.hash = "game_live/" + createResult.id;
+        });
+
+        window.currentUser.fetch();
+      },
+      error: (err) => {
+        console.log(err);
+        toasts.notifyError("An error occured.");
+      },
+    });
+  }
 });
 
 const Users = Backbone.Collection.extend({
   model: User,
-  url: "http://localhost:3000/api/users?limit=20",
+  url: "http://" + window.location.hostname + ":3000/api/users?limit=20",
   // parse: function (data) {
   // 	data.forEach(el => {
   // 		this.add(new User(el));

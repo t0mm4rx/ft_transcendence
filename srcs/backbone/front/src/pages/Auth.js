@@ -138,10 +138,13 @@ export default Backbone.View.extend({
 	},
 	ask42Login: function () {
 		let creation = null;
-		const w = window.open("http://0.0.0.0:3000/api/logintra", "_blank", "width=500px,height=500px");
+		const w = window.open("http://" + window.location.hostname + ":3000/api/logintra", "_blank", "width=500px,height=500px");
 		window.addEventListener('message', event => {
 			w.close();
 			const params = new URLSearchParams("?" + event.data.params);
+			params.forEach(param => {
+				console.log(name, param);
+			})
 			if (!params.get("token") || !params.get("creation")) {
 				toasts.notifyError("Cannot get the 42 API token.");
 				return;
@@ -212,7 +215,7 @@ export default Backbone.View.extend({
 			return;
 		}
 		$.ajax({
-			url: 'http://localhost:3000/api/tfa/',
+			url: 'http://' + window.location.hostname + ':3000/api/tfa/',
 			type: 'get',
 			data: `code=${code}`,
 			success: () => {

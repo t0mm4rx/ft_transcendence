@@ -18,7 +18,7 @@ export default Backbone.View.extend({
 	getGameByID: async function(id)
 	{
 		var rtn;
-		await fetch(`http://localhost:3000/api/game_rooms/` + id, {
+		await fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + id, {
 			headers: {
 				'Content-Type': 'application/json',
 				'Accept': 'application/json',
@@ -41,7 +41,7 @@ export default Backbone.View.extend({
 		var gameid;
 
 		// TMP
-		await fetch(`http://localhost:3000/api/game/tmp_last_game`, {
+		await fetch(`http://` + window.location.hostname + `:3000/api/game/tmp_last_game`, {
 			headers: {
 				'Content-Type': 'application/json',
 				'Accept': 'application/json',

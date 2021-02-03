@@ -21,7 +21,7 @@ const ChannelUser = Backbone.Model.extend({
 const ChannelUsers = Backbone.Collection.extend({
   model: ChannelUser,
   url() {
-    return `http://localhost:3000/api/channels/${this.channel_id}/channel_users/`;
+    return `http://` + window.location.hostname + `:3000/api/channels/${this.channel_id}/channel_users/`;
   },
   initialize(props) {
     this.channel_id = props.channel_id;

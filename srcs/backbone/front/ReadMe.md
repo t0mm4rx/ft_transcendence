@@ -4,7 +4,6 @@
 - Webpack + Babel to compile JS
 - webpack-dev-server to run the dev server
 - underscore for the templates
-- p5 for the game canvas
 - backbone for the front-end
 - SASS compiles everything in ./scss/ in ./dist/
 - Toastify.js for sending toasts

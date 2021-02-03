@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  get 'game_requests/index'
+  namespace :api do
+    get 'game_request/index'
+  end
+  get 'game_request/index'
   namespace :api do
     root 'users#index'
     resources :channels do
@@ -45,6 +50,9 @@ Rails.application.routes.draw do
     post '/game/is_disconnected', to: 'game_rooms#is_disconnected'
     get '/game/tmp_last_game', to: 'game_rooms#tmp_last_game'
     post '/game/:id/update_score', to: 'game_rooms#update_score'
+    post '/game/:id/update_status', to: 'game_rooms#update_status'
+
+    resources :game_requests, only: [:index, :create, :update]
 end
 
   mount ActionCable.server => '/cable'

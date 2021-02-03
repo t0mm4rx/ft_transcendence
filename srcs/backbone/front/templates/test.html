@@ -1,4 +1,23 @@
-<div id="test-div">
-    <button id="create-db">CreateDB</button>
-    <button id="send-msg">Send Message</button>
+<div class="panel" id="game-canvas-div">
+    <div class="top-part">
+        <div class="top-text" id="left-player">
+            <h3>Romain</h3>
+        </div>
+        <div class="top-text" id="vs">
+            <h3>vs</h3>
+        </div>
+        <div class="top-text" id="right-player">
+            <h3>Mathis</h3>
+        </div>
+    </div>
+    <canvas id="game-canvas" width="600" height="400"></canvas>
+    <script>
+        var c = document.getElementById("game-canvas");
+        var ctx = c.getContext("2d");
+
+        ctx.beginPath();
+        ctx.rect(0,0,600,400);
+        ctx.fillStyle = "red";
+        ctx.fill();
+    </script>
 </div>

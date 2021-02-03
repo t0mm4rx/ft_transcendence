@@ -382,3 +382,30 @@ input[type="datetime-local"],
 		opacity: 0;
 	}
 }
+
+/*
+- Common Game --------------------------------------------------------------------
+*/
+
+#game-canvas-div
+{
+	display: flex;
+	flex-direction: column;
+	border-radius: 10px;
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+	background-color: $grey;
+	overflow: hidden;
+	
+	.top-part
+	{
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		.top-text
+		{
+			text-align: center;
+			width: 100%;
+		}
+	}
+}

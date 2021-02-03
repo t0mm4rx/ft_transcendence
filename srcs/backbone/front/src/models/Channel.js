@@ -9,7 +9,7 @@ import _ from "underscore";
 const Channel = Backbone.Collection.extend({
   comparator: "date",
   url() {
-    return `http://localhost:3000/api/channels/${this.channel_id}/messages`;
+    return `http://` + window.location.hostname + `:3000/api/channels/${this.channel_id}/messages`;
   },
   initialize(props) {
     this.channel_id = props.channel_id;
@@ -50,7 +50,7 @@ const Channel = Backbone.Collection.extend({
   },
   sendMessage(body) {
     $.ajax({
-      url: `http://localhost:3000/api/channels/${this.channel_id}/messages`,
+      url: `http://` + window.location.hostname + `:3000/api/channels/${this.channel_id}/messages`,
       type: "POST",
       data: `body=${body}`,
       success: () => {},
@@ -91,7 +91,7 @@ const Channel = Backbone.Collection.extend({
   },
   fetchBlockedUsers() {
     $.ajax({
-      url: `http://localhost:3000/api/blocked/`,
+      url: `http://` + window.location.hostname + `:3000/api/blocked/`,
       type: "GET",
       success: (data) => {
         console.log("BLOCKED USERS: ", data);

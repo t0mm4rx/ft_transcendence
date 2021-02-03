@@ -25,6 +25,10 @@ export default Backbone.View.extend({
     "click #user-add-friend": function () {
       this.user.askFriend();
     },
+    "click #game-request-button": function()
+    {
+      this.user.askGame();
+    },
     "click .message-button": function (event) {
       $(document).trigger("chat", {
         chat: event.currentTarget.id.split("-")[1],
