@@ -1,7 +1,7 @@
 /* User preview displayed in the top right corner. */
 import Backbone from 'backbone';
 import $, { event, uniqueSort } from 'jquery';
-import { select } from 'underscore';
+import _ from 'underscore';
 
 const state_enum = {
     "BEGIN": 1,
@@ -66,44 +66,6 @@ export default Backbone.View.extend({
         }, 1000 / 30);
 
         this.render();
-    },
-    
-    // Events
-    events: { "mousemove": "mouseMoveHandler" },
-
-    /**
-     * Capture mouse mouvement on the canvas.
-     * @param {event} event the event.
-     */
-    mouseMoveHandler: function (event)
-    {
-        if (self.state != state_enum["DISCONNECTION"] && this.canvas && this.connection_type != "live")
-        {
-            // The canvas rectangle.
-            let rect = this.canvas.getBoundingClientRect();
-
-            // Player info. 
-            var player = this.player_info.is;
-
-            // Set player paddle y at mouse position.
-            player.y = event.pageY - rect.top - player.height / 2;
-
-            // Avoid the paddle to be outside of the canvas.
-            if (event.pageY + player.height / 2 + 5 > rect.bottom)
-                player.y = rect.height - player.height - 5;
-            else if (event.pageY - player.height / 2 - 5 < rect.top)
-                player.y = 5;
-
-            // Send to other client the paddle position.
-            this.ftsocket.sendMessage({
-                action: "to_broadcast",
-                infos: {
-                    message: "update_y",
-                    content: {
-                        player_id: player.player.id,
-                        y: player.y
-            }}}, false);
-        }
     },
 
     /**
@@ -226,11 +188,27 @@ export default Backbone.View.extend({
      */
     resetBall: function()
     {
+        var ball_update = JSON.parse(JSON.stringify(this.ball));
+        var velo_pos = false;
+        if (ball_update.velocityX > 0)
+            velo_pos = true;
+
         // this.playSound('../../assets/game_sound/score.ogg');
-        this.ball.x = this.canvas.width / 2;
-        this.ball.y = this.canvas.height / 2;
-        this.ball.speed = 8;
-        this.ball.velocityX = -this.ball.velocityX;
+        ball_update.speed = 8;
+        ball_update.x = this.canvas.width / 2;
+        ball_update.y = this.canvas.height / 2;
+        ball_update.velocityX = (velo_pos == false) ? -5 : 5;
+        ball_update.velocityY = 0;
+
+        // Send ball position to other clients.
+        this.ftsocket.sendMessage({
+            action: "to_broadcast",
+            infos: {
+                message: "update_ball",
+                content: ball_update
+        }}, false);
+
+        this.ball = ball_update;
     },
 
     detectGoal: function()
@@ -305,7 +283,6 @@ export default Backbone.View.extend({
         }
 	
 		let player = (ball_update.x < this.canvas.width / 2) ? this.left : this.right;
-    
         if (this.collision(ball_update, player))
         {
             // Where the ball hit the player
@@ -325,7 +302,9 @@ export default Backbone.View.extend({
             ball_update.velocityY = ball_update.speed * Math.sin(angleRad);
 
             // Increase difficulty
-            ball_update.speed += 0.1;
+            if (ball_update.speed < 8)
+                ball_update.speed = 8;
+            ball_update.speed += 0.5;
             // this.playSound('../../assets/game_sound/wall_hit.ogg');
         }
 
@@ -357,12 +336,12 @@ export default Backbone.View.extend({
         this.context.globalAlpha = 1.0;
 
         // Width of left/right player and of "vs" strings.
-        var textWidthT = this.context.measureText(this.left.player.name);
+        var textWidthT = this.context.measureText(this.left.player.username);
         var textWidthV = this.context.measureText("vs");
-        var textWidthM = this.context.measureText(this.right.player.name);
+        var textWidthM = this.context.measureText(this.right.player.username);
 
         // Draw left player name.
-        this.drawText(this.left.player.name,
+        this.drawText(this.left.player.username,
             (this.canvas.width / 2) - (textWidthT.width/2), // Position in x.
             this.canvas.height / 4, // Position in y.
             "WHITE"); // Color.
@@ -374,7 +353,7 @@ export default Backbone.View.extend({
             "WHITE");
 
         // Draw right player name.
-        this.drawText(this.right.player.name,
+        this.drawText(this.right.player.username,
             (this.canvas.width / 2) - (textWidthM.width/2),
             (this.canvas.height / 4) + 90,
             "WHITE");
@@ -415,7 +394,7 @@ export default Backbone.View.extend({
         var looser = (winner == this.left) ? this.right : this.left;
 
         // End title.
-        var end_title = winner.player.name + " win !"
+        var end_title = winner.player.username + " win !"
 
         // Width of "end title", winner/looser score and of "-" strings.
         var textWidthWin = this.context.measureText(end_title);
@@ -455,13 +434,13 @@ export default Backbone.View.extend({
             game_id: this.game_id,
             left: {
                 player_id: this.left.id,
-                player_name: this.left.name,
+                player_name: this.left.username,
                 score: this.left.score,
                 status: ((this.left.score >= 11) ? "winner" : "looser")
             },
             right: {
                 player_id: this.right.id,
-                player_name: this.right.name,
+                player_name: this.right.username,
                 score: this.right.score,
                 status: ((this.right.score >= 11) ? "winner" : "looser")
             }
@@ -550,16 +529,51 @@ export default Backbone.View.extend({
 
             if (msg.message)
             {
-                console.log("MSG ", msg.message);
+                if ((msg.message.message == "update_y"
+                    || msg.message.message == "ball_update")
+                    && msg.message.sender == self.player_info.id)
+                    return;
+                
+                if (self.state != state_enum["DISCONNECTION"]
+                    && (msg.message.message == "update_y"
+                    || msg.message.message == "ball_update"))
+                {
+                    // Update opponent paddle position
+                    if (msg.message.message == "update_y")
+                    {
+                        // It's not a livestream connection
+                        if (self.connection_type != "live"
+                            && msg.message.content.player_id == self.opponent_info.id)
+                            {
+                                console.log("plop");
+                                self.opponent_info.is.y = msg.message.content.y;
+                            }
+
+                        // It's a livestream connection
+                        else
+                        {
+                            if (self.left && msg.message.content.player_id == self.left.player.id)
+                                self.left.y = msg.message.content.y;
+                            else if (self.right && msg.message.content.player_id == self.right.player.id)
+                                self.right.y = msg.message.content.y;
+                        }
+                    }
+
+                    // Update ball position.
+                    else if (msg.message.message == "update_ball"
+                        && self.player_info.side != "left")
+                        self.ball = msg.message.content;
+                }
+
                 // Update state.
-                if (msg.message.message == "update_state")
+                else if (msg.message.message == "update_state")
                 {
                     self.state = msg.message.content.state;
                     if (self.state == state_enum["BEGIN"])
                         self.begin_date = new Date();
                 }
 
-                else  if (msg.message.message == "amipresent")
+                else if (msg.message.message == "amipresent")
 				{
 					if (msg.message.sender.id == window.currentUser.get('id')
 						&& msg.message.sender.connection_type != "live"
@@ -578,7 +592,7 @@ export default Backbone.View.extend({
                     && self.connection_type == "normal")
                 {
                     var left_values = {
-                        player: {id: self.left.player.id, name: self.left.player.name},
+                        player: {id: self.left.player.id, name: self.left.player.username},
                         x: self.left.x,
                         y: self.left.y,
                         width: self.left.width,
@@ -588,7 +602,7 @@ export default Backbone.View.extend({
                     }
 
                     var right_values = {
-                        player: {id: self.right.player.id, name: self.right.player.name},
+                        player: {id: self.right.player.id, name: self.right.player.username},
                         x: self.right.x,
                         y: self.right.y,
                         width: self.right.width,
@@ -612,6 +626,36 @@ export default Backbone.View.extend({
                                 reply_to: msg.message.sender
                             }
                     }}, true, true);
+                }
+
+                else if (self.state != state_enum["DISCONNECTION"])
+                {
+                    // Update ball position.
+                    if (msg.message.message == "update_ball"
+                        && self.player_info.side != "left")
+                        self.ball = msg.message.content;
+                    
+                    // Update score.
+                    else if (msg.message.message == "update_score")
+                    {
+                        if (msg.message.content.side == "left")
+                            self.left.score = msg.message.content.score;
+                        else if (msg.message.content.side == "right")
+                            self.right.score = msg.message.content.score;
+                    }
+
+                    // A client leave
+                    else if (msg.message.message == "client_quit")
+                    {
+                        self.disconnect_values = JSON.parse(msg.message.content);
+                        console.log("Message : ", msg.message);
+                        console.log("Disco value : ", self.disconnect_values);
+                        if (self.disconnect_values.connection_type == "normal")
+                        {
+                            self.state = state_enum["DISCONNECTION"];
+                            self.messageTreatment(self);
+                        }
+                    }
                 }
 
                 else if (msg.message.message == "force_infos"
@@ -671,54 +715,6 @@ export default Backbone.View.extend({
                         }, true);
                     }
                 }
-                    
-                else if (self.state != state_enum["DISCONNECTION"])
-                {
-                    // Update score.
-                    if (msg.message.message == "update_score")
-                    {
-                        if (msg.message.content.side == "left")
-                            self.left.score = msg.message.content.score;
-                        else if (msg.message.content.side == "right")
-                            self.right.score = msg.message.content.score;
-                    }
-
-                    // Update ball position.
-                    else if (msg.message.message == "update_ball"
-                        && self.player_info.side != "left")
-                        self.ball = msg.message.content;
-
-                    // Update opponent paddle position
-                    else if (msg.message.message == "update_y")
-                    {
-                        // It's not a livestream connection
-                        if (self.connection_type != "live"
-                            && msg.message.content.player_id == self.opponent_info.id)
-                            self.opponent_info.is.y = msg.message.content.y;
-
-                        // It's a livestream connection
-                        else
-                        {
-                            if (self.left && msg.message.content.player_id == self.left.player.id)
-                                self.left.y = msg.message.content.y;
-                            else if (self.right && msg.message.content.player_id == self.right.player.id)
-                                self.right.y = msg.message.content.y;
-                        }
-                    }
-
-                    // A client leave
-                    else if (msg.message.message == "client_quit")
-                    {
-                        self.disconnect_values = JSON.parse(msg.message.content);
-                        console.log("Message : ", msg.message);
-                        console.log("Disco value : ", self.disconnect_values);
-                        if (self.disconnect_values.connection_type == "normal")
-                        {
-                            self.state = state_enum["DISCONNECTION"];
-                            self.messageTreatment(self);
-                        }
-                    }
-                }
             }
         };
     },
@@ -729,6 +725,41 @@ export default Backbone.View.extend({
 
         // Cavas elements.
         this.canvas = this.$el[0];
+
+        this.canvas.addEventListener('mousemove', function(evt) {
+                    if (self.state != state_enum["DISCONNECTION"]
+            && self.canvas && self.connection_type != "live")
+            {
+
+            // The canvas rectangle.
+            let rect = self.canvas.getBoundingClientRect();
+
+            // Player info. 
+            var player = self.player_info.is;
+
+            // Set player paddle y at mouse position.
+            player.y = evt.clientY - rect.top - player.height / 2;
+
+            // Avoid the paddle to be outside of the canvas.
+            if (evt.clientY + player.height / 2 + 5 > rect.bottom)
+                player.y = rect.height - player.height - 5;
+            else if (evt.clientY - player.height / 2 - 5 < rect.top)
+                player.y = 5;
+
+            // Send to other client the paddle position.
+            _.throttle(self.ftsocket.sendMessage({
+                action: "to_broadcast",
+                infos: {
+                    sender: player.player.id,
+                    message: "update_y",
+                    content: {
+                        player_id: player.player.id,
+                        y: player.y
+                }}}, false, false)
+            , 40);
+            }
+        });
+
 		this.context = this.canvas.getContext("2d");
 
         var left_player;

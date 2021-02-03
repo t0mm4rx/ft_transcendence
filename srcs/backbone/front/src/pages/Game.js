@@ -49,7 +49,7 @@ export default Backbone.View.extend({
 		'end_game' : function(event, info)
 		{
 			// Get actual informations about the game
-			fetch(`http://localhost:3000/api/game_rooms/` + info.game_id, {
+			fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + info.game_id, {
 				headers: {
 					'Content-Type': 'application/json',
 					'Accept': 'application/json',
@@ -60,7 +60,7 @@ export default Backbone.View.extend({
 			.then(searchResult => {
 
 				// Update game data on backend part
-				fetch(`http://localhost:3000/api/game_rooms/` + info.game_id,{
+				fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + info.game_id,{
 					method: 'PATCH',
 					headers: {
 						'Content-Type': 'application/json',
@@ -96,7 +96,18 @@ export default Backbone.View.extend({
 	{
 		panel.html(`
 			<div id="game-canvas-div">
-				<canvas id="game-canvas" width="600" height="400"></canvas>
+				<div class="top-part">
+				<div class="top-text" id="left-player">
+					<h3>` + self.gameinfos.player.name + `</h3>
+				</div>
+				<div class="top-text" id="vs">
+					<h3>vs</h3>
+				</div>
+				<div class="top-text" id="right-player">
+					<h3>` + self.gameinfos.opponent.name + `</h3>
+				</div>
+			</div>
+			<canvas id="game-canvas" width="600" height="400"></canvas>
 			</div>
 		`);
 		
@@ -117,11 +128,11 @@ export default Backbone.View.extend({
 	gameFound: function(panel, self)
 	{
 		panel.html(`
-			<h1>Oppenent found !</h1>
-			<h3>` 
-			+ self.gameinfos.player.name
-			+ ` vs `
-			+ self.gameinfos.opponent.name
+			<div class="panel opponent-found">
+				<h1 class="panel-header">Oppenent found !</h1>
+				<h3 class="panel-header">` + self.gameinfos.player.name
+				+ ` vs ` + self.gameinfos.opponent.name +`</h3>
+			</div>`
 		);
 
 		// Wait 3 secondes to "start", for the show.
@@ -144,7 +155,7 @@ export default Backbone.View.extend({
 				clearTimeout(show);
 
 				// Get actual informations about the game
-				fetch(`http://localhost:3000/api/game_rooms/` + self.gameinfos.id, {
+				fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + self.gameinfos.id, {
 					headers: {
 						'Content-Type': 'application/json',
 						'Accept': 'application/json',
@@ -155,7 +166,7 @@ export default Backbone.View.extend({
 				.then(searchResult => {
 
 					// Update game data on backend part
-					fetch(`http://localhost:3000/api/game_rooms/` + self.gameinfos.id,{
+					fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + self.gameinfos.id,{
 						method: 'PATCH',
 						headers: {
 							'Content-Type': 'application/json',
@@ -281,7 +292,7 @@ export default Backbone.View.extend({
 	{
 		// /!\ To change to be the actual url
 		// Ask the backend to create the "game_room".
-		fetch(`http://localhost:3000/api/game_rooms`,{
+		fetch(`http://` + window.location.hostname + `:3000/api/game_rooms`,{
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -339,7 +350,7 @@ export default Backbone.View.extend({
 		self.gameinfos.opponent = opponent_infos;
 
 		// Update game data on backend part
-		fetch(`http://localhost:3000/api/game_rooms/` + self.gameinfos.id,{
+		fetch(`http://` + window.location.hostname + `:3000/api/game_rooms/` + self.gameinfos.id,{
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
@@ -347,8 +358,6 @@ export default Backbone.View.extend({
 				'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
 			},
 			body: JSON.stringify({
-				player: JSON.stringify(self.gameinfos.player),
-				opponent: JSON.stringify(self.gameinfos.opponent),
 				status: "active"
 			})
 		});
@@ -418,7 +427,7 @@ export default Backbone.View.extend({
 		var is_disco = true;
 
 		// Request to the backend.
-		await fetch(`http://localhost:3000/api/game/is_disconnected`, {
+		await fetch(`http://` + window.location.hostname + `:3000/api/game/is_disconnected`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -542,8 +551,14 @@ export default Backbone.View.extend({
 		var self = this.self;
 		const panel = $("#game-panel");
 		
+		panel.css("width", 'initial');
+		panel.css("height", 'initial');
+		panel.css("text_align", 'initial');
+
 		panel.html(`
-			<h1>Searching for opponent...</h1>
+			<div class="panel">
+				<h1 class="panel-header">Searching for opponent...</h1>
+			</div>
 		`);
 
 		var disco = await this.isDisconnected(self);
@@ -558,7 +573,7 @@ export default Backbone.View.extend({
 		} 
 
 		// Ask backend to get a game that doesn't have opponend.
-		fetch(`http://localhost:3000/api/game/match_no_opponent`, {
+		fetch(`http://` + window.location.hostname + `:3000/api/game/match_no_opponent`, {
 			headers: {
 				'Content-Type': 'application/json',
 				'Accept': 'application/json',

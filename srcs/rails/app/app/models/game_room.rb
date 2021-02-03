@@ -8,7 +8,7 @@ class GameRoom < ApplicationRecord
 	after_initialize :set_defaults
 
 	def game_over?
-		player_score >= 11 || opponent_score >= 11
+		status == "ended" || player_score >= 11 || opponent_score >= 11
 	end
 
 	def winner
@@ -78,7 +78,8 @@ class GameRoom < ApplicationRecord
     def set_defaults
 		self.player_score ||= 0
 		self.opponent_score ||= 0
-		self.number_player ||= opponent ? 2 : 1
+		# self.number_player ||= opponent ? 2 : 1
+		self.number_player ||= 0
 	end
 
 	def set_winner_and_loser

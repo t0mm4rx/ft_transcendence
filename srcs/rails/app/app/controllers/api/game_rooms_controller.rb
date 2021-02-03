@@ -55,6 +55,12 @@ module Api
             render json: game_room
         end
 
+        def update_status
+            game_room = GameRoom.find(params[:id])
+            game_room.update_attribute(:status, params[:status])
+            render json: game_room
+        end
+
         def update_score
             game_room = GameRoom.find(params[:id])
             game_room.update_attribute(:player_score, params[:player_score])
