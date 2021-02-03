@@ -18,6 +18,7 @@ import Livestream from "./pages/Livestream";
 import Guild from "./pages/Guild";
 import Admin from "./pages/Admin";
 import toasts from "./utils/toasts";
+import SearchBar from "./views/SearchBar";
 
 export default Backbone.Router.extend({
   routes: {
@@ -224,6 +225,9 @@ export default Backbone.Router.extend({
     if (!window.chatPanelView) {
       window.chatPanelView = new Chat({ collection: window.chat });
       window.chatPanelView.render();
+    }
+    if (!window.searchBar) {
+      window.searchBar = new SearchBar();
     }
   },
   hideLayout: function () {

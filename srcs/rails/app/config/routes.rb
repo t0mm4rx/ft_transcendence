@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       resources :friends, controller: 'friendships', only: :index
     end
     get '/users/:id/games', to: 'users#games'
+    get 'search', to: 'search#search'
 
     resources :friends, controller: 'friendships', only: [:create, :update, :destroy]
 
