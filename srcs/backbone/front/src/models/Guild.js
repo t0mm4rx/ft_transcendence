@@ -3,10 +3,25 @@ import Backbone from 'backbone';
 import toasts from '../utils/toasts';
 import $ from 'jquery';
 
-const Guild = Backbone.Model.extend({});
+const Guild = Backbone.Model.extend({
+	declareWar: function (options) {
+		$.ajax({
+			url: 'http://localhost:3000/api/wars/send_request',
+			type: 'POST',
+			data: `target_id=${this.get('id')}`,
+			success: (res) => {
+				console.log(res);
+			},
+			error: () => {
+				toasts.notifyError('Unable to send the war request.');
+			}
+		});
+	}
+});
 
 const Guilds = Backbone.Collection.extend({
 	url: 'http://localhost:3000/api/guilds/',
+	model: Guild,
 	save: function (name, anagram) {
 		$.ajax({
 			url: 'http://localhost:3000/api/guilds/',

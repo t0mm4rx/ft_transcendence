@@ -13,6 +13,7 @@
 @import './guilds-page.scss';
 @import './admin.scss';
 @import './tournaments.scss';
+@import './flatpickr.scss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
 html,
@@ -302,6 +303,7 @@ input[type="datetime-local"],
 	display: flex;
 	align-items: center;
 	width: 100%;
+	margin: 10px 0;
 
 	>* {
 		flex: 1;
