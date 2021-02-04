@@ -37,10 +37,13 @@ module Api
 			elsif @guild2.isinwar
 				return render json: { error: "One war at a time bro! The other guild are already in war"}, status: :unprocessable_entity
 			end
-			@guild2.war_invites = current_user.guild_id
-			@guild2.save
+			# @guild2.war_invites = current_user.guild_id
+			# @guild2.save
 			@war = War.create(guild1_id: current_user.guild_id, guild2_id: @guild2.id)
 			if @war.save
+				@guild2.war_invites = current_user.guild_id
+				@guild2.war_invite_id = @war.id
+				@guild2.save
 				@war.update(war_params)
 				render json: @war, status: :created
 			else
@@ -60,8 +63,10 @@ module Api
 					guild_inviter = Guild.find_by(id: current_user.guild.war_invites)
 					current_user.guild.isinwar = true
 					current_user.guild.war_invites = 0
+					current_user.guild.war_invite_id = 0
 					guild_inviter.isinwar = true
 					guild_inviter.war_invites = 0
+					guild_inviter.war_invite_id = 0
 					@war.accepted = true
 					if @war.save
 						guild_inviter.present_war_id = @war.id
@@ -82,6 +87,7 @@ module Api
 		def ignore_invitation
 			if current_user.guild && current_user.guild.war_invites != 0
 				current_user.guild.war_invites = 0
+				current_user.guild.war_invite_id = 0
 				current_user.guild.save
 				return render json: current_user.guild
 			else
