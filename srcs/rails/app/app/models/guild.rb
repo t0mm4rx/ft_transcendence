@@ -22,6 +22,7 @@ class Guild < ApplicationRecord
 		self.isinwar ||= false
 		self.war_invites ||= 0
 		self.wt_game_invite ||= 0
+		self.war_invite_id ||= 0
 		self.isinwtgame ||= false
 	end
 end
