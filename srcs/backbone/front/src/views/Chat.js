@@ -15,7 +15,12 @@ export default Backbone.View.extend({
     this.listenTo(this.collection, "block", this.onBlock);
     $(document).on("chat", (_, { chat }) => {
       $("#chat-panel").addClass("chat-panel-open");
-      this.collection.addChannel(chat, "");
+      console.log("ADD CHANNEL ", chat);
+
+      window.chat.fetch({
+        success: () =>
+          setTimeout(() => this.collection.addChannel(chat, ""), 200),
+      });
     });
   },
   el: "#chat-container",
@@ -36,7 +41,7 @@ export default Backbone.View.extend({
     },
     "click .fa-search": function () {
       $("#channel-input").trigger("focus");
-	},
+    },
   },
   render() {
     this.channelViews = [];
