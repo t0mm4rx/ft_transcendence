@@ -7,9 +7,6 @@ class Guild < ApplicationRecord
 	has_many :guild1_wars, class_name: :War, :foreign_key => 'guild1_id', dependent: :destroy
 	has_many :guild2_wars, class_name: :War, :foreign_key => 'guild2_id', dependent: :destroy
 
-	# has_many :g1_wars, :class_name => 'War', :foreign_key => 'guild1_id', dependent: :destroy
-	# has_many :g2_wars, :class_name => 'War', :foreign_key => 'guild2_id', dependent: :destroy
-
 	after_initialize :set_defaults
 
 	def self.check_rights(current_user)

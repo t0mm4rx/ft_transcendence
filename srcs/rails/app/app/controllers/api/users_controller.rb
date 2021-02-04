@@ -6,10 +6,7 @@ module Api
     before_action :validate_rights, only: [:destroy, :update]
 
     def index
-      # users = User.where(online: true).limit(limit).offset(params[:offset])
-      # users = User.limit(limit).offset(params[:offset])
-      users = User.order(ladder_score: :desc).limit(limit).offset(params[:offset])
-      # users = User.order(online: :desc).limit(limit).offset(params[:offset])
+      users = Usr.order(ladder_score: :desc).limit(limit).offset(params[:offset])
       render json: users, each_serializer: FriendSerializer
     end
 
@@ -85,7 +82,7 @@ module Api
         return render json: {}, status: :forbidden
       end
       if params.has_key?(:banned_until) && !current_user.admin
-        return render json: {}, status: :forbidden 
+        return render json: {}, status: :forbidden
       end
     end
 

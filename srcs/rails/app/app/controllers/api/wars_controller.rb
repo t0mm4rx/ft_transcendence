@@ -37,8 +37,6 @@ module Api
 			elsif @guild2.isinwar
 				return render json: { error: "One war at a time bro! The other guild are already in war"}, status: :unprocessable_entity
 			end
-			# @guild2.war_invites = current_user.guild_id
-			# @guild2.save
 			@war = War.create(guild1_id: current_user.guild_id, guild2_id: @guild2.id)
 			if @war.save
 				@guild2.war_invites = current_user.guild_id
