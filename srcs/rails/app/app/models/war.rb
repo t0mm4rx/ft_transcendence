@@ -5,10 +5,11 @@ class War < ApplicationRecord
 	after_initialize :set_defaults
 
 	def self.check_if_war_time(war)
-		if war.wt_start > DateTime.now || war.wt_end < DateTime.now
+		unless war.nil? && if war.wt_start > DateTime.now || war.wt_end < DateTime.now
 			return false
 		else
 			return true
+		end
 		end
 	end
 
