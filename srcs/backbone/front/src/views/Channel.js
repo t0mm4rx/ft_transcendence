@@ -48,13 +48,13 @@ export default Backbone.View.extend({
   },
   events: {
     "click #edit-channel": "editChannel",
-	"click #leave-channel": "leaveChannel",
-	'click #chat-title': function () {
-		this.getUserProfile();
-	},
-	'click #chat-avatar': function () {
-		this.getUserProfile();
-	}
+    "click #leave-channel": "leaveChannel",
+    "click #chat-title": function () {
+      this.getUserProfile();
+    },
+    "click #chat-avatar": function () {
+      this.getUserProfile();
+    },
   },
   render() {
     this.messagesLength = this.collection.length;
@@ -184,7 +184,25 @@ export default Backbone.View.extend({
     const input = $(".chat-input").val();
     if (input == "") return;
     $(".chat-input").val("");
-    this.collection.sendMessage(input);
+    const message = this.splitLongMessage(input);
+    this.collection.sendMessage(message);
+  },
+  splitLongMessage(string) {
+    const length = 29;
+    const whiteSpace = string.search(/\s/);
+    console.log(string, whiteSpace);
+
+    if (whiteSpace > length || (string.length > length && whiteSpace == -1)) {
+      string =
+        string.substring(0, length) +
+        "-" +
+        this.splitLongMessage(string.substring(length));
+    } else if (whiteSpace > 0) {
+      string =
+        string.substring(0, whiteSpace + 1) +
+        this.splitLongMessage(string.substring(whiteSpace + 1));
+    }
+    return string;
   },
   onScroll() {
     if ($("#chat-messages").scrollTop() == 0) {

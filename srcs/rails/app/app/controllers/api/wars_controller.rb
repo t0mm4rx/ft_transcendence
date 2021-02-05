@@ -37,10 +37,12 @@ module Api
 			elsif @guild2.isinwar
 				return render json: { error: "One war at a time bro! The other guild are already in war"}, status: :unprocessable_entity
 			end
-			@guild2.war_invites = current_user.guild_id
-			@guild2.save
+
 			@war = War.create(guild1_id: current_user.guild_id, guild2_id: @guild2.id)
 			if @war.save
+				@guild2.war_invites = current_user.guild_id
+				@guild2.war_invite_id = @war.id
+				@guild2.save
 				@war.update(war_params)
 				render json: @war, status: :created
 			else
@@ -60,8 +62,10 @@ module Api
 					guild_inviter = Guild.find_by(id: current_user.guild.war_invites)
 					current_user.guild.isinwar = true
 					current_user.guild.war_invites = 0
+					current_user.guild.war_invite_id = 0
 					guild_inviter.isinwar = true
 					guild_inviter.war_invites = 0
+					guild_inviter.war_invite_id = 0
 					@war.accepted = true
 					if @war.save
 						guild_inviter.present_war_id = @war.id
@@ -82,6 +86,7 @@ module Api
 		def ignore_invitation
 			if current_user.guild && current_user.guild.war_invites != 0
 				current_user.guild.war_invites = 0
+				current_user.guild.war_invite_id = 0
 				current_user.guild.save
 				return render json: current_user.guild
 			else
@@ -115,7 +120,7 @@ module Api
 				return render json: { error: "Your guild is already in a war time game bro!"}, status: :unprocessable_entity
 			else #add a condition where the inviter have to stay online until the time to answer, otherwise he loose?
 				opponent = User.find_by(id: current_user.guild.wt_game_invite)
-				game_room = GameRoom.create(player: current_user.id, opponent: opponent.id, status: "notstarted", number_player: 2, game_type: "war_time")
+				game_room = GameRoom.create(player: current_user, opponent: opponent, status: "notstarted", number_player: 2, game_type: "war_time")
 				current_user.guild.wt_game_invite = 0
 				current_user.guild.isinwtgame = true
 				opponent.guild.isinwtgame = true
@@ -145,7 +150,7 @@ module Api
 		def set_guilds_update
 			@war = War.find_by(id: params[:id])
 			if @war.nil?
-				return render json: { error: "You have no war"}, status: :unprocessable_entity
+				return render json: { error: "It's not a war id"}, status: :unprocessable_entity
 			end
 			if @war.war_closed == true
 				return render json: { error: "War is closed !"}, status: :unprocessable_entity
