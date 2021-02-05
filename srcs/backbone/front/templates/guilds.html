@@ -70,8 +70,8 @@
 			<i class="fas fa-bomb"></i>
 			<span>War zone</span>
 		</div>
-		<div>
-			<p>Currently in a war... More infos here</p>
+		<div id="current-war-wrapper">
+			<p>Currently in war against <%= window.currentUser.get('guild').present_war_id %></p>
 		</div>
 		<% } %>
 	</div>

@@ -23,9 +23,14 @@ const loadGuilds = () => {
     window.guilds.fetch();
 };
 
+const loadWars = () => {
+	if (window.wars.status !== 200 && !!Cookies.get("user"))
+		window.wars.fetch();
+};
+
 const logout = () => {
   Cookies.remove("user");
   window.location.reload();
 };
 
-export { loadCurrentUser, loadUsers, loadGuilds, logout };
+export { loadCurrentUser, loadUsers, loadGuilds, logout, loadWars };
