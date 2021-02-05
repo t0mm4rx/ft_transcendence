@@ -62,9 +62,9 @@ const Guilds = Backbone.Collection.extend({
 			}
 		});
 	},
-	acceptWar: function (id) {
+	acceptWar: function () {
 		$.ajax({
-			url: `http://${window.location.hostname}:3000/api/wars/${10}/accept_invitation`,
+			url: `http://${window.location.hostname}:3000/api/wars/${window.currentUser.get('guild').war_invite_id}/accept_invitation`,
 			type: 'POST',
 			success: () => {
 				toasts.notifySuccess('The war has been declared!');

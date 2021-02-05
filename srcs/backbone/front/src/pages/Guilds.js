@@ -42,7 +42,7 @@ export default Backbone.View.extend({
 	render: function () {
 		this.$el.html(_.template(template)({
 			isInGuild: !!window.currentUser.get('guild'),
-			isInWar: !!window.currentUser.get('guild') && !!window.currentUser.get('guild').isinwar
+			isInWar: !!window.currentUser.get('guild') && !!window.currentUser.get('guild').isinwar,
 		}));
 		this.renderGuildsList();
 		if (document.querySelector("#war-start-date")) {
