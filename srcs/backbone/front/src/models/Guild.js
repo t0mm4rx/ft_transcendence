@@ -4,13 +4,26 @@ import toasts from '../utils/toasts';
 import $ from 'jquery';
 
 const Guild = Backbone.Model.extend({
-	declareWar: function (options) {
+	declareWar: function (options, success) {
 		$.ajax({
 			url: `http://${window.location.hostname}:3000/api/wars/send_request`,
 			type: 'POST',
 			data: `target_id=${this.get('id')}`,
 			success: (res) => {
-				console.log(res);
+				toasts.notifySuccess(`Successfully sent a war request to ${this.get('name')}.`);
+				const warId = res.id;
+				$.ajax({
+					url: `http://${window.location.hostname}:3000/api/wars/${warId}`,
+					type: 'PUT',
+					data: Object.keys(options).map(a => `${a}=${options[a]}`).join("&"),
+					success: () => {
+						success();
+					},
+					error: () => {
+						success();
+						toasts.notifyError("Unable to update war rules.");
+					}
+				});
 			},
 			error: () => {
 				toasts.notifyError('Unable to send the war request.');
@@ -21,7 +34,7 @@ const Guild = Backbone.Model.extend({
 
 const Guilds = Backbone.Collection.extend({
 	url: 'http://' + window.location.hostname + ':3000/api/guilds/',
-	mode: Guild,
+	model: Guild,
 	save: function (name, anagram) {
 		$.ajax({
 			url: 'http://' + window.location.hostname + ':3000/api/guilds/',
@@ -51,7 +64,7 @@ const Guilds = Backbone.Collection.extend({
 	},
 	acceptWar: function () {
 		$.ajax({
-			url: `http://${window.location.hostname}:3000/api/wars/accept_invitation`,
+			url: `http://${window.location.hostname}:3000/api/wars/${window.currentUser.get('guild').war_invite_id}/accept_invitation`,
 			type: 'POST',
 			success: () => {
 				toasts.notifySuccess('The war has been declared!');

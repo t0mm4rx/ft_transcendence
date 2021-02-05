@@ -15,10 +15,11 @@ import { Chat } from "./models/Chat";
 import { Tournaments, PermanentTournament } from "./models/Tournaments";
 import $ from "jquery";
 import Cookies from "js-cookie";
-import { loadCurrentUser, loadUsers, loadGuilds } from "./utils/globals";
+import { loadCurrentUser, loadUsers, loadGuilds, loadWars } from "./utils/globals";
 import { Guilds } from "./models/Guild";
 import { FtSocket } from './models/FtSocket'
 import toasts from "./utils/toasts";
+import { Wars } from "./models/War";
 
 // Temp game server
 // import express from 'express';
@@ -53,6 +54,10 @@ loadUsers();
 // Guilds
 window.guilds = new Guilds();
 loadGuilds();
+
+// Wars
+window.wars = new Wars();
+loadWars();
 
 window.liveGames = new GameCollection();
 window.liveGames.add(

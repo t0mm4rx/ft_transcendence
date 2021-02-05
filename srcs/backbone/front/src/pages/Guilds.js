@@ -42,7 +42,7 @@ export default Backbone.View.extend({
 	render: function () {
 		this.$el.html(_.template(template)({
 			isInGuild: !!window.currentUser.get('guild'),
-			isInWar: !!window.currentUser.get('guild') && !!window.currentUser.get('guild').isinwar
+			isInWar: !!window.currentUser.get('guild') && !!window.currentUser.get('guild').isinwar,
 		}));
 		this.renderGuildsList();
 		if (document.querySelector("#war-start-date")) {
@@ -138,6 +138,22 @@ export default Backbone.View.extend({
 			toasts.notifyError("Dates cannot be empty.");
 			return;
 		}
-		guilds.models.find(a => a.get('anagram') === opponent).declareWar();
+		console.log(guilds.models.find(a => a.get('anagram') === opponent));
+		guilds.models.find(a => a.get('anagram') === opponent).declareWar({
+			'start_date': start,
+			'end_date': end,
+			'wt_start': wtStart,
+			'wt_end': wtEnd,
+			'wt_max_unanswers': max,
+			'prize': stake,
+		}, () => {
+			document.querySelector("#anagram-input").value = "";
+			document.querySelector("#stake-input").value = "";
+			document.querySelector("#max-input").value = "";
+			document.querySelector("#war-start-date").value = "";
+			document.querySelector("#war-end-date").value = "";
+			document.querySelector("#war-time-start").value = "";
+			document.querySelector("#war-time-end").value = "";
+		});
 	}
 });
