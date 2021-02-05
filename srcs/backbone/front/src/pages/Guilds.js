@@ -38,11 +38,31 @@ export default Backbone.View.extend({
 	initialize: function () {
 		this.listenTo(window.guilds, 'add', this.renderGuildsList);
 		this.listenTo(window.currentUser, 'change', this.render);
+		this.listenTo(window.wars, 'add', this.render);
 	},
 	render: function () {
+
+		let war = null;
+		let guild1 = null;
+		let guild2 = null;
+
+		const isInWar = !!window.currentUser.get('guild') && !!window.currentUser.get('guild').isinwar;
+
+		if (isInWar) {
+			war = window.wars.where('id', window.currentUser.get('guild').present_war_id);
+			if (war) {
+				console.log(war);
+				guild1 = window.guilds.find(a => a.get('id') === war.get('guild1_id'));
+				guild2 = window.guilds.find(a => a.get('id') === war.get('guild2_id'));
+			}
+		}
+
 		this.$el.html(_.template(template)({
 			isInGuild: !!window.currentUser.get('guild'),
-			isInWar: !!window.currentUser.get('guild') && !!window.currentUser.get('guild').isinwar,
+			isInWar: isInWar,
+			war: war,
+			guild1: guild1,
+			guild2: guild2,
 		}));
 		this.renderGuildsList();
 		if (document.querySelector("#war-start-date")) {
