@@ -6,7 +6,7 @@ module Api
     before_action :validate_rights, only: [:destroy, :update]
 
     def index
-      users = Usr.order(ladder_score: :desc).limit(limit).offset(params[:offset])
+      users = User.order(ladder_score: :desc).limit(limit).offset(params[:offset])
       render json: users, each_serializer: FriendSerializer
     end
 
