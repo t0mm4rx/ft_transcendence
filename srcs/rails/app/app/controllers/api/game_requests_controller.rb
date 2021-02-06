@@ -7,7 +7,9 @@ module Api
         end
 
         def create
+
             request = GameRequest.new(user_id: params[:userid], opponent_id: params[:opponentid], accepted: false)
+
             if request.save
               render json: request, status: :created
             else
@@ -22,13 +24,28 @@ module Api
           end
           gamerequest.update(accepted: true)
           if gamerequest.save
-            render json: gamerequest, status: :created
+            render json: gamerequest
           else
             render json: gamerequest.errors, status: :unprocessable_entity # 422
           end
         end
 
         def destroy
+        end
+
+        def first_no_oppenent
+          gamerequest = GameRequest.where(opponent_id: -1).first
+          render json: gamerequest
+        end
+
+        def change_opponent
+          gamerequest = GameRequest.where(id: params[:id], user_id: params[:userid], opponent_id: -1, accepted: false).first
+          gamerequest.update(opponent_id: params[:opponentid])
+          if gamerequest.save
+            render json: gamerequest
+          else
+            render json: gamerequest.errors, status: :unprocessable_entity # 422
+          end
         end
     end
 end

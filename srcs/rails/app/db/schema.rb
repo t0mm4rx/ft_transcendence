@@ -90,11 +90,11 @@ ActiveRecord::Schema.define(version: 2021_02_03_104923) do
     t.integer "opponent_score"
     t.integer "winner_id"
     t.integer "winner_score"
+    t.string "game_type"
     t.bigint "player_id"
     t.bigint "opponent_id"
     t.boolean "ladder", default: false
     t.bigint "tournament_id"
-    t.string "game_type"
     t.index ["opponent_id"], name: "index_game_rooms_on_opponent_id"
     t.index ["player_id"], name: "index_game_rooms_on_player_id"
     t.index ["tournament_id"], name: "index_game_rooms_on_tournament_id"
@@ -108,6 +108,9 @@ ActiveRecord::Schema.define(version: 2021_02_03_104923) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "war_invites"
     t.boolean "isinwar"
+    t.integer "present_war_id"
+    t.integer "wt_game_invite"
+    t.boolean "isinwtgame"
     t.datetime "wt_date_to_answer"
   end
 
@@ -185,6 +188,7 @@ ActiveRecord::Schema.define(version: 2021_02_03_104923) do
     t.integer "guild2_unanswers"
     t.integer "guild_win"
     t.boolean "war_closed"
+    t.integer "wt_time_to_answer"
   end
 
   add_foreign_key "blocked_users", "users"

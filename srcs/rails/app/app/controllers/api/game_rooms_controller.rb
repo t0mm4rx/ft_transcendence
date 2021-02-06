@@ -35,17 +35,12 @@ module Api
             render json: game_room
         end
 
-        def first_no_oppenent
-            game_room = GameRoom.where(opponent: nil).first
-            render json: game_room
-        end
-
         def is_disconnected
             game_room = GameRoom.where(
-                "opponent_id = ? AND status = ?", params[:player_id], "active").or(GameRoom.where(
-                    "player_id = ? AND status = ?", params[:player], "active")).or(GameRoom.where(
-                        "opponent_id = ? AND status = ?", params[:player], "notstarted")).or(GameRoom.where(
-                            "player_id = ? AND status = ?", params[:player_id], "notstarted"))
+                "opponent_id = ? AND status = ?", params[:user_id], "active").or(GameRoom.where(
+                    "player_id = ? AND status = ?", params[:user_id], "active")).or(GameRoom.where(
+                        "opponent_id = ? AND status = ?", params[:user_id], "notstarted")).or(GameRoom.where(
+                            "player_id = ? AND status = ?", params[:user_id], "notstarted"))
             render json: game_room.first
         end
 

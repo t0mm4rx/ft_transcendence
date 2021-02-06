@@ -41,14 +41,16 @@ export default Backbone.View.extend({
 			console.log("NOTIF USER ID = ", id);
 			const username = elId.split('-')[2];
 			console.log("NOTIF USER NAME = ", username);
+			const req_id = elId.split('-')[3];
+			console.log("REQUEST ID = ", req_id);
 			if (type === 'friend') {
 				const target = new User({id: id, username: username});
-				target.acceptFriend();
+				target.acceptFriend(true);
 			}
 			else if (type === 'game')
 			{
 				const target = new User({id: id, username: username});
-				target.acceptGame();
+				target.acceptGame(req_id);
 			}
 			else if (type === 'war') {
 				window.guilds.acceptWar();
@@ -70,18 +72,21 @@ export default Backbone.View.extend({
 					title: `${user[0].get('username')} sent you a friend request`,
 					type: 'friend',
 					id: user[0].get('id'),
-					name: user[0].get('username')
+					name: user[0].get('username'),
+					req_id: req.id
 				});
 			}
 		});
 		window.currentUser.get('game_pending_requests').forEach(req => {
+			console.log("Req: ", req);
 			const user = window.users.where({id: req.user_id});
 			if (user.length) {
 				this.notifs.push({
 					title: `${user[0].get('username')} sent you a game request`,
 					type: 'game',
 					id: user[0].get('id'),
-					name: user[0].get('username')
+					name: user[0].get('username'),
+					req_id: req.id
 				});
 			}
 		});

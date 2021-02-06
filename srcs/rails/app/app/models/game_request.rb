@@ -1,6 +1,6 @@
 class GameRequest < ApplicationRecord
     belongs_to :user
-    belongs_to :opponent, class_name: :User
+    belongs_to :opponent, class_name: :User, optional: true
 
     def self.exists?(id1, id2)
         case1 = !GameRequest.where(user_id: id1, opponent_id: id2, accepted: false).empty?

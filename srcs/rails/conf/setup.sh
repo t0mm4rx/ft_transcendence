@@ -28,6 +28,8 @@ fi
 # Remove a potentially pre-existing server.pid for Rails.
 rm -f /usr/app/tmp/pids/server.pid
 
+echo -n "HOST : "
+echo "$host"
 echo -n "Wait for database... "
 until PGPASSWORD="ecnednecsnart" psql -h "$host" -d "postgres" -U "railsapp" -c '\q'; do
   >&2 echo "Postgres is unavailable - sleeping"

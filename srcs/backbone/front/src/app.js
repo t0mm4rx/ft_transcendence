@@ -121,8 +121,7 @@ globalSocket.socket.onmessage = function (event) {
       //add if accept or not for game & friend request
       if (msg.message.message == "game_request_reply")
       {
-          toasts.notifySuccess("Game request accepted.")
-          console.log("msg : ", msg.message);
+          toasts.notifySuccess("Start game !");
           window.location.hash = "game_live/" + msg.message.content.gameid;
           return;
       }
