@@ -1,5 +1,5 @@
 class ChannelSerializer < ActiveModel::Serializer
-	attributes :id, :name, :private, :direct, :password, :admin, :owner
+	attributes :id, :name, :private, :direct, :password, :admin, :owner, :channel_users
 	attribute :avatar, if: :is_direct?
 	def owner
 		self.object.channel_users.find_by(user: current_user, owner: true) != nil
@@ -13,7 +13,7 @@ class ChannelSerializer < ActiveModel::Serializer
 		arr[1] === current_user.login ? arr[2] : arr[1]
 	end
 	def avatar
-		users = self.object.users 
+		users = self.object.users
 		users[0] === current_user ? users[1].avatar_url : users[0].avatar_url
 	end
 	def is_direct?
