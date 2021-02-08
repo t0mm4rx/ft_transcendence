@@ -15,10 +15,11 @@ import { Chat } from "./models/Chat";
 import { Tournaments, PermanentTournament } from "./models/Tournaments";
 import $ from "jquery";
 import Cookies from "js-cookie";
-import { loadCurrentUser, loadUsers, loadGuilds } from "./utils/globals";
+import { loadCurrentUser, loadUsers, loadGuilds, loadWars } from "./utils/globals";
 import { Guilds } from "./models/Guild";
 import { FtSocket } from './models/FtSocket'
 import toasts from "./utils/toasts";
+import { Wars } from "./models/War";
 
 // Temp game server
 // import express from 'express';
@@ -42,6 +43,21 @@ $(document).on("token_changed", function () {
 // We create the router, the part of the app which will change the page content according to the URL
 window.router = new Router();
 
+window.onbeforeunload = (e) => {
+    window.router.closeGame();
+    // return 'plop';
+};
+
+
+// window.addEventListener('close', function (e) { 
+//   window.router.closeGame(window.currentView);
+//   e.preventDefault(); 
+//   e.returnValue = ''; 
+// });
+// Backbone.Events.once('windowClosed', window.router.closeGame());
+
+// window.addEventListener('beforeunload', window.router.closeGame());
+
 // The current user
 window.currentUser = new User({ id: "me" });
 loadCurrentUser();
@@ -53,6 +69,10 @@ loadUsers();
 // Guilds
 window.guilds = new Guilds();
 loadGuilds();
+
+// Wars
+window.wars = new Wars();
+loadWars();
 
 window.liveGames = new GameCollection();
 window.liveGames.add(
@@ -154,6 +174,8 @@ globalSocket.sendMessage(
 );
 
 console.log(window.currentUser);
+
+window.globalSocket = globalSocket;
 
 export default globalSocket;
 

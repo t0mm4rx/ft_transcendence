@@ -5,10 +5,11 @@ class War < ApplicationRecord
 	after_initialize :set_defaults
 
 	def self.check_if_war_time(war)
-		if war.wt_start > DateTime.now || war.wt_end < DateTime.now
+		unless war.nil? && if war.wt_start > DateTime.now || war.wt_end < DateTime.now
 			return false
 		else
 			return true
+		end
 		end
 	end
 
@@ -81,11 +82,13 @@ class War < ApplicationRecord
 	end
 
 	def set_defaults
+
 		self.add_count_all ||= false
 		self.guild1_score ||= 0
 		self.guild2_score ||= 0
 		self.guild1_unanswers ||= 0
 		self.guild2_unanswers ||= 0
 		self.war_closed ||= false
+		self.accepted ||= false
 	end
 end

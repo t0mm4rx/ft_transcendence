@@ -41,6 +41,26 @@
 				<span>Max unanswered games</span>
 				<input type="number" placeholder="Leave empty for no limit" id="max-input" min="1"/>
 			</div>
+			<div class="input-row">
+				<div class="input-wrapper">
+					<span>Start date</span>
+					<input type="text" placeholder="War start date" id="war-start-date"/>
+				</div>
+				<div class="input-wrapper">
+					<span>End date</span>
+					<input type="text" placeholder="War end date" id="war-end-date"/>
+				</div>
+			</div>
+			<div class="input-row">
+				<div class="input-wrapper">
+					<span>War time start</span>
+					<input type="text" placeholder="War time start" id="war-time-start"/>
+				</div>
+				<div class="input-wrapper">
+					<span>War time end</span>
+					<input type="text" placeholder="War time end" id="war-time-end"/>
+				</div>
+			</div>
 			<div class="button">
 				<span id="guild-war-button">Declare war</span>
 			</div>
@@ -50,8 +70,15 @@
 			<i class="fas fa-bomb"></i>
 			<span>War zone</span>
 		</div>
-		<div>
-			<p>Currently in a war... More infos here</p>
+		<div id="current-war-wrapper">
+			<p><%= !!guild1 ? guild1.get('name') : "..." %> <b><%= !!war ? war.get('guild1_score') : "" %></b> - <b><%= !!war ? war.get('guild2_score') : "" %></b> <%= !!guild2 ? guild2.get('name') : "..." %></p>
+			<p>In war from <%= !!war ? new Date(war.get('start_date')).toLocaleDateString("en-FR") : "..." %> to <%= !!war ? new Date(war.get('end_date')).toLocaleDateString("en-FR") : "..." %>.</p>
+			<p>War time from <%= !!war ? new Date(war.get('wt_start')).toLocaleDateString("en-FR") : "..." %> to <%= !!war ? new Date(war.get('wt_end')).toLocaleDateString("en-FR") : "..." %>.</p>
+			<p><b><%= !!war && war.get('prize') %></b> points to win.</p>
+			<% if (!!war && war.get('wt_max_unanswers') >= 0) { %>
+			<p><b><%= war.get('wt_max_unanswers') - war.get('guild1_unanswers') %></b> unanswered games left for <%= guild1.get('name') %>.</p>
+			<p><b><%= war.get('wt_max_unanswers') - war.get('guild2_unanswers') %></b> unanswered games left for <%= guild2.get('name') %>.</p>
+			<% } %>
 		</div>
 		<% } %>
 	</div>

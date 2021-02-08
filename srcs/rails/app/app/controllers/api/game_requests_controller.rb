@@ -30,9 +30,6 @@ module Api
           end
         end
 
-        def destroy
-        end
-
         def first_no_oppenent
           gamerequest = GameRequest.where(opponent_id: -1).first
           render json: gamerequest
@@ -46,6 +43,11 @@ module Api
           else
             render json: gamerequest.errors, status: :unprocessable_entity # 422
           end
+        end
+
+        def destroy_empty_requests
+          gamerequests = GameRequest.where(user_id: params[:userid], opponent_id: -1, accepted: false);
+          GameRequest.destroy(gamerequests.map(&:id))
         end
     end
 end

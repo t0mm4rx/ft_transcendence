@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       resources :friends, controller: 'friendships', only: :index
     end
     get '/users/:id/games', to: 'users#games'
+    get 'search', to: 'search#search'
 
     resources :friends, controller: 'friendships', only: [:create, :update, :destroy]
 
@@ -36,7 +37,7 @@ Rails.application.routes.draw do
     resources :wars, only: [:index, :update, :create]
       post '/wars/send_request', to: 'wars#send_request'
       post '/wars/ignore_invitation', to: 'wars#ignore_invitation'
-      post '/wars/accept_invitation', to: 'wars#accept_invitation'
+      post '/wars/:id/accept_invitation', to: 'wars#accept_invitation'
       post '/wars/:id/wt_game_invite', to: 'wars#wt_game_invite'
       post '/wars/:id/wt_game_accept', to: 'wars#wt_game_accept'
 
@@ -54,6 +55,7 @@ Rails.application.routes.draw do
     resources :game_requests, only: [:index, :create, :update]
     get '/game/match_no_opponent', to: 'game_requests#first_no_oppenent'
     post '/game/:id/change_opponent', to: 'game_requests#change_opponent'
+    post '/game/:userid/destroy_empty_requests', to: 'game_requests#destroy_empty_requests'
 end
 
   mount ActionCable.server => '/cable'

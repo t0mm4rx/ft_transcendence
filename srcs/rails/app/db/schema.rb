@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_03_104923) do
+ActiveRecord::Schema.define(version: 2021_02_04_154011) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(version: 2021_02_03_104923) do
     t.integer "wt_game_invite"
     t.boolean "isinwtgame"
     t.datetime "wt_date_to_answer"
+    t.integer "war_invite_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -189,6 +190,7 @@ ActiveRecord::Schema.define(version: 2021_02_03_104923) do
     t.integer "guild_win"
     t.boolean "war_closed"
     t.integer "wt_time_to_answer"
+    t.boolean "accepted"
   end
 
   add_foreign_key "blocked_users", "users"

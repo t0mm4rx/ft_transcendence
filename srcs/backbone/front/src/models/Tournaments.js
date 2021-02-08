@@ -44,7 +44,6 @@ const Tournament = Backbone.Model.extend({
   },
   register() {
     console.log("REGISTER");
-
     $.ajax({
       url: this.url() + "/register",
       type: "POST",

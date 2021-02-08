@@ -154,7 +154,7 @@ const User = Backbone.Model.extend({
     $.ajax({
       url: `http://` + window.location.hostname + `:3000/api/game_requests/`,
       type: "POST",
-      data: `userid=${window.currentUser.id}&opponentid=${this.get("id")}`,
+      data: `userid=${window.currentUser.get("id")}&opponentid=${this.get("id")}`,
       success: () => {
 
         globalSocket.sendMessage({

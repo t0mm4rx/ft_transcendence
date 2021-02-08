@@ -37,4 +37,10 @@
 			width: 100%;
 		}
 	}
+	#current-war-wrapper {
+		padding: 20px;
+		> p:nth-child(1) {
+			text-align: center;
+		}
+	}
 }

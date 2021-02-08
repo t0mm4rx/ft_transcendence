@@ -12,6 +12,7 @@ export default Backbone.View.extend({
     {
       this.listenTo(window.currentUser, 'change', this.render);
       this.game = new Game();
+      this.plop = "mej";
     },
 
     events: {

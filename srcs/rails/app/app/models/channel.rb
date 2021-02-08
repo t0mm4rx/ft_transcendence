@@ -13,12 +13,23 @@ class Channel < ApplicationRecord
 	end
 
 	after_initialize :set_defaults
+	validate :unique_dm, :on => :create
 
 	def admins
 		users.where(admin: true)
 	end
 
 	private
+
+	def unique_dm
+		if direct == true
+			arr = name.split(':')
+			flipped_name = "#{arr[0]}:#{arr[2]}:#{arr[1]}"
+			if Channel.find_by(name: flipped_name) 
+				errors.add(:name, "channel already exists")
+			end
+		end
+	end
 
     def set_defaults
 		self.direct ||= false

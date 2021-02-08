@@ -18,6 +18,8 @@ import Livestream from "./pages/Livestream";
 import Guild from "./pages/Guild";
 import Admin from "./pages/Admin";
 import toasts from "./utils/toasts";
+import SearchBar from "./views/SearchBar";
+import { Router } from "./models/Router";
 
 export default Backbone.Router.extend({
   routes: {
@@ -52,6 +54,7 @@ export default Backbone.Router.extend({
     ":whatever/": "notFound",
   },
   home: function () {
+    this.closeGame();
     this.checkLogged();
     this.showLayout();
     if (window.currentView) {
@@ -63,6 +66,7 @@ export default Backbone.Router.extend({
     window.currentView.render();
   },
   user: function (id) {
+    this.closeGame();
     this.checkLogged();
     this.showLayout();
     console.log("Here");
@@ -77,6 +81,7 @@ export default Backbone.Router.extend({
     window.currentView.render();
   },
   guilds: function () {
+    this.closeGame();
     this.checkLogged();
     this.showLayout();
     if (window.currentView) {
@@ -88,6 +93,7 @@ export default Backbone.Router.extend({
     window.currentView.render();
   },
   game: function () {
+    this.closeGame();
     this.checkLogged();
     this.showLayout();
     if (window.currentView) {
@@ -99,6 +105,7 @@ export default Backbone.Router.extend({
     window.currentView.render();
   },
   game_live: function () {
+    this.closeGame();
     this.checkLogged();
     this.showLayout();
     if (window.currentView) {
@@ -110,6 +117,7 @@ export default Backbone.Router.extend({
     window.currentView.render();
   },
   livestream: function () {
+    this.closeGame();
     this.checkLogged();
     this.showLayout();
     if (window.currentView) {
@@ -121,6 +129,7 @@ export default Backbone.Router.extend({
     window.currentView.render();
   },
   tournaments: function (id) {
+    this.closeGame();
     this.checkLogged();
     this.showLayout();
     if (window.currentView) {
@@ -135,6 +144,7 @@ export default Backbone.Router.extend({
     });
   },
   guild: function (id) {
+    this.closeGame();
     this.checkLogged();
     this.showLayout();
     if (window.currentView) {
@@ -146,6 +156,7 @@ export default Backbone.Router.extend({
     window.currentView.render();
   },
   test: function () {
+    this.closeGame();
     this.checkLogged();
     this.showLayout();
     if (window.currentView) {
@@ -157,6 +168,7 @@ export default Backbone.Router.extend({
     window.currentView.render();
   },
   admin: function () {
+    this.closeGame();
     this.checkLogged();
     this.showLayout();
     if (!window.currentUser.get("admin")) {
@@ -183,6 +195,7 @@ export default Backbone.Router.extend({
       if (window.currentView) {
         window.currentView.undelegateEvents();
         window.currentView.unbind();
+
         window.currentView.stopListening();
       }
       window.currentView = new Auth();
@@ -225,6 +238,9 @@ export default Backbone.Router.extend({
       window.chatPanelView = new Chat({ collection: window.chat });
       window.chatPanelView.render();
     }
+    if (!window.searchBar) {
+      window.searchBar = new SearchBar();
+    }
   },
   hideLayout: function () {
     $("#menu").hide();
@@ -232,4 +248,16 @@ export default Backbone.Router.extend({
       window.location.reload();
     }
   },
+  closeGame: function() {
+    const actual = window.currentView;
+    if (actual && (!!actual.game || !!actual.game_live))
+    {
+      const router = new Router();
+      if (actual.game)
+        router.clearRequests();
+      if (actual.ftsocket)
+        actual.ftsocket.closeConnection();
+      console.log("Page : ", actual);
+    }
+  }
 });

@@ -231,6 +231,7 @@ export default Backbone.View.extend({
 
             // Reset ball position.
             this.resetBall();
+            this.game_model.updateScore(this.game_id, this.left.score, this.right.score + 1);
             
         } // Detect if the ball is after the right player on the canvas.
         else if (this.ball.x + this.ball.radius > this.canvas.width)
@@ -247,6 +248,7 @@ export default Backbone.View.extend({
 
             // Reset ball position.
             this.resetBall();
+            this.game_model.updateScore(this.game_id, this.left.score + 1, this.right.score);
 
         }
 
@@ -506,7 +508,8 @@ export default Backbone.View.extend({
             
             // In game state. gameUpdate() , gameRender().
             case state_enum["INGAME"]:
-                this.gameRender();
+                if (window.currentUser.get('id') == this.left.player.id)
+                    this.gameRender();
                 if (window.currentUser.get('id') == this.left.player.id
                     && this.connection_type != "live")
                         this.gameUpdate();
@@ -572,6 +575,7 @@ export default Backbone.View.extend({
                     else if (msg.message.message == "update_ball")
                     {
                         self.ball = msg.message.content;
+                        self.gameRender();
                         return;
                     }
                 }

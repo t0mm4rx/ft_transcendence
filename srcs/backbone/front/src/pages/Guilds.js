@@ -3,6 +3,8 @@ import Backbone from 'backbone';
 import $ from 'jquery';
 import template from '../../templates/guilds.html';
 import _ from "underscore";
+import flatpickr from "flatpickr";
+import toasts from '../utils/toasts';
 
 export default Backbone.View.extend({
 	el: "#page",
@@ -28,18 +30,77 @@ export default Backbone.View.extend({
 		},
 		"click #guild-create-button": function () {
 			window.guilds.save($("#name-input").val(), $("#anagram-input").val());
+		},
+		"click #guild-war-button": function () {
+			this.declareWar();
 		}
 	},
 	initialize: function () {
 		this.listenTo(window.guilds, 'add', this.renderGuildsList);
 		this.listenTo(window.currentUser, 'change', this.render);
+		this.listenTo(window.wars, 'add', this.render);
 	},
 	render: function () {
+
+		let war = null;
+		let guild1 = null;
+		let guild2 = null;
+
+		const isInWar = !!window.currentUser.get('guild') && !!window.currentUser.get('guild').isinwar;
+
+		if (isInWar) {
+			war = window.wars.where('id', window.currentUser.get('guild').present_war_id);
+			if (war) {
+				console.log(war);
+				guild1 = window.guilds.find(a => a.get('id') === war.get('guild1_id'));
+				guild2 = window.guilds.find(a => a.get('id') === war.get('guild2_id'));
+			}
+		}
+
 		this.$el.html(_.template(template)({
 			isInGuild: !!window.currentUser.get('guild'),
-			isInWar: !!window.currentUser.get('guild') && !!window.currentUser.get('guild').isinwar
+			isInWar: isInWar,
+			war: war,
+			guild1: guild1,
+			guild2: guild2,
 		}));
 		this.renderGuildsList();
+		if (document.querySelector("#war-start-date")) {
+			this.warStart = flatpickr(document.querySelector("#war-start-date"), {
+				onChange: a => {
+					if (this.warEnd)
+						this.warEnd.set('minDate', a[0]);
+					if (this.warTimeStart)
+						this.warTimeStart.set('minDate', a[0]);
+					if (this.warTimeEnd)
+						this.warTimeEnd.set('minDate', a[0]);
+				},
+				minDate: new Date()
+			});
+		}
+		if (document.querySelector("#war-end-date")) {
+			this.warEnd = flatpickr(document.querySelector("#war-end-date"), {
+				onChange: a => {
+					if (this.warTimeStart)
+						this.warTimeStart.set('maxDate', a[0]);
+					if (this.warTimeEnd)
+						this.warTimeEnd.set('maxDate', a[0]);
+				},
+				minDate: new Date()
+			});
+		}
+		if (document.querySelector("#war-time-start")) {
+			this.warTimeStart = flatpickr(document.querySelector("#war-time-start"), {
+				onChange: a => {
+					if (this.warTimeEnd)
+						this.warTimeEnd.set('minDate', a[0]);
+				},
+				minDate: new Date()
+			});
+		}
+		if (document.querySelector("#war-time-end")) {
+			this.warTimeEnd = flatpickr(document.querySelector("#war-time-end"));
+		}
 	},
 	renderGuildsList: function () {
 		const list = $("#guilds-listing");
@@ -73,5 +134,46 @@ export default Backbone.View.extend({
 			anagram += letter;
 		}
 		return anagram;
+	},
+	declareWar: function () {
+		const opponent = document.querySelector("#anagram-input").value;
+		const stake = document.querySelector("#stake-input").value;
+		let max = parseInt(document.querySelector("#max-input").value);
+		const start = document.querySelector("#war-start-date").value;
+		const end = document.querySelector("#war-end-date").value;
+		const wtStart = document.querySelector("#war-time-start").value;
+		const wtEnd = document.querySelector("#war-time-end").value;
+		if (!opponent || !guilds.models.find(a => a.get('anagram') === opponent)) {
+			toasts.notifyError("Opponent's anagram not found.");
+			return;
+		}
+		if (!stake) {
+			toasts.notifyError("Stake cannot be empty.");
+			return;
+		}
+		if (!max) {
+			max = -1;
+		}
+		if (!start || !end || !wtStart || !wtEnd) {
+			toasts.notifyError("Dates cannot be empty.");
+			return;
+		}
+		console.log(guilds.models.find(a => a.get('anagram') === opponent));
+		guilds.models.find(a => a.get('anagram') === opponent).declareWar({
+			'start_date': start,
+			'end_date': end,
+			'wt_start': wtStart,
+			'wt_end': wtEnd,
+			'wt_max_unanswers': max,
+			'prize': stake,
+		}, () => {
+			document.querySelector("#anagram-input").value = "";
+			document.querySelector("#stake-input").value = "";
+			document.querySelector("#max-input").value = "";
+			document.querySelector("#war-start-date").value = "";
+			document.querySelector("#war-end-date").value = "";
+			document.querySelector("#war-time-start").value = "";
+			document.querySelector("#war-time-end").value = "";
+		});
 	}
 });

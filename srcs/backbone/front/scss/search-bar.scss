@@ -1,0 +1,35 @@
+#upper-right-menu {
+	#search-bar {
+		margin-left: 12px;
+		margin-right: 12px;
+	}
+
+	.hidden {
+		display: none;
+	}
+
+	.search-result {
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+
+		h3 {
+			font-size: $m;
+			// color: $grey_light;
+		}
+
+		position: absolute;
+		width: 165px;
+		background-color: $grey_dark_light;
+
+		.search-result-object {
+			display: block;
+			padding: 5px 5px 5px 5px;
+			flex-grow: 1;
+		}
+
+		.search-result-object:hover {
+			background-color: $blue;
+		}
+	}
+}
