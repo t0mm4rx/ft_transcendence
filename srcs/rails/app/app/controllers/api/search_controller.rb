@@ -15,7 +15,7 @@ module Api
 
 		def users
 			users = User.starts_with("login", @prefix) + User.starts_with("username", @prefix) 
-			@users = users.map do |user|
+			@users = users.uniq.map do |user|
 				{
 					id: user.id,
 					name: user.login
@@ -24,7 +24,7 @@ module Api
 		end
 		def guilds
 			guilds = Guild.starts_with("name", @prefix) + Guild.starts_with("anagram", @prefix) 
-			@guilds = guilds.map do |guild|
+			@guilds = guilds.uniq.map do |guild|
 				{
 					id: guild.id,
 					name: guild.anagram
@@ -33,7 +33,7 @@ module Api
 		end
 		def tournaments
 			tournaments = Tournament.starts_with("name", @prefix)
-			@tournaments = tournaments.map do |tournament|
+			@tournaments = tournaments.uniq.map do |tournament|
 				{
 					id: tournament.id,
 					name: tournament.name

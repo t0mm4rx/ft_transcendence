@@ -12,24 +12,32 @@
 		z-index: 1;
 		display: flex;
 		flex-direction: column;
+		padding-bottom: 15px;
+
 
 		h3 {
-			font-size: $m;
-			// color: $grey_light;
+			font-size: $s;
+			color: $grey_accent;
+			margin-left: 10px;
 		}
 
+		top: 80px;
+		right: 60px;
 		position: absolute;
-		width: 165px;
+		width: 250px;
+		// width: 165px;
 		background-color: $grey_dark_light;
 
 		.search-result-object {
 			display: block;
-			padding: 5px 5px 5px 5px;
+			padding: 5px 5px 5px 15px;
 			flex-grow: 1;
 		}
 
 		.search-result-object:hover {
 			background-color: $blue;
 		}
+
+		border-radius: 10px;
 	}
 }

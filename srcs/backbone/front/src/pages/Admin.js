@@ -110,7 +110,12 @@ export default Backbone.View.extend({
         $("#tournament-start-input").val("");
         $("#tournament-title-input").val("");
       },
-      error: (data, state) => toasts.notifyError(state.responseJSON.error),
+      error: (state, date) => {
+        if (state.responseJSON.start_date)
+          toasts.notifyError(state.responseJSON.start_date);
+        else if (state.responseJSON.registration_start)
+          toasts.notifyError(state.responseJSON.registration_start);
+      },
     });
   },
 });

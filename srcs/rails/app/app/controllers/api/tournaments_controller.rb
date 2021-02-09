@@ -23,7 +23,7 @@ class Api::TournamentsController < ApplicationController
 		if @tournament.save
 		  render json: @tournament
 		else
-		  render json: {}, status: :unprocessable_entity
+		  render json: @tournament.errors, status: :unprocessable_entity
 		end
 	end
 	
@@ -34,6 +34,10 @@ class Api::TournamentsController < ApplicationController
 		else
 		  render json: {}, status: :unprocessable_entity
 		end
+	end
+
+	def show
+		render json: @tournament.games
 	end
 	
 	def destroy

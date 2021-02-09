@@ -27,8 +27,9 @@ Rails.application.routes.draw do
       post '/guilds/accept_invitation', to: 'guilds#accept_invitation'
       post '/guilds/delete_member', to: 'guilds#delete_member'
 
-    resources :tournaments, only: [:index, :create, :update, :destroy]
+    resources :tournaments#, only: [:index, :create, :update, :destroy]
     get 'ladder_games', to: 'game_rooms#ladder_games'
+    post 'ladder_games', to: 'game_rooms#create_ladder'
     get 'tournaments/:id/games', to: 'tournaments#games'
     get 'tournaments/:id/users', to: 'tournaments#users'
     post '/tournaments/:id/register', to: 'tournaments#register'
@@ -46,7 +47,7 @@ Rails.application.routes.draw do
     post 'authenticate', to: 'authentication#authenticate'
 
     # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-    resources :game_rooms, only: [:index, :create, :show, :update]
+    resources :game_rooms
     post '/game/is_disconnected', to: 'game_rooms#is_disconnected'
     get '/game/tmp_last_game', to: 'game_rooms#tmp_last_game'
     post '/game/:id/update_score', to: 'game_rooms#update_score'

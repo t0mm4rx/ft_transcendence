@@ -18,6 +18,9 @@ export default Backbone.View.extend({
     events: {
       'click #game-normal' : function() {
         this.findNormal();
+      },
+      'click #game-ranked' : function() {
+        window.currentUser.findLadderGame();
       }
     },
 
