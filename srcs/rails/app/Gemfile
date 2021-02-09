@@ -51,8 +51,7 @@ gem 'rb-readline'
 # Use to calculate elo rating in ladder tournament
 gem 'elo', '~> 0.1.0'
 
-# To automatically call functions on a given time
-gem 'delayed_job_active_record'
+gem 'rufus-scheduler', '~> 3.7'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

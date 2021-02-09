@@ -4,9 +4,19 @@ class Tournament < ApplicationRecord
 
 	after_create :set_start_timer
 
+	# validates :start_date, presence: true
+	# validates :registration_start, presence: true
+	validate :valid_dates, :on => :create
+
 	# register the timer
 	def set_start_timer
-		delay(:run_at => start_date).start_tournament
+		Rufus::Scheduler.singleton.at start_date do
+			start_tournament
+		end
+	end
+
+	def games
+		GameRoom.where(tournament_id: id)
 	end
 
 	def start_tournament
@@ -18,6 +28,7 @@ class Tournament < ApplicationRecord
 	end
 
 	def match_opponents
+		puts "MATCH OPPONENTS CALLED ##################################################"
 		n_games = users.count.odd? ? (users.count + 1) / 2 : users.count / 2
 		@games = []
 		n_games.times do |index|
@@ -25,11 +36,8 @@ class Tournament < ApplicationRecord
 			@games.push(game) if game.save
 			# @games.push({player: users[index], opponent: users[index + n_games], ladder: true })
 		end
-		@file = File.open('TOURNAMENT_START.txt', 'w') do |file|
+		@file = File.open("TOURNAMENT_#{name}.txt", 'w') do |file|
 			file.puts "MATCHING OPPONENT FOR TOURNAMENT with id #{id}"
-			file.p users
-			file.puts "#{@games.count} GAMES CREATED"
-			file.p @games
 		end
 	end
 
@@ -45,6 +53,20 @@ class Tournament < ApplicationRecord
 			winner = tournament_users.find_by(eliminated: false)
 			winner.update_attribute(:title, title) if title
 			update_attribute(:finished, true)
+		end
+	end
+
+	private
+
+	def valid_dates
+		if !registration_start
+			errors.add(:registration_start, "Registration start missing")
+		elsif !start_date
+			errors.add(:start_date, "Start date missing")
+		elsif registration_start > start_date 
+			errors.add(:registration_start, "Registration can't be after start")
+		elsif start_date < DateTime.now
+			errors.add(:start_date, "Start of tournament must be a future date")
 		end
 	end
 end
