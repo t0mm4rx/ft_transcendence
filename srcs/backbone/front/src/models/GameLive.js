@@ -1,8 +1,9 @@
 /* The game model and collection. */
 import Backbone from 'backbone';
-import toast from "../utils/toasts"
 import $ from 'jquery';
 import toasts from "../utils/toasts";
+import Cookies from "js-cookie";
+
 
 const GameLive = Backbone.Model.extend({
     urlRoot: `http://` + window.location.hostname + `:3000/api/game_rooms/`,
@@ -14,7 +15,7 @@ const GameLive = Backbone.Model.extend({
 			headers: {
 				'Content-Type': 'application/json',
 				'Accept': 'application/json',
-				'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+				'Authorization': 'Bearer ' + Cookies.get("user")
 			}
 		})
 		.then(response => response.json())

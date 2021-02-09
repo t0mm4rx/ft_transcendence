@@ -43,6 +43,21 @@ $(document).on("token_changed", function () {
 // We create the router, the part of the app which will change the page content according to the URL
 window.router = new Router();
 
+window.onbeforeunload = (e) => {
+    window.router.closeGame();
+    // return 'plop';
+};
+
+
+// window.addEventListener('close', function (e) { 
+//   window.router.closeGame(window.currentView);
+//   e.preventDefault(); 
+//   e.returnValue = ''; 
+// });
+// Backbone.Events.once('windowClosed', window.router.closeGame());
+
+// window.addEventListener('beforeunload', window.router.closeGame());
+
 // The current user
 window.currentUser = new User({ id: "me" });
 loadCurrentUser();
@@ -126,8 +141,7 @@ globalSocket.socket.onmessage = function (event) {
       //add if accept or not for game & friend request
       if (msg.message.message == "game_request_reply")
       {
-          toasts.notifySuccess("Game request accepted.")
-          console.log("msg : ", msg.message);
+          toasts.notifySuccess("Start game !");
           window.location.hash = "game_live/" + msg.message.content.gameid;
           return;
       }
@@ -160,6 +174,8 @@ globalSocket.sendMessage(
 );
 
 console.log(window.currentUser);
+
+window.globalSocket = globalSocket;
 
 export default globalSocket;
 

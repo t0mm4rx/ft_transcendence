@@ -18,6 +18,9 @@ const FtSocket = Backbone.Model.extend({
         this.cansend = false;
         this.identifier = identifier;
         
+        var opts  = {};
+        opts['sync disconnect on unload'] = false;
+
         // Init a new socket to backend.
         // URL NEED TO BE CHANGED BY THE ACTUAL
         this.socket = new WebSocket("ws://" + window.location.hostname + ":3000/cable");

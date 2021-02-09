@@ -6,6 +6,7 @@ import { showModal } from "../utils/modal";
 import toasts from "../utils/toasts";
 import { ChannelUsers } from "../models/ChannelUsers";
 import EditChat from "./EditChat";
+import { User } from "../models/User";
 
 export default Backbone.View.extend({
   className: "chat-chat",
@@ -55,6 +56,20 @@ export default Backbone.View.extend({
     "click #chat-avatar": function () {
       this.getUserProfile();
     },
+    "click #start-game": function ()
+    {
+      console.log("Model : ", this.model);
+      if (this.model.get("direct") == true)
+      {
+        const channel_users = this.model.get('channel_users');
+        var user;
+        if (channel_users[0].user_id === window.currentUser.get('id'))
+          user = new User({id: channel_users[1].user_id});
+        else
+          user = new User({id: channel_users[0].user_id});
+        user.askGame(true);
+      }
+    }
   },
   render() {
     this.messagesLength = this.collection.length;

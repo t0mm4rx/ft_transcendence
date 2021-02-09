@@ -22,7 +22,7 @@ export default Backbone.View.extend({
 			headers: {
 				'Content-Type': 'application/json',
 				'Accept': 'application/json',
-				'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+				'Authorization': 'Bearer ' + Cookies.get("user")
 			}
 		})
 		.then(response => response.json())
@@ -45,7 +45,7 @@ export default Backbone.View.extend({
 			headers: {
 				'Content-Type': 'application/json',
 				'Accept': 'application/json',
-				'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+				'Authorization': 'Bearer ' + Cookies.get("user")
 			}
 		})
 		.then(response => response.json())

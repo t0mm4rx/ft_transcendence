@@ -47,14 +47,16 @@ Rails.application.routes.draw do
     post 'authenticate', to: 'authentication#authenticate'
 
     # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-    resources :game_rooms#, only: [:index, :create, :show, :update]
-    get '/game/match_no_opponent', to: 'game_rooms#first_no_oppenent'
+    resources :game_rooms
     post '/game/is_disconnected', to: 'game_rooms#is_disconnected'
     get '/game/tmp_last_game', to: 'game_rooms#tmp_last_game'
     post '/game/:id/update_score', to: 'game_rooms#update_score'
     post '/game/:id/update_status', to: 'game_rooms#update_status'
 
     resources :game_requests, only: [:index, :create, :update]
+    get '/game/match_no_opponent', to: 'game_requests#first_no_oppenent'
+    post '/game/:id/change_opponent', to: 'game_requests#change_opponent'
+    post '/game/:userid/destroy_empty_requests', to: 'game_requests#destroy_empty_requests'
 end
 
   mount ActionCable.server => '/cable'

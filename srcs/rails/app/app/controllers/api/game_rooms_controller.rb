@@ -63,17 +63,12 @@ module Api
             end
         end
 
-        def first_no_oppenent
-            game_room = GameRoom.where(opponent: nil).first
-            render json: game_room
-        end
-
         def is_disconnected
             game_room = GameRoom.where(
-                "opponent_id = ? AND status = ?", params[:player_id], "active").or(GameRoom.where(
-                    "player_id = ? AND status = ?", params[:player], "active")).or(GameRoom.where(
-                        "opponent_id = ? AND status = ?", params[:player], "notstarted")).or(GameRoom.where(
-                            "player_id = ? AND status = ?", params[:player_id], "notstarted"))
+                "opponent_id = ? AND status = ?", params[:user_id], "active").or(GameRoom.where(
+                    "player_id = ? AND status = ?", params[:user_id], "active")).or(GameRoom.where(
+                        "opponent_id = ? AND status = ?", params[:user_id], "notstarted")).or(GameRoom.where(
+                            "player_id = ? AND status = ?", params[:user_id], "notstarted"))
             render json: game_room.first
         end
 
@@ -93,7 +88,7 @@ module Api
             game_room = GameRoom.find(params[:id])
             game_room.update_attribute(:player_score, params[:player_score])
             game_room.update_attribute(:opponent_score, params[:opponent_score])
-            if game_room.game_over? && !game_room.winner
+            if game_room.game_over? && game_room.winner
                 game_room.update_attribute(:status, "ended")
                 game_room.update_scores
                 # game_room.update_war_scores(current_user)

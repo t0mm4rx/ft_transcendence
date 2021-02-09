@@ -1,0 +1,22 @@
+Ft_transcendence :
+- [x] Return / goto search game 
+- [x] Readd disconnected from game
+- [x] Better look disconnect
+- [x] Fix reconnect
+- [ ] Colision with the opponent paddle
+- [ ] Finally Fix number player
+- [x] Remove notif in direct game
+- [ ] Multi client (youcantbehere) (Game_live)
+- [ ] ~ game_state player research (search or not or ingame etc)
+- [x] add players score to db
+- [ ] auto win when 10 secondes disconnect
+- [ ] Comment code 
+- [ ] Ball optimisation
+
+BQ :
+- [x] discover page
+- [x] contact page
+- [ ] acceuil
+- [x] login
+- [x] s'enregistrer
+- [ ] user menu

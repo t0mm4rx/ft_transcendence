@@ -6,7 +6,8 @@ class GlobalChannel < ApplicationCable::Channel
   end
 
   def unsubscribed
-    # Any cleanup needed when channel is unsubscribed
+      GlobalChannel.broadcast_to "global_channel", message:"client_quit", content: { "quit" => "plop" }.to_json
+      # Any cleanup needed when channel is unsubscribed
   end
 
   def to_broadcast (data)
