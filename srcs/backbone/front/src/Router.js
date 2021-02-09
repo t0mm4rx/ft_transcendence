@@ -13,13 +13,14 @@ import Chat from "./views/Chat";
 import UserMenu from "./views/UserMenu";
 import Cookies from "js-cookie";
 import $ from "jquery";
-import User from "./pages/User";
+import UserView from "./pages/User";
 import Livestream from "./pages/Livestream";
 import Guild from "./pages/Guild";
 import Admin from "./pages/Admin";
 import toasts from "./utils/toasts";
 import SearchBar from "./views/SearchBar";
 import { Router } from "./models/Router";
+import { User } from "./models/User";
 
 export default Backbone.Router.extend({
   routes: {
@@ -76,9 +77,9 @@ export default Backbone.Router.extend({
       window.currentView.unbind();
       window.currentView.stopListening();
     }
-    console.log("Draw");
-    window.currentView = new User({ login: id });
-    window.currentView.render();
+    const user = new User({ id: id });
+    window.currentView = new UserView({ model: user });
+    user.fetch();
   },
   guilds: function () {
     this.closeGame();
@@ -248,16 +249,13 @@ export default Backbone.Router.extend({
       window.location.reload();
     }
   },
-  closeGame: function() {
+  closeGame: function () {
     const actual = window.currentView;
-    if (actual && (!!actual.game || !!actual.game_live))
-    {
+    if (actual && (!!actual.game || !!actual.game_live)) {
       const router = new Router();
-      if (actual.game)
-        router.clearRequests();
-      if (actual.ftsocket)
-        actual.ftsocket.closeConnection();
+      if (actual.game) router.clearRequests();
+      if (actual.ftsocket) actual.ftsocket.closeConnection();
       console.log("Page : ", actual);
     }
-  }
+  },
 });

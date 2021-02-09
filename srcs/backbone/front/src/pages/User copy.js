@@ -13,20 +13,20 @@ export default Backbone.View.extend({
   events: {
     "click #user-friend-badge": function () {
       showModal(
-        `Are your sure you want to unfriend ${this.model.get("username")} ?`,
+        `Are your sure you want to unfriend ${this.user.get("username")} ?`,
         "",
         () => {
-          this.model.unfriend();
+          this.user.unfriend();
           return true;
         },
         () => {}
       );
     },
     "click #user-add-friend": function () {
-      this.model.askFriend();
+      this.user.askFriend();
     },
     "click #game-request-button": function () {
-      this.model.askGame();
+      this.user.askGame();
     },
     "click .message-button": function (event) {
       $(document).trigger("chat", {
@@ -34,17 +34,17 @@ export default Backbone.View.extend({
       });
     },
     "click #block-button": function (e) {
-      this.model.block();
+      this.user.block();
     },
     "click #unblock-button": function (e) {
-      this.model.unblock();
+      this.user.unblock();
     },
     "click #edit-username": function () {
       showModal(
         `Edit your display name`,
         `<div id="user-modal-edit"><div class="input-wrapper">
 				<span>Display name</span>
-				<input type="text" placeholder="AwesomeBob" id="display-name-input" value="${this.model.get(
+				<input type="text" placeholder="AwesomeBob" id="display-name-input" value="${this.user.get(
           "username"
         )}" />
 			</div></div>`,
@@ -54,10 +54,10 @@ export default Backbone.View.extend({
             toasts.notifyError("The display name cannot be empty.");
             return false;
           }
-          if (value === this.model.get("username")) {
+          if (value === this.user.get("username")) {
             return true;
           }
-          this.model.save("username", value);
+          this.user.save("username", value);
           return true;
         },
         () => {}
@@ -85,40 +85,40 @@ export default Backbone.View.extend({
   },
   initialize: function (options) {
     // this.login = options.login;
-    // this.model = new User();
+    // this.user = new User();
     this.listenTo(window.currentUser, "change", this.fetchUser);
     this.listenTo(window.users, "add", this.fetchUser);
-    this.listenTo(this.model, "change", this.render);
-    this.listenTo(this.model, "sync", this.render);
-    this.games = new UserGames({ id: this.model.id });
+    this.listenTo(this.user, "change", this.render);
+    this.listenTo(this.user, "sync", this.render);
+    this.games = new UserGames({ id: this.user.id });
     this.listenTo(this.games, "sync", this.renderHistoryList);
     this.games.fetch();
     // this.fetchUser();
     loadUsers();
   },
-  // fetchUser: function () {
-  //   this.preview = window.users.models.find(
-  //     (a) => a.get("login") === this.login
-  //   );
-  //   if (this.preview) {
-  //     this.model.set("id", this.preview.id);
-  //     this.model.fetch();
-  //     this.games = new UserGames({ id: this.preview.id });
-  //     this.listenTo(this.games, "sync", this.renderHistoryList);
-  //     this.games.fetch();
-  //   }
-  // },
+  fetchUser: function () {
+    this.preview = window.users.models.find(
+      (a) => a.get("login") === this.login
+    );
+    if (this.preview) {
+      this.user.set("id", this.preview.id);
+      this.user.fetch();
+      this.games = new UserGames({ id: this.preview.id });
+      this.listenTo(this.games, "sync", this.renderHistoryList);
+      this.games.fetch();
+    }
+  },
   render: function () {
-    console.log(this.model.toJSON());
-    this.$el.html(_.template(template)({ data: this.model.toJSON() }));
+    console.log(this.user.toJSON());
+    this.$el.html(_.template(template)({ data: this.user.toJSON() }));
     this.renderFriendsList();
     this.renderHistoryList();
   },
   renderFriendsList: function () {
-    if (!this.model.get("friends")) return;
+    if (!this.user.get("friends")) return;
     const friends = $("#friends-panel-content");
     friends.html("");
-    this.model.get("friends").forEach((friend) => {
+    this.user.get("friends").forEach((friend) => {
       friends.append(
         `<div class="friend-item">
 					<img src="${friend.avatar_url}" onclick="window.location.hash='user/${
@@ -156,7 +156,7 @@ export default Backbone.View.extend({
       if (game.get("player") && game.get("opponent"))
         html += this.gameTemplate({
           game: game,
-          result: game.get("winner_id") == this.model.id ? "win" : "loss",
+          result: game.get("winner_id") == this.user.id ? "win" : "loss",
           game_type: game_type,
         });
     });

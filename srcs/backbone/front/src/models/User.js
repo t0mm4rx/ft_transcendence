@@ -2,7 +2,7 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import toasts from "../utils/toasts";
-import globalSocket from "../app"
+import globalSocket from "../app";
 import Cookies from "js-cookie";
 import { create } from "underscore";
 
@@ -13,7 +13,7 @@ const UserGames = Backbone.Collection.extend({
 });
 
 const User = Backbone.Model.extend({
-  urlRoot: `http://` + window.location.hostname + `:3000/api/users/`,
+  urlRoot: `http://${window.location.hostname}:3000/api/users/`,
   save: function (key, value) {
     $.ajax({
       url:
@@ -192,12 +192,13 @@ const User = Backbone.Model.extend({
         toasts.notifyError(`Could not ban ${this.escape("username")}`),
     });
   },
-  askGame(notif)
-  {
+  askGame(notif) {
     $.ajax({
       url: `http://` + window.location.hostname + `:3000/api/game_requests/`,
       type: "POST",
-      data: `userid=${window.currentUser.get("id")}&opponentid=${this.get("id")}`,
+      data: `userid=${window.currentUser.get("id")}&opponentid=${this.get(
+        "id"
+      )}`,
       success: () => {
         globalSocket.sendMessage(
           {
@@ -217,8 +218,7 @@ const User = Backbone.Model.extend({
           true
         );
 
-        if (notif === true)
-          toasts.notifySuccess("Game Request send.");
+        if (notif === true) toasts.notifySuccess("Game Request send.");
       },
       error: (err) => {
         toasts.notifyError("Cannot send a game request.");
@@ -226,32 +226,33 @@ const User = Backbone.Model.extend({
       },
     });
   },
-  acceptGame(game_request_id)
-  {
+  acceptGame(game_request_id) {
     console.log("This.id = ", this.id);
     console.log("this.get('id')", this.get("id"));
     $.ajax({
-      url: `http://` + window.location.hostname + `:3000/api/game_requests/${game_request_id}`,
+      url:
+        `http://` +
+        window.location.hostname +
+        `:3000/api/game_requests/${game_request_id}`,
       type: "PUT",
       data: `opponentid=${window.currentUser.id}&userid=${this.get("id")}`,
       success: () => {
+        if (this.get("login"))
+          toasts.notifySuccess(`${this.get("login")} game request accepted.`);
+        else toasts.notifySuccess(`Start game!`);
 
-          if (this.get("login"))
-            toasts.notifySuccess(`${this.get("login")} game request accepted.`);
-          else toasts.notifySuccess(`Start game!`);
-
-        fetch(`http://` + window.location.hostname + `:3000/api/game_rooms`,{
-          method: 'POST',
+        fetch(`http://` + window.location.hostname + `:3000/api/game_rooms`, {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + Cookies.get("user")
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: "Bearer " + Cookies.get("user"),
           },
           body: JSON.stringify({
             player_id: window.currentUser.get("id"),
             opponent_id: this.get("id"),
             status: "notstarted",
-            number_player: 0
+            number_player: 0,
           }),
         })
           .then((res) => res.json())

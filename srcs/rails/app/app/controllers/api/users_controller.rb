@@ -20,33 +20,32 @@ module Api
     end
 
     def update
-      user = User.find(params[:id])
       if params.has_key?(:banned_until)
         params[:banned_until] = Time.now + params[:banned_until].to_i * 60
       end
-      if !user
+      if !@user
         return render json: { error: "no such user" }, status: :not_found
       end
-      unless user === current_user || current_user.admin
+      unless @user === current_user || current_user.admin
         return render json: {}, status: :forbidden
       end
-      user.update(user_params_change)
-      if user.save
-        render json: user
+      @user.update(user_params_change)
+      if @user.save
+        render json: @user
       else
         render json: @user.errors, status: :unprocessable_entity # 422
       end
     end
 
     def destroy
-      user = User.find(params[:id])
-      if !user
+      # user = User.find(params[:id])
+      if !@user
         return render json: {}, status: :not_found
       end
-      unless user === current_user || current_user.admin
+      unless @user === current_user || current_user.admin
         return render json: {}, status: :forbidden
       end
-      if user.destroy
+      if @user.destroy
         render json: {}, status: :ok
       elsif
         render json: @user.errors, status: :forbidden
@@ -61,8 +60,7 @@ module Api
     end
 
     def games
-      user = User.find(params[:id])
-      games = user.games.reverse # todo: order by updated_at
+      games = @user.games.reverse # todo: order by updated_at
       render json: games
     end
 
@@ -71,7 +69,10 @@ module Api
     def set_user
       id = params[:id]
       id = current_user.id if id == "me"
-      @user = User.find(id)
+      @user = User.find(id) rescue nil
+      if !@user
+        @user = User.find_by(login: id)
+      end
     end
 
     def validate_rights
