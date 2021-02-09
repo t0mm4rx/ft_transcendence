@@ -3,15 +3,14 @@
     <div id="stream-infos">
         <h2><div class="blinking-live"></div>Livestream</h2>
         <span>Direct game</span>
-        <span>2 watching</span>
         <div id="opponents-container">
-            <div class="opponent" onclick="window.location.hash='user/fake/'">
-                <img src="https://randomuser.me/api/portraits/men/20.jpg" />
+            <div class="opponent" id="player_one_div" onclick="window.location.hash='user/fake/'">
+                <img id="player_one_image" src="https://randomuser.me/api/portraits/men/20.jpg" />
                 <span id="player_one">Player 1</span>
             </div>
             <span>vs.</span>
-            <div class="opponent" onclick="window.location.hash='user/fake/'">
-                <img src="https://randomuser.me/api/portraits/women/13.jpg" />
+            <div class="opponent" id="player_two_div" onclick="window.location.hash='user/fake/'">
+                <img id="player_two_image" src="https://randomuser.me/api/portraits/women/13.jpg" />
                 <span id="player_two">Player 2</span>
             </div>
         </div>

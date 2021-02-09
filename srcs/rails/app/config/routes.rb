@@ -52,6 +52,7 @@ Rails.application.routes.draw do
     get '/game/tmp_last_game', to: 'game_rooms#tmp_last_game'
     post '/game/:id/update_score', to: 'game_rooms#update_score'
     post '/game/:id/update_status', to: 'game_rooms#update_status'
+    get '/game/livestream_games', to: 'game_rooms#livestream_games'
 
     resources :game_requests, only: [:index, :create, :update]
     get '/game/match_no_opponent', to: 'game_requests#first_no_oppenent'

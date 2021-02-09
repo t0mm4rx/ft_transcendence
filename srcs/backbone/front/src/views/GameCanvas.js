@@ -545,14 +545,16 @@ export default Backbone.View.extend({
             {
                 if ((msg.message.message == "update_y"
                     || msg.message.message == "update_ball")
-                    && msg.message.sender == self.player_info.id)
+                    && msg.message.sender == self.player_info.id
+                    && self.connection_type != "live")
                     return;
-                
+
                 else if (self.state != state_enum["DISCONNECTION"]
                     && (msg.message.message == "update_y"
                     || msg.message.message == "update_ball"))
                 {
-                    // console.log("Update data")
+                    if (self.connection_type == "live")
+                        console.log("Update data")
                     // Update opponent paddle position
                     if (msg.message.message == "update_y")
                     {
@@ -583,6 +585,8 @@ export default Backbone.View.extend({
                 // Update state.
                 else if (msg.message.message == "update_state")
                 {
+                    if (self.connection_type == "live")
+                        console.log("BAD (1)");
                     self.state = msg.message.content.state;
                     if (self.state == state_enum["BEGIN"])
                         self.begin_date = new Date();
@@ -590,6 +594,8 @@ export default Backbone.View.extend({
 
                 else if (msg.message.message == "amipresent")
 				{
+                    if (self.connection_type == "live")
+                        console.log("BAD (2)");
 					if (msg.message.sender.id == window.currentUser.get('id')
 						&& msg.message.sender.connection_type != "live"
 						&& msg.message.sender.uuid != self.uuid)
@@ -606,6 +612,8 @@ export default Backbone.View.extend({
                 else if (msg.message.message == "need_infos"
                     && self.connection_type == "normal")
                 {
+                    if (self.connection_type == "live")
+                        console.log("BAD (3)");
                     var left_values = {
                         player: {id: self.left.player.id, name: self.left.player.username},
                         x: self.left.x,
@@ -643,36 +651,11 @@ export default Backbone.View.extend({
                     }}, true, true);
                 }
 
-                else if (self.state != state_enum["DISCONNECTION"])
-                {
-                    
-                    // Update score.
-                    if (msg.message.message == "update_score")
-                    {
-                        if (msg.message.content.side == "left")
-                            self.left.score = msg.message.content.score;
-                        else if (msg.message.content.side == "right")
-                            self.right.score = msg.message.content.score;
-                    }
-
-                    // A client leave
-                    else if (msg.message.message == "client_quit")
-                    {
-                        self.disconnect_values = JSON.parse(msg.message.content);
-                        // console.log("Message : ", msg.message);
-                        // console.log("Disco value : ", self.disconnect_values);
-                        if (self.disconnect_values.connection_type == "normal")
-                        {
-                            self.state = state_enum["DISCONNECTION"];
-                            self.messageTreatment(self);
-                        }
-                    }
-                }
-
                 else if (msg.message.message == "force_infos"
                     && (self.connection_type == "live"
                         || self.state == state_enum["DISCONNECTION"]))
                 {
+                    console.log("FORCE INFOS GETTED");
                     // console.log("MSG RECO = ", msg.message)
                     if (window.currentUser.get('id') == msg.message.content.reply_to.id)
                     {
@@ -730,6 +713,34 @@ export default Backbone.View.extend({
                         }, true);
                     }
                 }
+
+                else if (self.state != state_enum["DISCONNECTION"])
+                {
+                    if (self.connection_type == "live")
+                        console.log("BAD (4)");
+                    // Update score.
+                    if (msg.message.message == "update_score")
+                    {
+                        if (msg.message.content.side == "left")
+                            self.left.score = msg.message.content.score;
+                        else if (msg.message.content.side == "right")
+                            self.right.score = msg.message.content.score;
+                    }
+
+                    // A client leave
+                    else if (msg.message.message == "client_quit")
+                    {
+                        self.disconnect_values = JSON.parse(msg.message.content);
+                        // console.log("Message : ", msg.message);
+                        // console.log("Disco value : ", self.disconnect_values);
+                        if (self.disconnect_values.connection_type == "normal")
+                        {
+                            self.state = state_enum["DISCONNECTION"];
+                            self.messageTreatment(self);
+                        }
+                    }
+                }
+
             }
         };
     },
