@@ -76,6 +76,7 @@ class GameRoom < ApplicationRecord
 	private
 
     def set_defaults
+		self.accepted ||= false
 		self.player_score ||= 0
 		self.opponent_score ||= 0
 		# self.number_player ||= opponent ? 2 : 1

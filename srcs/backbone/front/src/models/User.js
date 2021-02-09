@@ -2,7 +2,7 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import toasts from "../utils/toasts";
-import globalSocket from "../app"
+import globalSocket from "../app";
 import { create } from "underscore";
 
 const UserGames = Backbone.Collection.extend({
@@ -15,7 +15,10 @@ const User = Backbone.Model.extend({
   urlRoot: `http://` + window.location.hostname + `:3000/api/users/`,
   save: function (key, value) {
     $.ajax({
-      url: `http://` + window.location.hostname + `:3000/api/users/${window.currentUser.get("id")}/`,
+      url:
+        `http://` +
+        window.location.hostname +
+        `:3000/api/users/${window.currentUser.get("id")}/`,
       type: "PUT",
       data: `${key}=${value}`,
       success: () => {
@@ -31,12 +34,23 @@ const User = Backbone.Model.extend({
       success: () => {
         this.set("relation_to_user", "request sent");
 
-        globalSocket.sendMessage({
-          action: "to_broadcast",
-          infos: {
-            message: "friend_request",
-            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")} }
-        }}, false, true);
+        globalSocket.sendMessage(
+          {
+            action: "to_broadcast",
+            infos: {
+              message: "friend_request",
+              content: {
+                request_to: this.get("id"),
+                from: {
+                  id: window.currentUser.get("id"),
+                  login: window.currentUser.get("login"),
+                },
+              },
+            },
+          },
+          false,
+          true
+        );
 
         toasts.notifySuccess("Friend request sent.");
       },
@@ -48,7 +62,10 @@ const User = Backbone.Model.extend({
   },
   unfriend: function () {
     $.ajax({
-      url: `http://` + window.location.hostname + `:3000/api/friends/${this.get("id")}/`,
+      url:
+        `http://` +
+        window.location.hostname +
+        `:3000/api/friends/${this.get("id")}/`,
       type: "DELETE",
       success: () => {
         this.set("relation_to_user", null);
@@ -58,12 +75,23 @@ const User = Backbone.Model.extend({
           );
         else toasts.notifySuccess(`You're not friends anymore.`);
 
-        globalSocket.sendMessage({
-          action: "to_broadcast",
-          infos: {
-            message: "unfriend_request",
-            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")}}
-        }}, false, true);
+        globalSocket.sendMessage(
+          {
+            action: "to_broadcast",
+            infos: {
+              message: "unfriend_request",
+              content: {
+                request_to: this.get("id"),
+                from: {
+                  id: window.currentUser.get("id"),
+                  login: window.currentUser.get("login"),
+                },
+              },
+            },
+          },
+          false,
+          true
+        );
 
         window.currentUser.fetch();
       },
@@ -74,7 +102,10 @@ const User = Backbone.Model.extend({
   },
   acceptFriend: function () {
     $.ajax({
-      url: `http://` + window.location.hostname + `:3000/api/friends/${this.get("id")}`,
+      url:
+        `http://` +
+        window.location.hostname +
+        `:3000/api/friends/${this.get("id")}`,
       type: "PUT",
       success: () => {
         this.set("relation_to_user", "friends");
@@ -82,12 +113,23 @@ const User = Backbone.Model.extend({
           toasts.notifySuccess(`${this.get("login")} is now your friend.`);
         else toasts.notifySuccess(`You have a new friend!`);
 
-        globalSocket.sendMessage({
-          action: "to_broadcast",
-          infos: {
-            message: "friend_request_reply",
-            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")}}
-        }}, false, true);
+        globalSocket.sendMessage(
+          {
+            action: "to_broadcast",
+            infos: {
+              message: "friend_request_reply",
+              content: {
+                request_to: this.get("id"),
+                from: {
+                  id: window.currentUser.get("id"),
+                  login: window.currentUser.get("login"),
+                },
+              },
+            },
+          },
+          false,
+          true
+        );
 
         window.currentUser.fetch();
       },
@@ -122,7 +164,8 @@ const User = Backbone.Model.extend({
   unblock() {
     console.log(this);
     $.ajax({
-      url: `http://`+ window.location.hostname + `:3000/api/blocked/${this.id}`,
+      url:
+        `http://` + window.location.hostname + `:3000/api/blocked/${this.id}`,
       type: "DELETE",
       success: () => {
         toasts.notifySuccess(`You just unblocked ${this.get("username")}`);
@@ -148,20 +191,29 @@ const User = Backbone.Model.extend({
         toasts.notifyError(`Could not ban ${this.escape("username")}`),
     });
   },
-  askGame()
-  {
+  askGame() {
     $.ajax({
       url: `http://` + window.location.hostname + `:3000/api/game_requests/`,
       type: "POST",
       data: `userid=${window.currentUser.id}&opponentid=${this.get("id")}`,
       success: () => {
-
-        globalSocket.sendMessage({
-          action: "to_broadcast",
-          infos: {
-            message: "game_request",
-            content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")}}
-        }}, false, true);
+        globalSocket.sendMessage(
+          {
+            action: "to_broadcast",
+            infos: {
+              message: "game_request",
+              content: {
+                request_to: this.get("id"),
+                from: {
+                  id: window.currentUser.get("id"),
+                  login: window.currentUser.get("login"),
+                },
+              },
+            },
+          },
+          false,
+          true
+        );
 
         toasts.notifySuccess("Game Request send.");
       },
@@ -171,10 +223,9 @@ const User = Backbone.Model.extend({
       },
     });
   },
-  acceptGame()
-  {
+  acceptGame() {
     $.ajax({
-      url: `http://` + window.location.hostname + `:3000/api/game_requests/${this.id}`,
+      url: `http://${window.location.hostname}:3000/api/game_requests/${this.id}`,
       type: "PUT",
       data: `opponentid=${window.currentUser.id}&userid=${this.get("id")}`,
       success: () => {
@@ -183,39 +234,50 @@ const User = Backbone.Model.extend({
         else toasts.notifySuccess(`You accept game request!`);
 
         console.log("This : ", this);
-        fetch(`http://` + window.location.hostname + `:3000/api/game_rooms`,{
-          method: 'POST',
+        fetch(`http://` + window.location.hostname + `:3000/api/game_rooms`, {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE'
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2MTIzODU0OTZ9.dAqdnhASc-Ozc89CqvB0kksQ3BJx37fvVEZwiSKYgLE",
           },
           body: JSON.stringify({
-            player_id: window.currentUser.get('id'),
-            opponent_id: this.get('id'),
+            player_id: window.currentUser.get("id"),
+            opponent_id: this.get("id"),
             status: "notstarted",
-            number_player: 0
-          })
+            number_player: 0,
+          }),
         })
-        .then(res => res.json())
-        .then(createResult => {
-          
-          //tmp
-          if (createResult == null)
-          {
-            toasts.notifyError("Error during game creation.");
-            return ;
-          }
+          .then((res) => res.json())
+          .then((createResult) => {
+            //tmp
+            if (createResult == null) {
+              toasts.notifyError("Error during game creation.");
+              return;
+            }
 
-          globalSocket.sendMessage({
-            action: "to_broadcast",
-            infos: {
-              message: "game_request_reply",
-              content: { request_to: this.get("id"), from : { id : window.currentUser.get("id"), login : window.currentUser.get("login")}, gameid: createResult.id}
-          }}, false, true);
-          
-          window.location.hash = "game_live/" + createResult.id;
-        });
+            globalSocket.sendMessage(
+              {
+                action: "to_broadcast",
+                infos: {
+                  message: "game_request_reply",
+                  content: {
+                    request_to: this.get("id"),
+                    from: {
+                      id: window.currentUser.get("id"),
+                      login: window.currentUser.get("login"),
+                    },
+                    gameid: createResult.id,
+                  },
+                },
+              },
+              false,
+              true
+            );
+
+            window.location.hash = "game_live/" + createResult.id;
+          });
 
         window.currentUser.fetch();
       },
@@ -224,7 +286,81 @@ const User = Backbone.Model.extend({
         toasts.notifyError("An error occured.");
       },
     });
-  }
+  },
+  findLadderGame() {
+    console.log("FIND LADDER");
+
+    $.ajax({
+      url: `http://${window.location.hostname}:3000/api/ladder_games`,
+      type: "POST",
+      success: (data) => {
+        console.log(data);
+        toasts.notifySuccess(
+          `Ladder game request sent to ${data.opponent.login}`
+        );
+      },
+      error: (data) => {
+        console.log("ERROR", data);
+        toasts.notifyError(data.responseJSON.error);
+      },
+    });
+  },
+  acceptLadderGame(id) {
+    console.log("ACCEPT LADDER GAME");
+
+    $.ajax({
+      url: `http://${window.location.hostname}:3000/api/game_rooms/${id}`,
+      type: "PUT",
+      data: { accepted: true, status: "notstarted" },
+      success: (data) => {
+        console.log("ACCEPTED GAME", data);
+        toasts.notifySuccess("Game accepted");
+        if (data == null) {
+          toasts.notifyError("Error during game creation.");
+          return;
+        }
+
+        globalSocket.sendMessage(
+          {
+            action: "to_broadcast",
+            infos: {
+              message: "game_request_reply",
+              content: {
+                request_to: id,
+                from: {
+                  id: window.currentUser.get("id"),
+                  login: window.currentUser.get("login"),
+                },
+                gameid: data.id,
+              },
+            },
+          },
+          false,
+          true
+        );
+
+        window.location.hash = "game_live/" + data.id;
+      },
+      error: (data) => {
+        console.log("ERROR", data);
+        toasts.notifyError(data.responseJSON.error);
+      },
+    });
+  },
+  declineLadderGame(id) {
+    $.ajax({
+      url: `http://${window.location.hostname}:3000/api/game_rooms/${id}`,
+      type: "DELETE",
+      success: (data) => {
+        console.log("DENIED GAME");
+        toasts.notifySuccess("Game denied");
+      },
+      error: (data) => {
+        console.log("ERROR", data);
+        toasts.notifyError(data.responseJSON.error);
+      },
+    });
+  },
 });
 
 const Users = Backbone.Collection.extend({

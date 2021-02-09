@@ -13,6 +13,7 @@ class User < ApplicationRecord
 	has_many :messages, dependent: :destroy
 
 	has_many :game_pending_requests, -> {where accepted: false}, class_name: 'GameRequest', foreign_key: "opponent_id"
+	has_many :pending_games, -> {where accepted: false}, class_name: 'GameRoom', foreign_key: "opponent_id"
 	has_many :game_player, class_name: 'GameRoom', foreign_key: "player_id", dependent: :destroy
 	has_many :game_opponent, class_name: 'GameRoom', foreign_key: "opponent_id", dependent: :destroy
 
@@ -33,6 +34,12 @@ class User < ApplicationRecord
 		# GameRoom.where("player_id = ? OR opponent_id = ?", id, id)
 		game_player + game_opponent
 	end
+
+	# def pending_games
+	# 	# games.where(accepted: false)
+	# 	# GameRoom.where(accepted: nil).update_all(accepted: false)
+	# 	# GameRoom.where(accepted: false, opponent_id: id) + GameRoom.where(accepted: false, player_id: id) 
+	# end
 
 	def friendships
 		Friendship.where("user_id = ? OR friend_id = ?", id, id)
@@ -101,7 +108,8 @@ class User < ApplicationRecord
 	end
 
 	def find_higher_ranked_user
-		User.where("online = true AND ladder_score > ?", ladder_score).order(ladder_score: :asc).first
+		# User.where("online = true AND ladder_score > ?", ladder_score).order(ladder_score: :asc).first
+		User.where("id != ? AND ladder_score >= ?", id, ladder_score).order(ladder_score: :asc).first
 	end
 
 	private
