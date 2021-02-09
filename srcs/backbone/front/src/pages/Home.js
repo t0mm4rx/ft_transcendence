@@ -2,6 +2,7 @@
 import Backbone from 'backbone';
 import $ from 'jquery';
 import template from '../../templates/home.html'
+import { Livestream } from '../models/Livestream'
 
 export default Backbone.View.extend({
 	el: "#page",
@@ -16,18 +17,32 @@ export default Backbone.View.extend({
 		this.renderFriendsList();
 		this.listenTo(window.currentUser, 'change', this.renderFriendsList);
 	},
-	renderGameList: function () {
+	renderGameList: async function () {
 		const games = $("#live-game-list");
 		games.html("");
-		window.liveGames.forEach(game => {
+		const to_stream = await new Livestream().gamestostream();
+		console.log('To stream : ', to_stream);
+
+		if (to_stream !== null)
+		{
 			games.append(
 				`<div class="game-item">
-					<span><b>${game.attributes.player1}</b> vs. <b>${game.attributes.player2}</b></span>
-					<span>${game.attributes.type}</span>
-					<a class="button-icon button-icon-accent" onclick="window.location.hash='livestream/42/'"><i class="fas fa-tv"></i></a>
+					<span><b>${to_stream.player.username}</b> vs. <b>${to_stream.opponent.username}</b></span>
+					<span>${to_stream.game_type}</span>
+					<a class="button-icon button-icon-accent" onclick="window.location.hash='livestream/${to_stream.id}/'"><i class="fas fa-tv"></i></a>
 				</div>`
 			);
-		});
+		}
+
+		// window.liveGames.forEach(game => {
+		// 	games.append(
+		// 		`<div class="game-item">
+		// 			<span><b>${game.attributes.player1}</b> vs. <b>${game.attributes.player2}</b></span>
+		// 			<span>${game.attributes.type}</span>
+		// 			<a class="button-icon button-icon-accent" onclick="window.location.hash='livestream/42/'"><i class="fas fa-tv"></i></a>
+		// 		</div>`
+		// 	);
+		// });
 	},
 	renderFriendsList: function () {
 		if (!window.currentUser.get('friends'))

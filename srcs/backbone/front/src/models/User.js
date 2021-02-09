@@ -251,7 +251,7 @@ const User = Backbone.Model.extend({
             player_id: window.currentUser.get("id"),
             opponent_id: this.get("id"),
             status: "notstarted",
-            number_player: 0,
+            number_player: 0
           }),
         })
           .then((res) => res.json())

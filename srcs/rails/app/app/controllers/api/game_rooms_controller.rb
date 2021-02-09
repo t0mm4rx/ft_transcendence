@@ -101,6 +101,11 @@ module Api
             render json: @games
         end
 
+        def livestream_games
+            gameroom_normal = GameRoom.where(status: "active").first;
+            render json: gameroom_normal
+        end
+
         private
 
         # Set GameRoom param
@@ -118,9 +123,5 @@ module Api
           #  params.require(:game_room).permit(:player, :opponent, :status, :number_player)
             params.permit(:opponent_id, :status, :number_player, :accepted)
         end
-
-        # def check_wt_game
-        #     if war_time
-        # end
     end
 end
