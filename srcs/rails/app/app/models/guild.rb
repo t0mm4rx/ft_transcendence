@@ -1,6 +1,6 @@
 class Guild < ApplicationRecord
-	validates :name, presence: true, length: { minimum:2, maximum: 30}, uniqueness: { case_sensitive: false }
-	validates :anagram, presence: true, length: { minimum:2, maximum: 5}, uniqueness: { case_sensitive: false }
+	validates :name, presence: true, length: { minimum:2, maximum: 30}, uniqueness: { case_sensitive: false }, format: {with: /\A[^`@;\$%\^*+]+\z/}
+	validates :anagram, presence: true, length: { minimum:2, maximum: 5}, uniqueness: { case_sensitive: false }, format: {with: /\A[a-zA-Z0-9]+\z/}
 
 	has_many :users, class_name: :User, dependent: :nullify
 

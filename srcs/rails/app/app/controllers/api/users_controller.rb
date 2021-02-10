@@ -68,6 +68,7 @@ module Api
 
     def set_user
       id = params[:id]
+      return if id.match(/\A[a-zA-Z0-9 ]*\z/).nil?
       id = current_user.id if id == "me"
       @user = User.find(id) rescue nil
       if !@user

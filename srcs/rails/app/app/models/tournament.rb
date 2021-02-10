@@ -6,6 +6,7 @@ class Tournament < ApplicationRecord
 
 	# validates :start_date, presence: true
 	# validates :registration_start, presence: true
+	validates :name, presence: true, length: { minimum:2, maximum: 30}, format: {with: /\A[^`@;\$%\^*+]+\z/}
 	validate :valid_dates, :on => :create
 
 	# register the timer

@@ -6,11 +6,16 @@ module Api
 		before_action :tournaments
 
 		def search 
+			return {} if @prefix.empty?
 			render json: {users: @users, guilds: @guilds, tournaments: @tournaments}
 		end
 
 		def set_prefix
 			@prefix = params[:input]
+			if @prefix.length > 10 || @prefix.match(/\A[a-zA-Z0-9 ]*\z/).nil?
+				puts "bad input!"
+				@prefix = ""
+			end
 		end
 
 		def users
