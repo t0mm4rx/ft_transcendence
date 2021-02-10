@@ -2,7 +2,7 @@
 import Backbone from 'backbone';
 import $ from 'jquery';
 import template from '../../templates/guild.html';
-import {getGuildMembers} from '../models/Guild';
+import {Guild, getGuildMembers} from '../models/Guild';
 import _ from 'underscore';
 import {showModal} from '../utils/modal';
 
@@ -11,8 +11,11 @@ export default Backbone.View.extend({
 	initialize: function (options) {
 		this.listenTo(window.users, 'add', this.render);
 		this.listenTo(window.users, 'change', this.render);
+		this.listenTo(window.guilds, 'add', this.render);
+		this.listenTo(window.guilds, 'change', this.render);
 		this.listenTo(window.currentUser, 'change', this.render);
 		this.anagram = options.anagram;
+
 	},
 	events: {
 		'click .message-button': function (event) {
@@ -25,10 +28,22 @@ export default Backbone.View.extend({
 			, () => {
 				return true;
 			}, () => true);
+		},
+		'click #join_guild': function()
+		{
+			this.guild.join();
 		}
 	},
 	render: function () {
-		this.guild = window.guilds.models.find(a => a.get('anagram') === this.anagram);
+		this.guild = window.guilds.models.find(a =>
+		{
+			if (a.get('anagram') === this.anagram)
+				return (a); 
+		});
+
+		console.log("Anagram : ", this.anagram);
+		console.log("Guilds : ", window.guilds);
+		console.log("Guild : ", this.guild);
 		this.$el.html(_.template(template)({guild: this.guild}));
 		this.renderUsers();
 	},

@@ -107,6 +107,17 @@ module Api
 			end
 		end
 
+		def join
+			if current_user.guild_id
+				return render json: { error: "You already have a guild bro!"}, status: :forbidden
+		  	end
+			@current_user.guild_locked = true
+			@current_user.guild_id = params[:id]
+			@current_user.guild_invites = 0
+			@current_user.save
+			return render json: current_user
+		end
+
 		private
 		# Use callbacks to share common setup or constraints between actions.
 		def set_guild
