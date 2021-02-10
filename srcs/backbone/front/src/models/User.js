@@ -23,7 +23,13 @@ const User = Backbone.Model.extend({
       type: "PUT",
       data: `${key}=${value}`,
       success: () => {
-        window.currentUser.set(key, value);
+        // window.currentUser.set(key, value);
+        console.log("SUCCESSFULLY SAVED");
+
+        this.set(key, value);
+      },
+      error: (data) => {
+        toasts.notifyError("Invalid " + Object.keys(data.responseJSON)[0]);
       },
     });
   },
@@ -52,7 +58,6 @@ const User = Backbone.Model.extend({
           false,
           true
         );
-
         toasts.notifySuccess("Friend request sent.");
       },
       error: (err) => {

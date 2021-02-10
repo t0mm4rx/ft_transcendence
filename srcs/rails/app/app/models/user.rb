@@ -21,9 +21,12 @@ class User < ApplicationRecord
 
 	belongs_to :guild, optional: true
 
-	validates :username, presence: true, length: { minimum:2, maximum: 30}, uniqueness: { case_sensitive: false }
-	validates :login, presence: true, length: { minimum:2, maximum: 30 }, uniqueness: { case_sensitive: false }
-	validates :avatar_url, presence: true, length: { minimum:5, maximum: 255 } # format: { with: ConstantData::VALID_EMAIL_REGEX }
+	validates :username, presence: true, length: { minimum:2, maximum: 30}, uniqueness: { case_sensitive: false }, format: {with: /\A[^`@;#\$%\^&*+=]+\z/}
+	validates :login, presence: true, length: { minimum:2, maximum: 30 }, uniqueness: { case_sensitive: false }#, format: {with: /\A[a-z]+\z/}
+	validates :avatar_url, presence: true, length: { minimum:5, maximum: 255 }#, format: URI::regexp(%w[http https])
+
+	# validates_format_of :username, :with => /\A[^0-9`!@#\$%\^&*+_=]+\z/
+
 
 	validate :first_is_admin, :on => :create
 	# has_many :games, class_name: 'GameRoom'
