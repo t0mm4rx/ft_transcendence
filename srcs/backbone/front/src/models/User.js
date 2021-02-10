@@ -23,7 +23,9 @@ const User = Backbone.Model.extend({
       type: "PUT",
       data: `${key}=${value}`,
       success: () => {
-        window.currentUser.set(key, value);
+        // window.currentUser.set(key, value);
+        console.log("SUCCESSFULLY SAVED");
+
         this.set(key, value);
       },
       error: (data) => {

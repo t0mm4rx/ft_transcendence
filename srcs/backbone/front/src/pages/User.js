@@ -57,7 +57,8 @@ export default Backbone.View.extend({
           if (value === this.model.get("username")) {
             return true;
           }
-          this.model.save("username", value);
+          window.currentUser.save("username", value);
+          this.model.set("username", value);
           return true;
         },
         () => {}
@@ -89,7 +90,7 @@ export default Backbone.View.extend({
               "avatar_url",
               `http://127.0.0.1:8080/assets/user_images/${result.filename}`
             );
-            setTimeout(() => this.render(), 200);
+            this.model.trigger("change");
           })
           .catch((error) => {
             console.error("Error:", error);
@@ -104,35 +105,20 @@ export default Backbone.View.extend({
     },
   },
   initialize: function (options) {
-    // this.login = options.login;
-    // this.model = new User();
-    this.listenTo(window.currentUser, "change", this.model.fetch);
+    this.listenTo(window.currentUser, "change", this.render);
     this.listenTo(window.users, "add", this.fetchUser);
     this.listenTo(this.model, "change", this.render);
     this.listenTo(this.model, "sync", this.render);
     this.games = new UserGames({ id: this.model.id });
     this.listenTo(this.games, "sync", this.renderHistoryList);
-    this.games.fetch();
     // this.fetchUser();
     loadUsers();
   },
-  // fetchUser: function () {
-  //   this.preview = window.users.models.find(
-  //     (a) => a.get("login") === this.login
-  //   );
-  //   if (this.preview) {
-  //     this.model.set("id", this.preview.id);
-  //     this.model.fetch();
-  //     this.games = new UserGames({ id: this.preview.id });
-  //     this.listenTo(this.games, "sync", this.renderHistoryList);
-  //     this.games.fetch();
-  //   }
-  // },
   render: function () {
     console.log("RENDER", this.model.toJSON());
     this.$el.html(_.template(template)({ data: this.model.toJSON() }));
     this.renderFriendsList();
-    this.renderHistoryList();
+    this.games.fetch();
   },
   renderFriendsList: function () {
     if (!this.model.get("friends")) return;
