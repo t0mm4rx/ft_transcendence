@@ -29,6 +29,32 @@ const Guild = Backbone.Model.extend({
 				toasts.notifyError('Unable to send the war request.');
 			}
 		});
+	},
+	join: function ()
+	{
+		$.ajax({
+			url: `http://${window.location.hostname}:3000/api/guilds/${this.get('id')}/join`,
+			type: 'POST',
+			data: `target_id=${this.get('id')}`,
+			success: (res) => {
+				toasts.notifySuccess(this.get('name') + ' joined !');
+			}, error: (err) => {
+				toasts.notifyError(JSON.parse(err.responseText).error);
+			}
+		});
+	},
+	gameWarInvite: function () {
+		$.ajax({
+		url: `http://${window.location.hostname}:3000/api/wars/${window.currentUser.get('guild').present_war_id}/wt_game_invite`,
+		type: 'POST',
+		success: () => {
+			toasts.notifySuccess('Game invite sended');
+			window.currentUser.fetch();
+		},
+		error: (err) => {
+			toasts.notifyError(JSON.parse(err.responseText).error);
+		}
+		});
 	}
 });
 

@@ -5,6 +5,7 @@ import template from '../../templates/guilds.html';
 import _ from "underscore";
 import flatpickr from "flatpickr";
 import toasts from '../utils/toasts';
+import { Guild } from '../models/Guild';
 
 export default Backbone.View.extend({
 	el: "#page",
@@ -33,6 +34,12 @@ export default Backbone.View.extend({
 		},
 		"click #guild-war-button": function () {
 			this.declareWar();
+		},
+		"click #wt_game_invite": function ()
+		{
+			var guild = new Guild(window.currentUser.get('guild'));
+			console.log(guild);
+			guild.gameWarInvite();
 		}
 	},
 	initialize: function () {
@@ -100,6 +107,14 @@ export default Backbone.View.extend({
 		}
 		if (document.querySelector("#war-time-end")) {
 			this.warTimeEnd = flatpickr(document.querySelector("#war-time-end"));
+		}
+
+		if (isInWar)
+		{
+			$('#current-war-wrapper').append(`<button id="wt_game_invite"
+					type="button">
+				Ask game
+			</button>`);
 		}
 	},
 	renderGuildsList: function () {
