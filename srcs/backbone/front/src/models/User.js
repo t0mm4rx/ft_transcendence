@@ -24,6 +24,10 @@ const User = Backbone.Model.extend({
       data: `${key}=${value}`,
       success: () => {
         window.currentUser.set(key, value);
+        this.set(key, value);
+      },
+      error: (data) => {
+        toasts.notifyError("Invalid " + Object.keys(data.responseJSON)[0]);
       },
     });
   },
@@ -52,7 +56,6 @@ const User = Backbone.Model.extend({
           false,
           true
         );
-
         toasts.notifySuccess("Friend request sent.");
       },
       error: (err) => {
