@@ -89,6 +89,7 @@ export default Backbone.View.extend({
               "avatar_url",
               `http://127.0.0.1:8080/assets/user_images/${result.filename}`
             );
+            setTimeout(() => this.render(), 200);
           })
           .catch((error) => {
             console.error("Error:", error);
