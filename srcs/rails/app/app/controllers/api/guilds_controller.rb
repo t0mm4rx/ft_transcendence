@@ -134,7 +134,7 @@ module Api
 		end
 
 		def guild_update_params
-			params.permit(:name, :anagram, :score, :war_invites, :isinwar, :present_war_id, :isinwtgame, :wt_date_to_answer)
+			params.permit(:name, :anagram, :score, :war_invites, :isinwar, :present_war_id, :isinwtgame, :wt_date_to_answer, :wt_game_invite)
 		end
 	end
 end
