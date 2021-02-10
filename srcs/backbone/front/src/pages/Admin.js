@@ -88,7 +88,8 @@ export default Backbone.View.extend({
     const start = $("#tournament-start-input").val();
     const title = $("#tournament-title-input").val();
 
-    console.log("CREATE TOURNAMENT", name, regStart, start);
+    const timeZone = -(new Date().getTimezoneOffset() / 60);
+    console.log("OFFSET", timeZone);
 
     if (name == "" || regStart == "" || start == "") {
       toasts.notifyError("Inputs can't be left blank");
@@ -102,6 +103,7 @@ export default Backbone.View.extend({
         registration_start: regStart,
         start_date: start,
         title: title,
+        timeZone: timeZone,
       },
       success: () => {
         toasts.notifySuccess(`The tournament has been created`);

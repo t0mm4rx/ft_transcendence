@@ -72,8 +72,22 @@ class Api::TournamentsController < ApplicationController
 	private
 
 	def tournament_params
-		params.permit(:name, :registration_start, :start_date, :title)
-		# params.require(:name, :registration_start, :start_date, :end_date).permit(:name, :registration_start, :start_date, :end_date)
+		if set_time_zone
+			params.permit(:name, :registration_start, :start_date, :title)
+		end
+	end
+	def set_time_zone
+		return false if !params.has_key?(:registration_start) || !params.has_key?(:start_date)
+		timezone = params[:timeZone].to_i
+		tz_string = "+"
+		if timezone < 0 
+			tz_string = "-" 
+			timezone = -timezone
+		end
+		tz_string += "0" if timezone < 10 
+		params[:registration_start] = "#{params[:registration_start]} UTC#{tz_string}#{timezone}00"
+		params[:start_date] = "#{params[:start_date]} UTC#{tz_string}#{timezone}00"
+		return true
 	end
 
 	def set_tournament

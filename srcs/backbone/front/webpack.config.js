@@ -24,9 +24,11 @@ module.exports = {
         const fileExtension = mime.extension(req.header("Content-Type"));
         const filename = `${req.header("X-Login")}.${fileExtension}`;
         console.log("FILE NAME:", filename);
-
+        if (!req.body || !req.header("X-Login")) {
+          return res.status(400).send({ error: "No data" });
+        }
         fs.writeFile("./assets/user_images/" + filename, req.body, (err) => {
-          if (err) res.send("Error");
+          if (err) res.status(400).send({ error: "Failed to write to file" });
           else res.send({ filename: filename });
         });
       });

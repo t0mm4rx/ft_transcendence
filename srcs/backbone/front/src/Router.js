@@ -77,7 +77,10 @@ export default Backbone.Router.extend({
       window.currentView.unbind();
       window.currentView.stopListening();
     }
-    const user = new User({ id: id });
+    const user =
+      id == window.currentUser.get("login")
+        ? window.currentUser
+        : new User({ id: id });
     window.currentView = new UserView({ model: user });
     user.fetch();
   },
