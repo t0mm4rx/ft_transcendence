@@ -75,6 +75,10 @@ class War < ApplicationRecord
 		war.guild2.isinwar = false
 		war.guild1.present_war_id = 0
 		war.guild2.present_war_id = 0
+		war.guild2.wt_game_invite = 0
+		war.guild1.wt_game_invite = 0
+		war.guild1.isinwtgame = false
+		war.guild2.isinwtgame = false
 		war.war_closed = true
 		war.save
 		war.guild1.save
@@ -90,5 +94,6 @@ class War < ApplicationRecord
 		self.guild2_unanswers ||= 0
 		self.war_closed ||= false
 		self.accepted ||= false
+		self.wt_time_to_answer ||= 1
 	end
 end
