@@ -29,6 +29,19 @@ const Guild = Backbone.Model.extend({
 				toasts.notifyError('Unable to send the war request.');
 			}
 		});
+	},
+	join: function ()
+	{
+		$.ajax({
+			url: `http://${window.location.hostname}:3000/api/guilds/${this.get('id')}/join`,
+			type: 'POST',
+			data: `target_id=${this.get('id')}`,
+			success: (res) => {
+				toasts.notifySuccess(this.get('name') + ' joined !');
+			}, error: (err) => {
+				toasts.notifyError(JSON.parse(err.responseText).error);
+			}
+		});
 	}
 });
 
