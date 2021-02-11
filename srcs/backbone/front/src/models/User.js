@@ -23,9 +23,6 @@ const User = Backbone.Model.extend({
       type: "PUT",
       data: `${key}=${value}`,
       success: () => {
-        // window.currentUser.set(key, value);
-        console.log("SUCCESSFULLY SAVED");
-
         this.set(key, value);
       },
       error: (data) => {
@@ -337,7 +334,7 @@ const User = Backbone.Model.extend({
             infos: {
               message: "game_request_reply",
               content: {
-                request_to: id,
+                request_to: data.player_id,
                 from: {
                   id: window.currentUser.get("id"),
                   login: window.currentUser.get("login"),

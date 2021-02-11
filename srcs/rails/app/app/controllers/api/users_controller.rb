@@ -94,7 +94,7 @@ module Api
     end
 
     def user_params_change
-      params.permit(:username, :avatar_url, :password, :guild_id, :banned_until)
+      params.permit(:username, :avatar_url, :password, :guild_id, :banned_until, :online)
     end
 
     def limit
