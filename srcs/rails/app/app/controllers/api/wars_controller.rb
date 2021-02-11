@@ -120,7 +120,7 @@ module Api
 				return render json: { error: "Your guild is already in a war time game bro!"}, status: :unprocessable_entity
 			else #add a condition where the inviter have to stay online until the time to answer, otherwise he loose?
 				opponent = User.find_by(id: current_user.guild.wt_game_invite)
-				game_room = GameRoom.create(player: current_user, opponent: opponent, status: "notstarted", number_player: 2, game_type: "war_time")
+				game_room = GameRoom.create(player: current_user, opponent: opponent, status: "notstarted", number_player: 0, game_type: "war_time")
 				current_user.guild.wt_game_invite = 0
 				current_user.guild.isinwtgame = true
 				opponent.guild.isinwtgame = true

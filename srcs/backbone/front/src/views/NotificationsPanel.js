@@ -7,6 +7,7 @@ import { showModal } from "../utils/modal";
 import { User } from "../models/User";
 import _ from "underscore";
 import $ from "jquery";
+import toasts from "../utils/toasts";
 
 export default Backbone.View.extend({
   el: "#notifications-menu",
@@ -57,7 +58,7 @@ export default Backbone.View.extend({
         const war = window.wars.where('id', window.currentUser.get('guild').war_invite_id);
         if (!war)
           return;
-        console.log(war);
+        console.log("War = ", war);
         showModal("War declaration", 
         `<div id="war-notification"><p>Prize: ${war.get('prize')}</p>
         <p>From ${new Date(war.get('start_date')).toLocaleDateString("en-FR")} to ${new Date(war.get('end_date')).toLocaleDateString("en-FR")}</p>
@@ -69,6 +70,9 @@ export default Backbone.View.extend({
         }, () => {
           return true;
         });
+      } else if (type === "war_game")
+      {
+        window.currentUser.acceptWarGame();
       }
     },
   },
@@ -76,7 +80,7 @@ export default Backbone.View.extend({
     this.$el.html(_.template(template_frame)({ model: this.model }));
     this.renderList();
   },
-  renderList: function () {
+  renderList: async function () {
     if (!window.currentUser || !window.currentUser.get("pending_requests")) return;
     this.notifs = [];
     window.currentUser.get("pending_requests").forEach((req) => {
@@ -115,19 +119,36 @@ export default Backbone.View.extend({
         });
       }
     });
-    if (
-      window.currentUser.get("guild") &&
-      window.currentUser.get("guild").war_invites
-    ) {
-      const guild_id = window.currentUser.get("guild").war_invites;
-      const guild = window.guilds.where("id", guild_id);
-      if (!!guild)
-      this.notifs.push({
-        title: `${guild.get("name")} declares war to your guild`,
-        type: "war",
-        id: 0,
-      });
+    if (window.currentUser.get("guild"))
+    { 
+      if (window.currentUser.get("guild").war_invites) {
+        const guild_id = window.currentUser.get("guild").war_invites;
+        const guild = window.guilds.where("id", guild_id);
+        if (!!guild)
+        this.notifs.push({
+          title: `${guild.get("name")} declares war to your guild`,
+          type: "war",
+          id: 0,
+        });
+      }
+      if (window.currentUser.get("guild").wt_game_invite)
+      {
+        var prop = window.users.where({id: window.currentUser.get("guild").wt_game_invite})[0];
+        var self = this;
+        if (prop)
+        {
+          await prop.fetch({success: () => {
+            console.log("Prop : ", `${prop.get('username')} from the ${prop.get('guild').name} guild ask for a game.`)
+              self.notifs.push({
+                title: `${prop.get('username')} from the ${prop.get('guild').name} guild ask for a game.`,
+                type: "war_game",
+                id: 0,
+              });
+          }});
+        }
+      }
     }
+
     if (this.notifs.length <= 0) {
       $("#notification-panel").removeClass("notification-panel-open");
       $("#notification-badge").hide();
