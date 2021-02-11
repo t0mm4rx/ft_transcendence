@@ -3,6 +3,7 @@ the list is for refreshing only the part displaying the notifications and avoid 
 import Backbone from "backbone";
 import template_frame from "../../templates/notification-panel.html";
 import template_list from "../../templates/notification-list.html";
+import { showModal } from "../utils/modal";
 import { User } from "../models/User";
 import _ from "underscore";
 import $ from "jquery";
@@ -12,6 +13,7 @@ export default Backbone.View.extend({
   initialize: function () {
     this.listenTo(window.currentUser, "change", this.renderList);
     this.listenTo(window.users, "add", this.renderList);
+    this.listenTo(window.guilds, "add", this.renderList);
     this.notifs = [];
   },
   events: {
@@ -52,7 +54,21 @@ export default Backbone.View.extend({
       } else if (type === "ladder") {
         window.currentUser.acceptLadderGame(id);
       } else if (type === "war") {
-        window.guilds.acceptWar();
+        const war = window.wars.where('id', window.currentUser.get('guild').war_invite_id);
+        if (!war)
+          return;
+        console.log(war);
+        showModal("War declaration", 
+        `<div id="war-notification"><p>Prize: ${war.get('prize')}</p>
+        <p>From ${new Date(war.get('start_date')).toLocaleDateString("en-FR")} to ${new Date(war.get('end_date')).toLocaleDateString("en-FR")}</p>
+        <p>War time from ${new Date(war.get('wt_start')).toLocaleDateString("en-FR")} to ${new Date(war.get('wt_end')).toLocaleDateString("en-FR")}</p>
+        <p>Max unanswered games: ${war.get('wt_max_unanswers')}</p></div>`
+        , () => {
+          window.guilds.acceptWar();
+          return true;
+        }, () => {
+          return true;
+        });
       }
     },
   },
@@ -61,7 +77,7 @@ export default Backbone.View.extend({
     this.renderList();
   },
   renderList: function () {
-    if (!window.currentUser.get("pending_requests")) return;
+    if (!window.currentUser || !window.currentUser.get("pending_requests")) return;
     this.notifs = [];
     window.currentUser.get("pending_requests").forEach((req) => {
       const user = window.users.where({ id: req.user_id });
@@ -105,6 +121,7 @@ export default Backbone.View.extend({
     ) {
       const guild_id = window.currentUser.get("guild").war_invites;
       const guild = window.guilds.where("id", guild_id);
+      if (!!guild)
       this.notifs.push({
         title: `${guild.get("name")} declares war to your guild`,
         type: "war",

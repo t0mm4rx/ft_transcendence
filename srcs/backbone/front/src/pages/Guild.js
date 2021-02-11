@@ -51,11 +51,11 @@ export default Backbone.View.extend({
 		this.guild = window.guilds.models.find(a => a.get('anagram') === this.anagram);
 		const friends = $("#guild-users-list");
 		friends.html("");
-		console.log(window.users.length);
 		if (!this.guild)
-			return
-		console.log(getGuildMembers(this.guild.id));
-		getGuildMembers(this.guild.id).forEach(friend => {
+			return;
+		console.log("Id: ", this.guild.get("id"));
+		console.log(getGuildMembers(this.guild.get("id")));
+		getGuildMembers(this.guild.get("id")).forEach(friend => {
 			friends.append(
 				`<div class="friend-item">
 					<img src="${friend.get('avatar_url')}" onclick="window.location.hash='user/${friend.get('login')}/'"/>
