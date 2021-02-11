@@ -101,10 +101,14 @@ export default Backbone.View.extend({
     );
   },
   autocomplete() {
+    if (window.users.length === 0) {
+      window.users.fetch({ success: () => this.autocomplete() });
+      return;
+    }
     const query = $("#channel-input").val();
     let result = false;
     $("#autocomplete-container").html("");
-    window.users.forEach((user) => {
+    window.users.each((user) => {
       if (query.length === 0 || user.get("login").indexOf(query) !== -1) {
         $("#autocomplete-container").append(
           `<span class="autocomplete-item">${user.get("login")}</span>`

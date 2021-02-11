@@ -16,7 +16,7 @@ export default Backbone.View.extend({
   render: function (id) {
     this.$el.html(template);
     this.renderTournamentList(id);
-    if (id) this.renderTournament(id);
+    if (id && this.collection.get(id)) this.renderTournament(id);
     else this.renderPermanent();
   },
   renderTournamentList(id) {
