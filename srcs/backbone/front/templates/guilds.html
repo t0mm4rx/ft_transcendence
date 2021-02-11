@@ -79,6 +79,9 @@
 			<p><b><%= war.get('wt_max_unanswers') - war.get('guild1_unanswers') %></b> unanswered games left for <%= guild1.get('name') %>.</p>
 			<p><b><%= war.get('wt_max_unanswers') - war.get('guild2_unanswers') %></b> unanswered games left for <%= guild2.get('name') %>.</p>
 			<% } %>
+			<button class="button" id="wt_game_invite" type="button">
+				Ask game
+			</button>
 		</div>
 		<% } %>
 	</div>

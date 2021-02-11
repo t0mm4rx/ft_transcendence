@@ -108,14 +108,6 @@ export default Backbone.View.extend({
 		if (document.querySelector("#war-time-end")) {
 			this.warTimeEnd = flatpickr(document.querySelector("#war-time-end"));
 		}
-
-		if (isInWar)
-		{
-			$('#current-war-wrapper').append(`<button id="wt_game_invite"
-					type="button">
-				Ask game
-			</button>`);
-		}
 	},
 	renderGuildsList: function () {
 		const list = $("#guilds-listing");
