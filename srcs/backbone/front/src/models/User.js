@@ -369,6 +369,40 @@ const User = Backbone.Model.extend({
       },
     });
   },
+
+  acceptWarGame() {
+    $.ajax({
+      url: `http://${window.location.hostname}:3000/api/wars/${window.currentUser.get('guild').present_war_id}/wt_game_accept`,
+      type: 'POST',
+      success: (data) => {
+        toasts.notifySuccess('Nice game start');
+        
+        globalSocket.sendMessage(
+          {
+            action: "to_broadcast",
+            infos: {
+              message: "game_request_reply",
+              content: {
+                request_to: data.opponent.id,
+                from: {
+                  id: window.currentUser.get("id"),
+                  login: window.currentUser.get("login"),
+                },
+                gameid: data.id,
+              },
+            },
+          },
+          false,
+          true
+        );
+
+        window.location.hash = "game_live/" + data.id;
+      },
+      error: (err) => {
+        toasts.notifyError(JSON.parse(err.responseText).error);
+      }
+      });
+    }
 });
 
 const Users = Backbone.Collection.extend({
