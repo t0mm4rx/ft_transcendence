@@ -56,20 +56,17 @@ export default Backbone.View.extend({
     "click #chat-avatar": function () {
       this.getUserProfile();
     },
-    "click #start-game": function ()
-    {
+    "click #start-game": function () {
       console.log("Model : ", this.model);
-      if (this.model.get("direct") == true)
-      {
-        const channel_users = this.model.get('channel_users');
+      if (this.model.get("direct") == true) {
+        const channel_users = this.model.get("channel_users");
         var user;
-        if (channel_users[0].user_id === window.currentUser.get('id'))
-          user = new User({id: channel_users[1].user_id});
-        else
-          user = new User({id: channel_users[0].user_id});
+        if (channel_users[0].user_id === window.currentUser.get("id"))
+          user = new User({ id: channel_users[1].user_id });
+        else user = new User({ id: channel_users[0].user_id });
         user.askGame(true);
       }
-    }
+    },
   },
   render() {
     this.messagesLength = this.collection.length;
@@ -136,10 +133,9 @@ export default Backbone.View.extend({
     let html = "";
     messages.forEach((message) => {
       const username = message.get("username");
-      const date = new Date(message.get("date")).toLocaleString(
-        "en-US",
-        options
-      );
+      const date = new Date(
+        message.get("date").replace(/-/g, "/")
+      ).toLocaleString("en-US", options);
       html += this.messageTemplate({
         model: message.toJSON(),
         date: date,
@@ -199,25 +195,7 @@ export default Backbone.View.extend({
     const input = $(".chat-input").val();
     if (input == "") return;
     $(".chat-input").val("");
-    const message = this.splitLongMessage(input);
-    this.collection.sendMessage(message);
-  },
-  splitLongMessage(string) {
-    const length = 29;
-    const whiteSpace = string.search(/\s/);
-    console.log(string, whiteSpace);
-
-    if (whiteSpace > length || (string.length > length && whiteSpace == -1)) {
-      string =
-        string.substring(0, length) +
-        "-" +
-        this.splitLongMessage(string.substring(length));
-    } else if (whiteSpace > 0) {
-      string =
-        string.substring(0, whiteSpace + 1) +
-        this.splitLongMessage(string.substring(whiteSpace + 1));
-    }
-    return string;
+    this.collection.sendMessage(input);
   },
   onScroll() {
     if ($("#chat-messages").scrollTop() == 0) {
