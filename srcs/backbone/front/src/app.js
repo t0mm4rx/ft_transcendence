@@ -173,7 +173,7 @@ globalSocket.sendMessage(
   true
 );
 
-console.log(window.currentUser);
+console.log("Current user : ", window.currentUser);
 
 window.globalSocket = globalSocket;
 
