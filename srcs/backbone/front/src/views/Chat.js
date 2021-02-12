@@ -19,7 +19,7 @@ export default Backbone.View.extend({
 
       window.chat.fetch({
         success: () =>
-          setTimeout(() => this.collection.addChannel(chat, ""), 200),
+          setTimeout(() => this.collection ? this.collection.addChannel(chat, "") : null, 200),
       });
     });
   },
@@ -29,7 +29,8 @@ export default Backbone.View.extend({
       $("#chat-panel").removeClass("chat-panel-open");
     },
     "click #chat-icon": function () {
-      this.collection.fetch();
+      if (this.collection)
+        this.collection.fetch();
       $("#chat-panel").addClass("chat-panel-open");
     },
     "keyup #channel-input": "onKeyUp",
