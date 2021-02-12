@@ -362,6 +362,7 @@ const User = Backbone.Model.extend({
       success: (data) => {
         console.log("DENIED GAME");
         toasts.notifySuccess("Game denied");
+		window.currentUser.fetch();
       },
       error: (data) => {
         console.log("ERROR", data);
