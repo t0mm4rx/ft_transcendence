@@ -82,7 +82,8 @@ export default Backbone.View.extend({
 					if (this.warTimeEnd)
 						this.warTimeEnd.set('minDate', a[0]);
 				},
-				minDate: new Date()
+				minDate: new Date(),
+				enableTime: true
 			});
 		}
 		if (document.querySelector("#war-end-date")) {
@@ -93,7 +94,8 @@ export default Backbone.View.extend({
 					if (this.warTimeEnd)
 						this.warTimeEnd.set('maxDate', a[0]);
 				},
-				minDate: new Date()
+				minDate: new Date(),
+				enableTime: true
 			});
 		}
 		if (document.querySelector("#war-time-start")) {
@@ -102,11 +104,12 @@ export default Backbone.View.extend({
 					if (this.warTimeEnd)
 						this.warTimeEnd.set('minDate', a[0]);
 				},
-				minDate: new Date()
+				minDate: new Date(),
+				enableTime: true
 			});
 		}
 		if (document.querySelector("#war-time-end")) {
-			this.warTimeEnd = flatpickr(document.querySelector("#war-time-end"));
+			this.warTimeEnd = flatpickr(document.querySelector("#war-time-end"), {enableTime: true});
 		}
 	},
 	renderGuildsList: function () {
@@ -150,6 +153,7 @@ export default Backbone.View.extend({
 		const end = document.querySelector("#war-end-date").value;
 		const wtStart = document.querySelector("#war-time-start").value;
 		const wtEnd = document.querySelector("#war-time-end").value;
+		const allGamesCount = document.querySelector("#all-games-count").checked;
 		if (!opponent || !guilds.models.find(a => a.get('anagram') === opponent)) {
 			toasts.notifyError("Opponent's anagram not found.");
 			return;
@@ -173,6 +177,7 @@ export default Backbone.View.extend({
 			'wt_end': wtEnd,
 			'wt_max_unanswers': max,
 			'prize': stake,
+			'add_count_all': allGamesCount
 		}, () => {
 			document.querySelector("#anagram-input").value = "";
 			document.querySelector("#stake-input").value = "";
