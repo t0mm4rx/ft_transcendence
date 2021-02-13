@@ -35,6 +35,13 @@ export default Backbone.View.extend({
   },
   showResults() {
     console.log("SHOW RESULTS", this.search, this.search.get("users"));
+    if (
+      this.search.get("users").length === 0 &&
+      this.search.get("guilds").length === 0 &&
+      this.search.get("tournaments").length === 0
+    ) {
+      return;
+    }
     let html =
       this.search.get("users").length > 0
         ? `<h3 class="search-title">USERS</h3>`

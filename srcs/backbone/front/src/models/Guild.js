@@ -72,7 +72,6 @@ const Guilds = Backbone.Collection.extend({
 				window.currentUser.fetch();
 			},
 			error: (error) => {
-				console.log(error);
 				if (error.responseJSON.anagram) {
 					let msg = "The anagram ";
 					msg += error.responseJSON.anagram.join(", ");

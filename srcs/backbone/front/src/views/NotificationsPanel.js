@@ -61,9 +61,10 @@ export default Backbone.View.extend({
         console.log("War = ", war);
         showModal("War declaration", 
         `<div id="war-notification"><p>Prize: ${war.get('prize')}</p>
-        <p>From ${new Date(war.get('start_date')).toLocaleDateString("en-FR")} to ${new Date(war.get('end_date')).toLocaleDateString("en-FR")}</p>
-        <p>War time from ${new Date(war.get('wt_start')).toLocaleDateString("en-FR")} to ${new Date(war.get('wt_end')).toLocaleDateString("en-FR")}</p>
-        <p>Max unanswered games: ${war.get('wt_max_unanswers')}</p></div>`
+        <p>From ${new Date(war.get('start_date')).toLocaleString("en-FR")} to ${new Date(war.get('end_date')).toLocaleString("en-FR")}</p>
+        <p>War time from ${new Date(war.get('wt_start')).toLocaleString("en-FR")} to ${new Date(war.get('wt_end')).toLocaleString("en-FR")}</p>
+        <p>Max unanswered games: ${war.get('wt_max_unanswers')}</p>
+		<p>All games count for the war: ${war.get('add_count_all') ? "yes" : "no"}</p></div>`
         , () => {
           window.guilds.acceptWar();
           return true;
