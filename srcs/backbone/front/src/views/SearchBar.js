@@ -9,6 +9,15 @@ export default Backbone.View.extend({
     `<a href="<%= link %>" class="search-result-object"><%= name %></a>`
   ),
   initialize() {
+    console.log("Init");
+    $("#search-bar").append(`<i class="fas fa-search"></i>
+    <input
+      type="text"
+      class="hidden"
+      placeholder="Search..."
+      id="search-input"
+    />
+    <div class="search-result hidden"></div>`);
     this.search = new SearchResults();
     this.listenTo(this.search, "sync", this.showResults);
     $(".search-result").hide();
