@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_08_201316) do
+ActiveRecord::Schema.define(version: 2021_02_12_170419) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -154,7 +154,6 @@ ActiveRecord::Schema.define(version: 2021_02_08_201316) do
     t.integer "wins"
     t.integer "losses"
     t.boolean "admin"
-    t.boolean "online"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "password_digest"
@@ -169,6 +168,7 @@ ActiveRecord::Schema.define(version: 2021_02_08_201316) do
     t.datetime "banned_until"
     t.integer "ladder_score", default: 1000
     t.string "title"
+    t.string "status"
     t.index ["guild_id"], name: "index_users_on_guild_id"
   end
 

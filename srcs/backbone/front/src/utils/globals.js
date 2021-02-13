@@ -1,7 +1,19 @@
 import Cookies from "js-cookie";
 
 const loadCurrentUser = (
-  success = () => {},
+  success = () => {
+    globalSocket.sendMessage(
+      {
+        action: "to_broadcast",
+        infos: {
+          message: "new_client",
+          content: {},
+        },
+      },
+      false,
+      true
+    );
+  },
   error = (data, state) => {
     console.log(state.responseJSON.error);
   }

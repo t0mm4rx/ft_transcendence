@@ -160,18 +160,9 @@ globalSocket.socket.onmessage = function (event) {
   }
 };
 
-// Send message to everyone
-globalSocket.sendMessage(
-  {
-    action: "to_broadcast",
-    infos: {
-      message: "new_client",
-      content: {},
-    },
-  },
-  false,
-  true
-);
+console.log("Current user id : ", window.currentUser.id);
+
+
 
 console.log("Current user : ", window.currentUser);
 

@@ -380,6 +380,8 @@ const User = Backbone.Model.extend({
       success: (data) => {
         toasts.notifySuccess('Nice game start');
         
+        window.currentUser.fetch();
+        
         globalSocket.sendMessage(
           {
             action: "to_broadcast",
