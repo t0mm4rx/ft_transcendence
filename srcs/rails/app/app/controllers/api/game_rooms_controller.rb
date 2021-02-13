@@ -23,7 +23,9 @@ module Api
 
         def create_ladder
             opponent = current_user.find_higher_ranked_user
-            return render json: {error: "could not find a worthy opponent"}, status: :not_found if !opponent 
+            if !opponent 
+                return render json: {error: "could not find a worthy opponent"}, status: :not_found 
+            end
             game_room = GameRoom.new(opponent: opponent, player: current_user, ladder: true)
             if game_room.save 
                 render json: game_room
