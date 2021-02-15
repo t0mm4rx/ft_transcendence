@@ -50,6 +50,20 @@ export default Backbone.View.extend({
   events: {
     "click #edit-channel": "editChannel",
     "click #leave-channel": "leaveChannel",
+    "click #block-user": function ({ currentTarget }) {
+      const login = $(currentTarget.parentNode).find("#chat-title").html();
+      console.log(login);
+      const user = new User({ id: login });
+      user.fetch({
+        success: () => {
+          if (user.get("blocked") === true) {
+            user.unblock();
+          } else {
+            user.block();
+          }
+        },
+      });
+    },
     "click #chat-title": function () {
       this.getUserProfile();
     },
