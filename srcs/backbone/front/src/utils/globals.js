@@ -1,7 +1,67 @@
 import Cookies from "js-cookie";
+import { FtSocket } from "../models/FtSocket"
+
+const connectGlobalSocket = () => {
+  if ( !window.globalSocket
+    || !window.globalSocket.socket
+    || window.globalSocket.socket.readyState === WebSocket.CLOSED
+    || window.globalSocket.socket.readyState === WebSocket.CLOSING)
+  {
+    // Global socket
+    var globalSocket = new FtSocket({
+      channel: "GlobalChannel",
+      user_id: window.currentUser.get('id')
+    });
+
+    globalSocket.socket.onmessage = function (event) {
+      const event_res = event.data;
+      const msg = JSON.parse(event_res);
+
+      // Ignores pings.
+      if (msg.type === "ping") return;
+
+      if (msg.message) {
+        if (msg.message.message == "new_client") {
+          // Refresh HERE
+          window.currentUser.fetch();
+          console.log("[TMP] New client.");
+        } else if (msg.message.content.request_to == window.currentUser.get("id")) {
+          console.log("(2) MSG : ", msg.message.message);
+          console.log("(2) CONTENT : ", msg.message.content);
+          //add if accept or not for game & friend request
+          if (msg.message.message == "game_request_reply") {
+            toasts.notifySuccess("Start game !");
+            window.location.hash = "game_live/" + msg.message.content.gameid;
+            return;
+          }
+          window.currentUser.fetch();
+          console.log("From : ", msg.message.content.from);
+          if (msg.message.message == "friend_request")
+            toasts.notifySuccess(
+              "Friend request received from " + msg.message.content.from.login
+            );
+          else if (msg.message.message == "game_request")
+            toasts.notifySuccess(
+              "Game request received from " + msg.message.content.from.login
+            );
+          } else if (msg.message.message == "client_quit") {
+            console.log("AAAAAAAAAAAA");
+            window.currentUser.fetch();
+          } else {
+            console.log("MSG : ", msg.message.message);
+            console.log("CONTENT : ", msg.message.content);
+          }
+        }
+      };
+
+      window.globalSocket = globalSocket;
+  }
+}
 
 const loadCurrentUser = (
-  success = () => {},
+  success = () => {
+    connectGlobalSocket();
+  },
   error = (data, state) => {
     console.log(state.responseJSON.error);
   }
@@ -33,4 +93,4 @@ const logout = () => {
   window.location.reload();
 };
 
-export { loadCurrentUser, loadUsers, loadGuilds, logout, loadWars };
+export { connectGlobalSocket, loadCurrentUser, loadUsers, loadGuilds, logout, loadWars };

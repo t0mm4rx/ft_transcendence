@@ -21,7 +21,7 @@ RSpec.describe "Friendships", type: :request do
         "guild"=>nil,
         "id"=>@user2.id,
         "login"=>"magrosje",
-        "online"=>false,
+        "status"=>"offline",
         "username"=>"mathis"}
         ])
     end
@@ -98,7 +98,7 @@ RSpec.describe "Friendships", type: :request do
         "guild"=>nil,
         "id"=>@user2.id, 
         "login"=>"magrosje", 
-        "online"=>false, 
+        "status"=>"offline", 
         "username"=>"mathis"
       },
       {
@@ -106,7 +106,7 @@ RSpec.describe "Friendships", type: :request do
        "guild"=>nil,
        "id"=>@user3.id,
        "login"=>"mabois",
-       "online"=>false,
+       "status"=>"offline",
        "username"=>"mathisss"
        }])
 
@@ -117,7 +117,7 @@ RSpec.describe "Friendships", type: :request do
         "guild"=>nil,
         "id"=>@user1.id,
         "login"=>"frlindh",
-        "online"=>false,
+        "status"=>"offline",
         "username"=>"fredrika"
       }])
     end
