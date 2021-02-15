@@ -112,7 +112,7 @@ class User < ApplicationRecord
 
 	def find_higher_ranked_user
 		# User.where("online = true AND ladder_score > ?", ladder_score).order(ladder_score: :asc).first
-		User.where("online = true AND id != ? AND ladder_score >= ?", id, ladder_score).order(ladder_score: :asc).first
+		User.where("'status' = 'online' AND id != ? AND ladder_score >= ?", id, ladder_score).order(ladder_score: :asc).first
 	end
 
 	private
@@ -126,7 +126,7 @@ class User < ApplicationRecord
 		self.wins ||= 0
 		self.losses ||= 0
 		self.admin ||= false
-		self.online ||= false
+		self.status ||= "offline"
 		self.avatar_url ||= "https://cdn.intra.42.fr/users/small_#{self.login}.jpg"
 		self.tfa ||= false
 		self.guild_id ||= nil
