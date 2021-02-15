@@ -2,7 +2,6 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import toasts from "../utils/toasts";
-import globalSocket from "../app";
 import Cookies from "js-cookie";
 import { create } from "underscore";
 
@@ -15,20 +14,27 @@ const UserGames = Backbone.Collection.extend({
 const User = Backbone.Model.extend({
   urlRoot: `http://${window.location.hostname}:3000/api/users/`,
   save: function (key, value) {
-    $.ajax({
-      url:
-        `http://` +
-        window.location.hostname +
-        `:3000/api/users/${window.currentUser.get("id")}/`,
-      type: "PUT",
-      data: `${key}=${value}`,
-      success: () => {
-        this.set(key, value);
-      },
-      error: (data) => {
-        toasts.notifyError("Invalid " + Object.keys(data.responseJSON)[0]);
-      },
-    });
+
+    if (window.currentUser)
+    {
+      console.log("Save : ", key, value);
+      console.log("Save 2 : ", window.currentUser);
+      $.ajax({
+        url:
+          `http://` +
+          window.location.hostname +
+          `:3000/api/users/${window.currentUser.get("id")}/`,
+        type: "PUT",
+        data: `${key}=${value}`,
+        success: () => {
+          this.set(key, value);
+        },
+        error: (data) => {
+          console.log("Data :", data);
+          toasts.notifyError("Invalid " + Object.keys(data.responseJSON)[0]);
+        },
+      });
+    }
   },
   askFriend: function () {
     $.ajax({
@@ -38,7 +44,7 @@ const User = Backbone.Model.extend({
       success: () => {
         this.set("relation_to_user", "request sent");
 
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
@@ -78,7 +84,7 @@ const User = Backbone.Model.extend({
           );
         else toasts.notifySuccess(`You're not friends anymore.`);
 
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
@@ -116,7 +122,7 @@ const User = Backbone.Model.extend({
           toasts.notifySuccess(`${this.get("login")} is now your friend.`);
         else toasts.notifySuccess(`You have a new friend!`);
 
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
@@ -202,7 +208,7 @@ const User = Backbone.Model.extend({
         "id"
       )}`,
       success: () => {
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
@@ -265,7 +271,7 @@ const User = Backbone.Model.extend({
               return;
             }
 
-            globalSocket.sendMessage(
+            window.globalSocket.sendMessage(
               {
                 action: "to_broadcast",
                 infos: {
@@ -328,7 +334,7 @@ const User = Backbone.Model.extend({
           return;
         }
 
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
@@ -379,7 +385,7 @@ const User = Backbone.Model.extend({
         
         window.currentUser.fetch();
         
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {

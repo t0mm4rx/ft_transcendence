@@ -49,8 +49,8 @@ $(document).on("token_changed", function () {
 window.router = new Router();
 
 window.onbeforeunload = (e) => {
+  window.currentUser.save("status", "offline");
   window.router.closeGame();
-  window.currentUser.save("online", false);
   // return 'plop';
 };
 
@@ -121,57 +121,5 @@ window.notifications.add(
 
 // Page layout
 window.layoutView = new PageLayout().render();
-
-// Global socket
-var globalSocket = new FtSocket({
-  channel: "GlobalChannel",
-});
-
-globalSocket.socket.onmessage = function (event) {
-  const event_res = event.data;
-  const msg = JSON.parse(event_res);
-
-  // Ignores pings.
-  if (msg.type === "ping") return;
-
-  if (msg.message) {
-    if (msg.message.message == "new_client") {
-      // Refresh HERE
-      console.log("[TMP] New client.");
-    } else if (msg.message.content.request_to == window.currentUser.get("id")) {
-      console.log("(2) MSG : ", msg.message.message);
-      console.log("(2) CONTENT : ", msg.message.content);
-      //add if accept or not for game & friend request
-      if (msg.message.message == "game_request_reply") {
-        toasts.notifySuccess("Start game !");
-        window.location.hash = "game_live/" + msg.message.content.gameid;
-        return;
-      }
-      window.currentUser.fetch();
-      console.log("From : ", msg.message.content.from);
-      if (msg.message.message == "friend_request")
-        toasts.notifySuccess(
-          "Friend request received from " + msg.message.content.from.login
-        );
-      else if (msg.message.message == "game_request")
-        toasts.notifySuccess(
-          "Game request received from " + msg.message.content.from.login
-        );
-    } else {
-      console.log("MSG : ", msg.message.message);
-      console.log("CONTENT : ", msg.message.content);
-    }
-  }
-};
-
-console.log("Current user id : ", window.currentUser.id);
-
-
-
-console.log("Current user : ", window.currentUser);
-
-window.globalSocket = globalSocket;
-
-export default globalSocket;
 
 Backbone.history.start();
