@@ -33,7 +33,7 @@ describe "Users API", type: :request do
 			"id" => @user.id,
 			"login" => "frlindh",
 			"losses" => 0,
-			"online" => false,
+			"status" => "offline",
 			"pending_friends" => [],
 			"pending_requests" => [],
 			"relation_to_user" => "current_user",

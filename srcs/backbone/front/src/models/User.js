@@ -2,7 +2,6 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import toasts from "../utils/toasts";
-import globalSocket from "../app";
 import Cookies from "js-cookie";
 import { create } from "underscore";
 
@@ -38,7 +37,7 @@ const User = Backbone.Model.extend({
       success: () => {
         this.set("relation_to_user", "request sent");
 
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
@@ -78,7 +77,7 @@ const User = Backbone.Model.extend({
           );
         else toasts.notifySuccess(`You're not friends anymore.`);
 
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
@@ -116,7 +115,7 @@ const User = Backbone.Model.extend({
           toasts.notifySuccess(`${this.get("login")} is now your friend.`);
         else toasts.notifySuccess(`You have a new friend!`);
 
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
@@ -202,7 +201,7 @@ const User = Backbone.Model.extend({
         "id"
       )}`,
       success: () => {
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
@@ -265,7 +264,7 @@ const User = Backbone.Model.extend({
               return;
             }
 
-            globalSocket.sendMessage(
+            window.globalSocket.sendMessage(
               {
                 action: "to_broadcast",
                 infos: {
@@ -328,7 +327,7 @@ const User = Backbone.Model.extend({
           return;
         }
 
-        globalSocket.sendMessage(
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
@@ -376,9 +375,11 @@ const User = Backbone.Model.extend({
       }/wt_game_accept`,
       type: "POST",
       success: (data) => {
-        toasts.notifySuccess("Nice game start");
-
-        globalSocket.sendMessage(
+        toasts.notifySuccess('Nice game start');
+        
+        window.currentUser.fetch();
+        
+        window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
             infos: {
