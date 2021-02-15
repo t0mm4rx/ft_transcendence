@@ -25,8 +25,8 @@ const User = Backbone.Model.extend({
       success: () => {
         this.set(key, value);
       },
-      error: (data) => {
-        toasts.notifyError("Invalid " + Object.keys(data.responseJSON)[0]);
+      error: (model, response) => {
+        toasts.notifyError("Invalid " + Object.keys(model.responseJSON)[0]);
       },
     });
   },
@@ -334,7 +334,7 @@ const User = Backbone.Model.extend({
             infos: {
               message: "game_request_reply",
               content: {
-                request_to: data.player_id,
+                request_to: data.player.id,
                 from: {
                   id: window.currentUser.get("id"),
                   login: window.currentUser.get("login"),
@@ -369,14 +369,15 @@ const User = Backbone.Model.extend({
       },
     });
   },
-
   acceptWarGame() {
     $.ajax({
-      url: `http://${window.location.hostname}:3000/api/wars/${window.currentUser.get('guild').present_war_id}/wt_game_accept`,
-      type: 'POST',
+      url: `http://${window.location.hostname}:3000/api/wars/${
+        window.currentUser.get("guild").present_war_id
+      }/wt_game_accept`,
+      type: "POST",
       success: (data) => {
-        toasts.notifySuccess('Nice game start');
-        
+        toasts.notifySuccess("Nice game start");
+
         globalSocket.sendMessage(
           {
             action: "to_broadcast",
@@ -400,9 +401,9 @@ const User = Backbone.Model.extend({
       },
       error: (err) => {
         toasts.notifyError(JSON.parse(err.responseText).error);
-      }
-      });
-    }
+      },
+    });
+  },
 });
 
 const Users = Backbone.Collection.extend({
