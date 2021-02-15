@@ -56,7 +56,7 @@ class GameRoom < ApplicationRecord
 			war = War.find(current_user.guild.present_war_id)
 			guild1 = Guild.find_by(id: war.guild1_id)
 			guild2 = Guild.find_by(id: war.guild2_id)
-			if war.add_count_all == true || game_type == 'war' || game_type == 'war_time'
+			if war.add_count_all == true || self.game_type == 'war' || self.game_type == 'war_time'
 				guild1.isinwtgame = false
 				guild2.isinwtgame = false
 				if @winner.guild_id == war.guild1_id
