@@ -245,6 +245,18 @@ export default Backbone.View.extend({
 				$("#auth-panel").addClass("auth-panel-open");
 				$("#auth-2fa").addClass("auth-panel-open");
 			}
+			// Send message to everyone
+		// 	window.globalSocket.sendMessage(
+		// 		{
+		// 		action: "to_broadcast",
+		// 		infos: {
+		// 			message: "new_client",
+		// 			content: {},
+		// 		},
+		// 		},
+		// 		false,
+		// 		true
+		// 	);
 		}
 	}
 });

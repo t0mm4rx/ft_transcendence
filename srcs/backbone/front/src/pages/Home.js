@@ -50,6 +50,7 @@ export default Backbone.View.extend({
 		// });
 	},
 	renderFriendsList: function () {
+
 		if (!window.currentUser.get('friends'))
 			return;
 		const friends = $("#live-friends-list");
@@ -59,7 +60,7 @@ export default Backbone.View.extend({
 				`<div class="friend-item">
 					<img src="${friend.avatar_url}" onclick="window.location.hash='user/${friend.login}/'"/>
 					<b class="friend-name" onclick="window.location.hash='user/${friend.login}/'">${friend.username}</b>
-					<span class="friend-status${friend.online ? " friend-status-online" : ""}">${friend.online ? "Online" : "Offline"}</span>
+					<span class="friend-status friend-status-${friend.status}">${(friend.status.charAt(0).toUpperCase() + friend.status.slice(1)) }</span>
 					<span class="button-icon message-button" id="message-${friend.login}"><i class="far fa-comment"></i></span>
 					${friend.online ? `<span class="button-icon button-icon-accent game-button" id="game-${friend.login}"><i class="fas fa-gamepad"></i></span>` : ""}
 				</div>`

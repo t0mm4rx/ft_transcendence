@@ -15,6 +15,10 @@
 		// background-color: $grey_dark_light;
 		overflow-y: auto;
 		text-align: center;
+
+		.tournament-item:hover {
+			background-color: $blue;
+		}
 	}
 
 	.tournament {
@@ -211,4 +215,14 @@
 	justify-self: center;
 	display: block;
 	// display: inline-block;
+}
+
+.tournament#permanent {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+
+	.current-tournament {
+		max-height: 40%;
+	}
 }

@@ -45,7 +45,7 @@ class War < ApplicationRecord
 			war.guild1.wt_date_to_answer = war.end_date + 1
 			war.guild1.wt_game_invite = 0
 			check_max_unanswered(war)
-		elsif war.guild1.wt_date_to_answer && war.guild2.wt_date_to_answer < DateTime.now
+		elsif war.guild1.wt_date_to_answer != nil && war.guild2.wt_date_to_answer != nil && war.guild1.wt_date_to_answer && war.guild2.wt_date_to_answer < DateTime.now
 			war.guild2_unanswers += 1
 			war.guild1_score += 1
 			war.guild2.wt_date_to_answer = war.end_date + 1
