@@ -33,10 +33,12 @@ export default Backbone.View.extend({
       const id = parseInt(elId.split("-")[1]);
       if (type === "friend") {
         window.users.models.find((a) => a.get("id") === 3).unfriend();
-      }
-      if (type === "war") {
+      } else if (type === "war") {
         window.guilds.declineWar();
-      } else {
+      }
+	  else if (type === "guild_invite") {
+		window.currentUser.declineGuildInvite();
+	  } else {
         const game = new Game({ id: id });
         game.destroy({
           success: (data) => {
@@ -96,7 +98,9 @@ export default Backbone.View.extend({
         );
       } else if (type === "war_game") {
         window.currentUser.acceptWarGame();
-      } else {
+      } else if (type === "guild_invite") {
+		window.currentUser.acceptGuildInvite();
+	  } else {
         const game = new Game({ id: id });
         game.open();
         this.removeNofif(parseInt(index));
@@ -188,6 +192,15 @@ export default Backbone.View.extend({
         }
       }
     }
+
+	if (window.currentUser.get('guild_invites') !== 0) {
+		const user = window.users.models.find(a => a.get('id') === window.currentUser.get('guild_invites'));
+		this.notifs.push({
+			title: `${user.get('username')} wants to invite you in his/her guild.`,
+			type: "guild_invite",
+			id: 0
+		});
+	}
 
     if (this.notifs.length <= 0) {
       $("#notification-panel").removeClass("notification-panel-open");

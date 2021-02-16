@@ -61,9 +61,15 @@
 					<input type="text" placeholder="War time end" id="war-time-end"/>
 				</div>
 			</div>
-			<div class="input-row input-row-checkbox">
-				<label for="all-games-count">All games count for the war</label>
-				<input type="checkbox" name="all-games-count" id="all-games-count" checked/>
+			<div class="input-row">
+				<div class="input-row input-row-checkbox">
+					<input type="checkbox" name="all-games-count" id="all-games-count" checked/>
+					<label for="all-games-count">All games count for the war</label>
+				</div>
+				<div class="input-wrapper">
+					<span>Time to answer game request</span>
+					<input type="number" placeholder="Max time in days" id="time-to-answer-input" min="1"/>
+				</div>
 			</div>
 			<div class="button">
 				<span id="guild-war-button">Declare war</span>

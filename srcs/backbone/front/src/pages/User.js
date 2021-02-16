@@ -49,7 +49,7 @@ export default Backbone.View.extend({
         )}" />
 			</div></div>`,
         () => {
-          const value = $("#display-name-input").val();
+          const value = $("#display-name-input").val().replace(/[&<>"'\/]/g, "");
           if (value.length === 0) {
             toasts.notifyError("The display name cannot be empty.");
             return false;
@@ -100,10 +100,16 @@ export default Backbone.View.extend({
         return false;
       };
       reader.onerror = function (error) {
-        // console.log(error);
         toasts.notifyError("Unable to read the image you selected");
       };
     },
+	"click .game-button": function (event) {
+		const login = event.currentTarget.id.split('-')[1];
+		window.users.models.find(a => a.get('login') === login).askGame();
+	},
+	'click #user-add-guild': function () {
+		this.model.askGuild();
+	}
   },
   initialize: function (options) {
     this.listenTo(window.currentUser, "change", this.render);
@@ -116,6 +122,7 @@ export default Backbone.View.extend({
     loadUsers();
   },
   render: function () {
+	  console.log(this.model);
     this.$el.html(_.template(template)({ data: this.model.toJSON() }));
     this.renderFriendsList();
     this.games.fetch();
@@ -143,7 +150,7 @@ export default Backbone.View.extend({
           }"><i class="far fa-comment"></i></span>
 					${
             friend.online
-              ? '<span class="button-icon button-icon-accent"><i class="fas fa-gamepad"></i></span>'
+              ? `<span class="button-icon button-icon-accent game-button" id="game-${friend.login}"><i class="fas fa-gamepad"></i></span>`
               : ""
           }
 				</div>`

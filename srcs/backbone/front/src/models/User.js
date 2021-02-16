@@ -139,6 +139,46 @@ const User = Backbone.Model.extend({
       },
     });
   },
+  askGuild: function () {
+	$.ajax({
+		url: `http://${window.location.hostname}:3000/api/guilds/send_request`,
+		type: 'POST',
+		data: `target_id=${this.get("id")}`,
+		success: () => {
+			toasts.notifySuccess(`You invited ${this.get('username')} in your guild.`);
+		},
+		error: () => {
+			toasts.notifyError("Cannot send guild request.");
+		}
+	});
+  },
+  acceptGuildInvite: function () {
+	$.ajax({
+		url: `http://${window.location.hostname}:3000/api/guilds/accept_invitation`,
+		type: 'POST',
+		success: () => {
+			toasts.notifySuccess(`You joined the guild!`);
+			window.currentUser.fetch();
+			window.guilds.fetch();
+		},
+		error: () => {
+			toasts.notifyError("Unable to join the guild.");
+		}
+	});
+  },
+  declineGuildInvite: function () {
+	$.ajax({
+		url: `http://${window.location.hostname}:3000/api/guilds/ignore_invitation`,
+		type: 'POST',
+		success: () => {
+			toasts.notifySuccess(`You declined the guild invitation.`);
+			window.currentUser.fetch();
+		},
+		error: () => {
+			toasts.notifyError("Unable to decline the invitation.");
+		}
+	});
+  },
   setTFA: function () {
     $.ajax({
       url: "http://" + window.location.hostname + ":3000/api/tfa",
