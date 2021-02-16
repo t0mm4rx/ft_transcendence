@@ -20,13 +20,17 @@ export default Backbone.View.extend({
     this.$el.html(this.model.escape("name"));
     return this;
   },
-  renderMessages(e) {
-    console.log("RENDER MESS", e);
+  renderMessages(e, adminPeak) {
+    console.log("RENDER MESS", adminPeak);
+    this.adminPeak = !!adminPeak;
 
     $(`.channel-current`).removeClass("channel-current");
     this.$el.addClass("channel-current");
     if (!this.channelMessages) {
-      this.channelMessages = new Channel({ channel_id: this.model.id });
+      this.channelMessages = new Channel({
+        channel_id: this.model.id,
+        adminPeak: !!adminPeak,
+      });
       this.channelView = new ChannelView({
         model: this.model,
         collection: this.channelMessages,
@@ -38,7 +42,11 @@ export default Backbone.View.extend({
     }
   },
   onLoad() {
-    $(".chat-chat").replaceWith(this.channelView.render().el);
+    if (this.adminPeak) {
+      $(".chat-chat").replaceWith(this.channelView.renderAdminPeak().el);
+    } else {
+      $(".chat-chat").replaceWith(this.channelView.render().el);
+    }
     document.querySelector("#chat-messages").scrollTop = document.querySelector(
       "#chat-messages"
     ).scrollHeight;

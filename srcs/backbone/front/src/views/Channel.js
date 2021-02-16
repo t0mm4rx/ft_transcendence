@@ -21,7 +21,7 @@ export default Backbone.View.extend({
   <div class="button-icon" id="block-user"><i class="fas fa-ban"></i></div>
   <% } else { if (model.get("admin") === true || model.get("owner") === true) { %>
     <div class="button-icon" id="edit-channel"><i class="fas fa-cog"></i></div>
-   <% } if (window.currentUser.get("admin") === false) {%>
+   <% } if (!adminPeak) {%>
     <div class="button-icon" id="leave-channel"><i class="fas fa-sign-out-alt"></i></div>
    <% }} %>
    </div>`),
@@ -85,7 +85,7 @@ export default Backbone.View.extend({
   render() {
     this.messagesLength = this.collection.length;
     // console.log("RENDER CHANNEL");
-    this.renderHeader();
+    this.renderHeader(false);
     this.$el.append(`<div id="chat-messages"></div>
     <div id="chat-input" id=${this.model.id}>
       <input type="text" class="chat-input" id=${this.model.id} placeholder="Send something"/>
@@ -94,13 +94,17 @@ export default Backbone.View.extend({
     this.renderMessages();
     return this;
   },
-  renderAdmin() {
+  renderAdminPeak() {
     // todo: no message input, no join, no leave
+    this.messagesLength = this.collection.length;
+    // console.log("RENDER CHANNEL");
+    this.renderHeader(true);
+    this.$el.append(`<div id="chat-messages"></div>`);
+    this.renderMessages();
+    return this;
   },
-  renderHeader() {
-    console.log("render header", this.model, this.model.escape("admin"));
-
-    this.$el.html(this.template({ model: this.model }));
+  renderHeader(adminPeak) {
+    this.$el.html(this.template({ model: this.model, adminPeak: adminPeak }));
   },
   renderMessages() {
     const messages = this.collection.models;
@@ -209,7 +213,7 @@ export default Backbone.View.extend({
         $("#chat-messages").scrollTop(),
         document.querySelector("#chat-messages").scrollHeight
       );
-      this.collection.loadMessages();
+      this.collection.loadMessages(this.adminPeak);
     }
   },
   onKeyUp(event) {
