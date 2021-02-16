@@ -41,27 +41,44 @@ module Api
         end
 
         def update
-            game_room = GameRoom.find(params[:id])
-            # game_room.update_attribute(:player_id, params[:player_id])
-            # game_room.update_attribute(:opponent_id, params[:opponent_id])
-            # game_room.update_attribute(:status, params[:status])
-            game_room.update(game_room_params_update)
-            if game_room.save
-                render json: game_room
-            else
-                render json: {}, status: :unprocessable_entity
-            end
-        end
-
-        def destroy
-            game_room = GameRoom.find(params[:id])
-            unless game_room.player_id == current_user.id || game_room.opponent_id = current_user.id
+            game = GameRoom.find(params[:id])
+            # game_room.update(game_room_params_update)
+            unless game.player_id == current_user.id || game.opponent_id = current_user.id
                 return render json: {}, status: :forbidden
             end
-            if game_room.destroy
-                render json: {}, status: :ok
+            game.accepted_by(current_user)
+            if game.save
+                render json: game
+            else
+                render json: game.errors, status: :unprocessable_entity
+            end
+        end
+        # def update
+        #     game_room = GameRoom.find(params[:id])
+        #     # game_room.update_attribute(:player_id, params[:player_id])
+        #     # game_room.update_attribute(:opponent_id, params[:opponent_id])
+        #     # game_room.update_attribute(:status, params[:status])
+        #     game_room.update(game_room_params_update)
+        #     if game_room.save
+        #         render json: game_room
+        #     else
+        #         render json: {}, status: :unprocessable_entity
+        #     end
+        # end
+
+        def destroy
+            game = GameRoom.find(params[:id])
+            unless game.player_id == current_user.id || game.opponent_id = current_user.id
+                return render json: {}, status: :forbidden
+            end
+            if game.tournament
+                game.declined(current_user)
+                return render json: {}
+            end
+            if game.destroy
+                render json: {}
             elsif
-                render json: @game_room.errors, status: :unprocessable_entity
+                render json: @game.errors, status: :unprocessable_entity
             end
         end
 

@@ -29,7 +29,6 @@ class Tournament < ApplicationRecord
 	end
 
 	def match_opponents
-		puts "MATCH OPPONENTS CALLED ##################################################"
 		n_games = users.count.odd? ? (users.count + 1) / 2 : users.count / 2
 		@games = []
 		n_games.times do |index|
@@ -50,15 +49,11 @@ class Tournament < ApplicationRecord
 				content['from']['login'] = player.login
 				GlobalChannel.broadcast_to "global_channel", sender: player.id, message: "game_request", content: content
 			end
-			# @games.push({player: users[index], opponent: users[index + n_games], ladder: true })
 		end
-		# @file = File.open("TOURNAMENT_#{name}.txt", 'w') do |file|
-		# 	file.puts "MATCHING OPPONENT FOR TOURNAMENT with id #{id}"
-		# end
 	end
 
 	def calculate_new_game (user)
-		existing = GameRoom.find_by(winner: nil, tournament_id: id)
+		existing = GameRoom.find_by(winner_id: nil, tournament_id: id)
 		if tournament_users.where(eliminated: false).count > 1
 			if existing
 				existing.update(opponent: user)
@@ -67,6 +62,7 @@ class Tournament < ApplicationRecord
 			end
 		else
 			winner = tournament_users.find_by(eliminated: false)
+			winner = User.find(winner.user_id)
 			winner.update_attribute(:title, title) if title
 			update_attribute(:finished, true)
 		end

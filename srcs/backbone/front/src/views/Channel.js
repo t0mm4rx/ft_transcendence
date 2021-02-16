@@ -94,6 +94,9 @@ export default Backbone.View.extend({
     this.renderMessages();
     return this;
   },
+  renderAdmin() {
+    // todo: no message input, no join, no leave
+  },
   renderHeader() {
     console.log("render header", this.model, this.model.escape("admin"));
 

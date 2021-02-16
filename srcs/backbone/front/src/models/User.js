@@ -322,10 +322,6 @@ const User = Backbone.Model.extend({
       success: (data) => {
         console.log("ACCEPTED GAME", data);
         toasts.notifySuccess("Game accepted");
-        if (data == null) {
-          toasts.notifyError("Error during game creation.");
-          return;
-        }
 
         window.globalSocket.sendMessage(
           {
@@ -345,7 +341,6 @@ const User = Backbone.Model.extend({
           false,
           true
         );
-
         window.location.hash = "game_live/" + data.id;
       },
       error: (data) => {
@@ -375,10 +370,10 @@ const User = Backbone.Model.extend({
       }/wt_game_accept`,
       type: "POST",
       success: (data) => {
-        toasts.notifySuccess('Nice game start');
-        
+        toasts.notifySuccess("Nice game start");
+
         window.currentUser.fetch();
-        
+
         window.globalSocket.sendMessage(
           {
             action: "to_broadcast",

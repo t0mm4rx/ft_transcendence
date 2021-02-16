@@ -8,6 +8,7 @@ import { User } from "../models/User";
 import _ from "underscore";
 import $ from "jquery";
 import toasts from "../utils/toasts";
+import { Game } from "../models/Game";
 
 export default Backbone.View.extend({
   el: "#notifications-menu",
@@ -34,8 +35,23 @@ export default Backbone.View.extend({
       }
       if (type === "war") {
         window.guilds.declineWar();
-      } else if (type === "ladder") {
-        window.currentUser.declineLadderGame(id);
+        // } else if (type === "ladder") {
+        //   window.currentUser.declineLadderGame(id);
+        //   el.currentTarget.parentNode.parentNode.remove();
+        // } else if (type == "tournament") {
+        //   window.currentUser.forfeit(id);
+      } else {
+        const game = new Game({ id: id });
+        game.destroy({
+          success: (data) => {
+            console.log("DENIED GAME");
+            toasts.notifySuccess("Game denied");
+          },
+          error: (data) => {
+            console.log("ERROR", data);
+            toasts.notifyError(data.responseJSON.error);
+          },
+        });
       }
     },
     "click .notification-accept": function (el) {
@@ -52,8 +68,6 @@ export default Backbone.View.extend({
       } else if (type === "game") {
         const target = new User({ id: id, username: username });
         target.acceptGame();
-      } else if (type === "ladder") {
-        window.currentUser.acceptLadderGame(id);
       } else if (type === "war") {
         const war = window.wars.where(
           "id",
@@ -84,6 +98,17 @@ export default Backbone.View.extend({
         );
       } else if (type === "war_game") {
         window.currentUser.acceptWarGame();
+      } else {
+        //if (type === "ladder")
+        console.log("OTHER");
+
+        const game = new Game({ id: id });
+        game.open();
+        // window.currentUser.openGame(id);
+        // TODO: something like this for all?
+        el.currentTarget.parentNode.parentNode.remove();
+        // } else if (type == "tournament") {
+        //   window.currentUser.openTournamentGame(id);
       }
     },
   },
@@ -119,7 +144,7 @@ export default Backbone.View.extend({
     });
     window.currentUser.get("pending_games").forEach((req) => {
       let type = req.ladder ? "ladder" : "";
-      if (req.game_type == "war") type = "war";
+      if (req.game_type == "war") type = "war_game";
       else if (req.tournament_id) type = "tournament";
       const user = window.users.find(req.user_id);
       if (!!user) {
@@ -129,7 +154,7 @@ export default Backbone.View.extend({
         }
         this.notifs.push({
           title: title,
-          type: "ladder",
+          type: type,
           id: req.id,
           name: user.get("username"),
         });

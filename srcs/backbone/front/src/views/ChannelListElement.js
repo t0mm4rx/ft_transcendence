@@ -20,7 +20,9 @@ export default Backbone.View.extend({
     this.$el.html(this.model.escape("name"));
     return this;
   },
-  renderMessages() {
+  renderMessages(e) {
+    console.log("RENDER MESS", e);
+
     $(`.channel-current`).removeClass("channel-current");
     this.$el.addClass("channel-current");
     if (!this.channelMessages) {

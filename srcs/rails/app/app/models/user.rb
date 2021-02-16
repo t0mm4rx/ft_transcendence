@@ -116,7 +116,8 @@ class User < ApplicationRecord
 
 	def find_higher_ranked_user
 		# User.where("online = true AND ladder_score > ?", ladder_score).order(ladder_score: :asc).first
-		User.where("'status' = 'online' AND id != ? AND ladder_score >= ?", id, ladder_score).order(ladder_score: :asc).first
+		User.where("id != ? AND ladder_score >= ?", id, ladder_score).order(ladder_score: :asc).first
+		# User.where("'status' = 'online' AND id != ? AND ladder_score >= ?", id, ladder_score).order(ladder_score: :asc).first
 	end
 
 	private

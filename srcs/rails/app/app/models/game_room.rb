@@ -30,14 +30,9 @@ class GameRoom < ApplicationRecord
 		eliminate_loser
 	end
 
-	def eliminate
-		tournament_user = TournamentUser.find_by(tournament_id: tournament_id, user_id: @loser.id)
-		tournament_user.update(eliminated: true)
-		if tournament_user.save
-			render json: {}
-		else
-			render json: tournament_user.errors, status: :unprocessable_entity
-		end
+	def eliminate_loser
+		tournament_user = TournamentUser.find_by(tournament_id: tournament.id, user_id: @loser.id)
+		tournament_user.update_attribute(:eliminated, true)
 	end
 
 	def check_no_show
@@ -47,6 +42,28 @@ class GameRoom < ApplicationRecord
 		end
 	end
 
+	def declined(user)
+		status = user == opponent ? "player" : "opponent"
+		update_attribute(:status, status)
+		@no_show = true
+		update_scores
+	end
+
+	def accepted_by(user)
+		status = "notstarted"
+		n_player = number_player + 1
+		if tournament
+			status = user === player ? "player" : "opponent"
+			if n_player == 1
+				Rufus::Scheduler.singleton.in "3m" do
+					check_no_show
+				end
+			elsif n_player == 2
+				status = "everyone_ready"		
+			end
+		end
+		update(number_player: n_player, status: status, accepted: true)
+	end
 	# after a ladder game is finished we need to update the users' scores
 	# for more info: https://github.com/mxhold/elo
 	def calculate_new_user_score
