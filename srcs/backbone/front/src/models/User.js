@@ -7,27 +7,26 @@ import { create } from "underscore";
 
 const UserGames = Backbone.Collection.extend({
   initialize(props) {
-    this.url = `http://localhost:3000/api/users/${props.id}/games`;
+    this.url = `http://${window.location.hostname}:3000/api/users/${props.id}/games`;
   },
 });
 
 const User = Backbone.Model.extend({
   urlRoot: `http://${window.location.hostname}:3000/api/users/`,
   save: function (key, value) {
-    $.ajax({
-      url:
-        `http://` +
-        window.location.hostname +
-        `:3000/api/users/${window.currentUser.get("id")}/`,
-      type: "PUT",
-      data: `${key}=${value}`,
-      success: () => {
-        this.set(key, value);
-      },
-      error: (model, response) => {
-        toasts.notifyError("Invalid " + Object.keys(model.responseJSON)[0]);
-      },
-    });
+      $.ajax({
+        url:
+          `http://` +
+          window.location.hostname +
+          `:3000/api/users/${window.currentUser.get("id")}/`,
+        type: "PUT",
+        data: `${key}=${value}`,
+        success: () => {
+          this.set(key, value);
+        },
+        error: (model, response) => {
+        },
+      });
   },
   askFriend: function () {
     $.ajax({
@@ -215,7 +214,7 @@ const User = Backbone.Model.extend({
               },
             },
           },
-          false,
+          true,
           true
         );
 

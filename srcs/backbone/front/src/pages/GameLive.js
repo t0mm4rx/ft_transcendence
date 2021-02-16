@@ -29,10 +29,12 @@ export default Backbone.View.extend({
 	{
 		self.gameinfos = await self.gamelive.gamebyid(self.game_id);
 
-		if (self.gameinfos == null)
+		if (self.gameinfos == null || !self.gameinfos)
 			return ;
 
-		if (self.gameinfos.status == "ended")
+		console.log("Self Gameinfos : ", self.gameinfos);
+
+		if (self.gameinfos.status == "ended" || self.gameinfos.errors)
 		{
 			toasts.notifyError("Game already ended.");
 			window.location.hash = "home";
