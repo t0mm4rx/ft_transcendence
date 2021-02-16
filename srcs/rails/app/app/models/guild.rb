@@ -17,9 +17,11 @@ class Guild < ApplicationRecord
 
 	def set_defaults
 		self.isinwar ||= false
+		self.score ||= 0
 		self.war_invites ||= 0
 		self.wt_game_invite ||= 0
 		self.war_invite_id ||= 0
 		self.isinwtgame ||= false
+		self.wt_date_to_answer ||= Time.now.year + 1
 	end
 end

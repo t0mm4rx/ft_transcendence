@@ -85,6 +85,9 @@ export default Backbone.View.extend({
     return this;
   },
   renderPermanent() {
+    this.$el.attr("id", "permanent");
+    // console.log($(".tournament.panel"));
+
     this.$el.html(this.permanentTemplate);
     this.renderUsers(
       this.model.get("users").map((user) => user.toJSON()),

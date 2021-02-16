@@ -21,6 +21,7 @@ import toasts from "./utils/toasts";
 import SearchBar from "./views/SearchBar";
 import { Router } from "./models/Router";
 import { User } from "./models/User";
+import { connectGlobalSocket } from "./utils/globals"
 
 export default Backbone.Router.extend({
   routes: {
@@ -224,6 +225,7 @@ export default Backbone.Router.extend({
     if (!user) {
       window.location.hash = "auth/";
     }
+    connectGlobalSocket();
   },
   /* Show chat panel, notification panel and other elements only visible when logged */
   showLayout: function () {
@@ -254,7 +256,7 @@ export default Backbone.Router.extend({
   },
   closeGame: function () {
     const actual = window.currentView;
-    if (actual && (!!actual.game || !!actual.game_live)) {
+  if (actual && (!!actual.game || !!actual.game_live)) {
       const router = new Router();
       if (actual.game) router.clearRequests();
       if (actual.ftsocket) actual.ftsocket.closeConnection();

@@ -55,24 +55,34 @@ export default Backbone.View.extend({
       } else if (type === "ladder") {
         window.currentUser.acceptLadderGame(id);
       } else if (type === "war") {
-        const war = window.wars.where('id', window.currentUser.get('guild').war_invite_id);
-        if (!war)
-          return;
+        const war = window.wars.where(
+          "id",
+          window.currentUser.get("guild").war_invite_id
+        );
+        if (!war) return;
         console.log("War = ", war);
-        showModal("War declaration", 
-        `<div id="war-notification"><p>Prize: ${war.get('prize')}</p>
-        <p>From ${new Date(war.get('start_date')).toLocaleString("en-FR")} to ${new Date(war.get('end_date')).toLocaleString("en-FR")}</p>
-        <p>War time from ${new Date(war.get('wt_start')).toLocaleString("en-FR")} to ${new Date(war.get('wt_end')).toLocaleString("en-FR")}</p>
-        <p>Max unanswered games: ${war.get('wt_max_unanswers')}</p>
-		<p>All games count for the war: ${war.get('add_count_all') ? "yes" : "no"}</p></div>`
-        , () => {
-          window.guilds.acceptWar();
-          return true;
-        }, () => {
-          return true;
-        });
-      } else if (type === "war_game")
-      {
+        showModal(
+          "War declaration",
+          `<div id="war-notification"><p>Prize: ${war.get("prize")}</p>
+        <p>From ${new Date(war.get("start_date")).toLocaleString(
+          "en-FR"
+        )} to ${new Date(war.get("end_date")).toLocaleString("en-FR")}</p>
+        <p>War time from ${new Date(war.get("wt_start")).toLocaleString(
+          "en-FR"
+        )} to ${new Date(war.get("wt_end")).toLocaleString("en-FR")}</p>
+        <p>Max unanswered games: ${war.get("wt_max_unanswers")}</p>
+		<p>All games count for the war: ${
+      war.get("add_count_all") ? "yes" : "no"
+    }</p></div>`,
+          () => {
+            window.guilds.acceptWar();
+            return true;
+          },
+          () => {
+            return true;
+          }
+        );
+      } else if (type === "war_game") {
         window.currentUser.acceptWarGame();
       }
     },
@@ -82,7 +92,8 @@ export default Backbone.View.extend({
     this.renderList();
   },
   renderList: async function () {
-    if (!window.currentUser || !window.currentUser.get("pending_requests")) return;
+    if (!window.currentUser || !window.currentUser.get("pending_requests"))
+      return;
     this.notifs = [];
     window.currentUser.get("pending_requests").forEach((req) => {
       const user = window.users.where({ id: req.user_id });
@@ -112,40 +123,52 @@ export default Backbone.View.extend({
       else if (req.tournament_id) type = "tournament";
       const user = window.users.find(req.user_id);
       if (!!user) {
+        let title = `${user.get("username")} sent you a ${type} game request`;
+        if (type == "tournament") {
+          title = `You have an upcoming tournament game. Declining or no-show leads to elimination.`;
+        }
         this.notifs.push({
-          title: `${user.get("username")} sent you a ${type} game request`,
+          title: title,
           type: "ladder",
           id: req.id,
           name: user.get("username"),
         });
       }
     });
-    if (window.currentUser.get("guild"))
-    { 
+    if (window.currentUser.get("guild")) {
       if (window.currentUser.get("guild").war_invites) {
         const guild_id = window.currentUser.get("guild").war_invites;
         const guild = window.guilds.where("id", guild_id);
         if (!!guild)
-        this.notifs.push({
-          title: `${guild.get("name")} declares war to your guild`,
-          type: "war",
-          id: 0,
-        });
+          this.notifs.push({
+            title: `${guild.get("name")} declares war to your guild`,
+            type: "war",
+            id: 0,
+          });
       }
-      if (window.currentUser.get("guild").wt_game_invite)
-      {
-        var prop = window.users.where({id: window.currentUser.get("guild").wt_game_invite})[0];
+      if (window.currentUser.get("guild").wt_game_invite) {
+        var prop = window.users.where({
+          id: window.currentUser.get("guild").wt_game_invite,
+        })[0];
         var self = this;
-        if (prop)
-        {
-          await prop.fetch({success: () => {
-            console.log("Prop : ", `${prop.get('username')} from the ${prop.get('guild').name} guild ask for a game.`)
+        if (prop) {
+          await prop.fetch({
+            success: () => {
+              console.log(
+                "Prop : ",
+                `${prop.get("username")} from the ${
+                  prop.get("guild").name
+                } guild ask for a game.`
+              );
               self.notifs.push({
-                title: `${prop.get('username')} from the ${prop.get('guild').name} guild ask for a game.`,
+                title: `${prop.get("username")} from the ${
+                  prop.get("guild").name
+                } guild ask for a game.`,
                 type: "war_game",
                 id: 0,
               });
-          }});
+            },
+          });
         }
       }
     }

@@ -85,10 +85,10 @@ export default Backbone.View.extend({
         })
           .then((response) => response.json())
           .then((result) => {
-            console.log("Success:", result);
+            // console.log("Success:", result);
             window.currentUser.save(
               "avatar_url",
-              `http://127.0.0.1:8080/assets/user_images/${result.filename}`
+              `http://${window.location.hostname}:8080/assets/user_images/${result.filename}`
             );
             this.model.trigger("change");
           })
@@ -100,7 +100,7 @@ export default Backbone.View.extend({
         return false;
       };
       reader.onerror = function (error) {
-        console.log(error);
+        // console.log(error);
         toasts.notifyError("Unable to read the image you selected");
       };
     },
@@ -116,7 +116,6 @@ export default Backbone.View.extend({
     loadUsers();
   },
   render: function () {
-    console.log("RENDER", this.model.toJSON());
     this.$el.html(_.template(template)({ data: this.model.toJSON() }));
     this.renderFriendsList();
     this.games.fetch();
