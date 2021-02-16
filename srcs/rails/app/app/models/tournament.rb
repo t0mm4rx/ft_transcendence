@@ -33,13 +33,28 @@ class Tournament < ApplicationRecord
 		n_games = users.count.odd? ? (users.count + 1) / 2 : users.count / 2
 		@games = []
 		n_games.times do |index|
-			game = GameRoom.new(player: users[index], opponent: users[index + n_games], tournament_id: id)
+			player = users[index]
+			opponent = users[index + n_games]
+			game = GameRoom.new(player: player, opponent: opponent, tournament_id: id, status: "created", number_player: 0)
 			@games.push(game) if game.save
+			# todo: socket to each player
+			if (opponent)
+				content = {}
+				content['request_to'] = player.id
+				content['from'] = {}
+				content['from']['id'] = opponent.id
+				content['from']['login'] = opponent.login
+				GlobalChannel.broadcast_to "global_channel", sender: opponent.id, message: "game_request", content: content
+				content['request_to'] = opponent.id
+				content['from']['id'] = player.id
+				content['from']['login'] = player.login
+				GlobalChannel.broadcast_to "global_channel", sender: player.id, message: "game_request", content: content
+			end
 			# @games.push({player: users[index], opponent: users[index + n_games], ladder: true })
 		end
-		@file = File.open("TOURNAMENT_#{name}.txt", 'w') do |file|
-			file.puts "MATCHING OPPONENT FOR TOURNAMENT with id #{id}"
-		end
+		# @file = File.open("TOURNAMENT_#{name}.txt", 'w') do |file|
+		# 	file.puts "MATCHING OPPONENT FOR TOURNAMENT with id #{id}"
+		# end
 	end
 
 	def calculate_new_game (user)

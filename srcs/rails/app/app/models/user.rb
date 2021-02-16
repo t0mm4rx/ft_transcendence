@@ -13,7 +13,7 @@ class User < ApplicationRecord
 	has_many :messages, dependent: :destroy
 
 	has_many :game_pending_requests, -> {where accepted: false}, class_name: 'GameRequest', foreign_key: "opponent_id"
-	has_many :pending_games, -> {where accepted: false}, class_name: 'GameRoom', foreign_key: "opponent_id"
+	# has_many :pending_games, -> {where accepted: false}, class_name: 'GameRoom', foreign_key: "opponent_id"
 	has_many :game_player, class_name: 'GameRoom', foreign_key: "player_id", dependent: :destroy
 	has_many :game_opponent, class_name: 'GameRoom', foreign_key: "opponent_id", dependent: :destroy
 
@@ -36,6 +36,10 @@ class User < ApplicationRecord
 	def games
 		# GameRoom.where("player_id = ? OR opponent_id = ?", id, id)
 		game_player + game_opponent
+	end
+
+	def pending_games 
+		games.filter {|game| game.status == "created"}
 	end
 
 	# def pending_games

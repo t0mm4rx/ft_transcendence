@@ -133,8 +133,10 @@ export default Backbone.View.extend({
 					<b class="friend-name" onclick="window.location.hash='user/${friend.login}/'">${
           friend.username
         }</b>
-					<span class="friend-status${friend.online ? " friend-status-online" : ""}">${
-          friend.online ? "Online" : "Offline"
+					<span class="friend-status${
+            friend.status == "online" ? " friend-status-online" : ""
+          }">${
+          friend.status.charAt(0).toUpperCase() + friend.status.slice(1)
         }</span>
 					<span class="button-icon message-button" id="message-${
             friend.login
@@ -158,7 +160,7 @@ export default Backbone.View.extend({
       let game_type = "direct";
       if (game.get("ladder")) game_type = "ladder";
       else if (game.get("game_type") == "war") game_type = "war";
-      else if (game.get("tournament_id")) game_type = "tournament";
+      else if (game.get("tournament")) game_type = "tournament";
       if (game.get("player") && game.get("opponent"))
         html += this.gameTemplate({
           game: game,

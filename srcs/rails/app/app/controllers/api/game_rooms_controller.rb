@@ -26,7 +26,7 @@ module Api
             if !opponent 
                 return render json: {error: "could not find a worthy opponent"}, status: :not_found 
             end
-            game_room = GameRoom.new(opponent: opponent, player: current_user, ladder: true)
+            game_room = GameRoom.new(opponent: opponent, player: current_user, ladder: true, status: "created")
             if game_room.save 
                 render json: game_room
             else
@@ -90,7 +90,7 @@ module Api
             game_room = GameRoom.find(params[:id])
             game_room.update_attribute(:player_score, params[:player_score])
             game_room.update_attribute(:opponent_score, params[:opponent_score])
-            if game_room.game_over? && game_room.winner
+            if game_room.game_over? && !game_room.winner_id
                 game_room.update_attribute(:status, "ended")
                 game_room.update_scores
                 # game_room.update_war_scores(current_user)

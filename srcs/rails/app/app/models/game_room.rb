@@ -40,6 +40,13 @@ class GameRoom < ApplicationRecord
 		end
 	end
 
+	def check_no_show
+		if number_player == 1
+			@no_show = true
+			update_scores
+		end
+	end
+
 	# after a ladder game is finished we need to update the users' scores
 	# for more info: https://github.com/mxhold/elo
 	def calculate_new_user_score
@@ -88,6 +95,11 @@ class GameRoom < ApplicationRecord
 			@winner = player_score > opponent_score ? player : opponent
 			@loser = player_score < opponent_score ? player : opponent
 			update_attribute(:winner_id, @winner.id)
+		elsif @no_show
+			@winner = status == "player" ? player : opponent
+			@loser = status == "player" ?  opponent : player
+			update_attribute(:winner_id, @winner.id)
+			update_attribute(:status, "ended")
 		end
 	end
 end

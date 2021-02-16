@@ -33,8 +33,9 @@ Rails.application.routes.draw do
     post 'ladder_games', to: 'game_rooms#create_ladder'
     get 'tournaments/:id/games', to: 'tournaments#games'
     get 'tournaments/:id/users', to: 'tournaments#users'
-    post '/tournaments/:id/register', to: 'tournaments#register'
-    delete '/tournaments/:id/unregister', to: 'tournaments#unregister'
+    post 'tournaments/:id/register', to: 'tournaments#register'
+    delete 'tournaments/:id/unregister', to: 'tournaments#unregister'
+    post 'tournaments/join_game/:id', to: 'tournaments#join_game'
 
     resources :wars, only: [:index, :update, :create]
       post '/wars/send_request', to: 'wars#send_request'
