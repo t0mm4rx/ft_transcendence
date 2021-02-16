@@ -55,8 +55,10 @@ class GameRoom < ApplicationRecord
 				# n_player = 2
 				# s = "notstarted"
 			end
+			update(accepted: (number_player >= 1))
+		elsif user === opponent
+			update(accepted: true)
 		end
-		update(accepted: (number_player >= 1))
 	end
 	# after a ladder game is finished we need to update the users' scores
 	# for more info: https://github.com/mxhold/elo
