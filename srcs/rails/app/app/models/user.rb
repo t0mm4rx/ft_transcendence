@@ -35,7 +35,7 @@ class User < ApplicationRecord
 	end
 
 	def pending_games 
-		games.filter {|game| !game.accepted }
+		games.filter {|game| !game.accepted && game.status == "notstarted" }
 	end
 
 	# def pending_games

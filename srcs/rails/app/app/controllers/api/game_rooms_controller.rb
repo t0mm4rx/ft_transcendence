@@ -25,7 +25,7 @@ module Api
             if !opponent
                 return render json: {error: "could not find a worthy opponent"}, status: :not_found
             end
-            game_room = GameRoom.new(opponent: opponent, player: current_user, ladder: true, status: "created")
+            game_room = GameRoom.new(opponent: opponent, player: current_user, ladder: true)
             if game_room.save 
                 GlobalChannel.send("game_request", opponent, current_user, game_room.id)
                 render json: game_room
@@ -74,7 +74,7 @@ module Api
                 return render json: {}, status: :forbidden
             end
             if game.tournament
-                game.declined(current_user)
+                game.set_no_show(current_user)
                 return render json: {}
             end
             if game.destroy
@@ -118,7 +118,7 @@ module Api
         end
 
         def ladder_games
-            @games = GameRoom.where(ladder: true)
+            @games = GameRoom.where(ladder: true).limit(20)
             render json: @games
         end
 
