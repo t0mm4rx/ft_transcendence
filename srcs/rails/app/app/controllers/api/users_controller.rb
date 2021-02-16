@@ -61,7 +61,7 @@ module Api
 
     def games
       games = @user.games.filter { |game| game.status == "ended" }
-      render json: games.reverse
+      render json: games.reverse.take(15)
     end
 
     private

@@ -28,6 +28,7 @@ module Api
             end
             game_room = GameRoom.new(opponent: opponent, player: current_user, ladder: true, status: "created")
             if game_room.save 
+                GlobalChannel.send("game_request", opponent, current_user, game_room.id)
                 render json: game_room
             else
                render json: {}, status: :unprocessable_entity
@@ -48,6 +49,8 @@ module Api
             end
             game.accepted_by(current_user)
             if game.save
+                other = game.player === current_user ? game.opponent : game.player
+                GlobalChannel.send("game_request_reply", other, current_user, game.id) if game.accepted
                 render json: game
             else
                 render json: game.errors, status: :unprocessable_entity

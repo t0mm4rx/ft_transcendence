@@ -7,10 +7,10 @@ class User < ApplicationRecord
 	has_many :friendships_user, class_name: 'Friendship', dependent: :destroy
 	has_many :friendships_friend, class_name: 'Friendship', foreign_key: "friend_id", dependent: :destroy
 
-
 	has_many :channel_users, dependent: :destroy
 	has_many :channels, through: :channel_users
 	has_many :messages, dependent: :destroy
+	has_many :tournament_users, dependent: :destroy
 
 	has_many :game_pending_requests, -> {where accepted: false}, class_name: 'GameRequest', foreign_key: "opponent_id"
 	# has_many :pending_games, -> {where accepted: false}, class_name: 'GameRoom', foreign_key: "opponent_id"
@@ -25,11 +25,7 @@ class User < ApplicationRecord
 	validates :login, presence: true, length: { minimum:2, maximum: 30 }, uniqueness: { case_sensitive: false }#, format: {with: /\A[a-z]+\z/}
 	validates :avatar_url, presence: true, length: { minimum:5, maximum: 255 }#, format: URI::regexp(%w[http https])
 
-	# validates_format_of :username, :with => /\A[^0-9`!@#\$%\^&*+_=]+\z/
-
-
 	validate :first_is_admin, :on => :create
-	# has_many :games, class_name: 'GameRoom'
 
 	after_initialize :set_defaults
 
@@ -39,7 +35,7 @@ class User < ApplicationRecord
 	end
 
 	def pending_games 
-		games.filter {|game| game.status == "created"}
+		games.filter {|game| !game.accepted }
 	end
 
 	# def pending_games

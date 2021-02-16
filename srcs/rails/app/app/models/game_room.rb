@@ -50,19 +50,22 @@ class GameRoom < ApplicationRecord
 	end
 
 	def accepted_by(user)
-		status = "notstarted"
+		s = "notstarted"
 		n_player = number_player + 1
 		if tournament
-			status = user === player ? "player" : "opponent"
-			if n_player == 1
+			s = user === player ? "player" : "opponent"
+			return if s == status
+			if status == "created"
+				n_player = 1
 				Rufus::Scheduler.singleton.in "3m" do
 					check_no_show
 				end
-			elsif n_player == 2
-				status = "everyone_ready"		
+			else #if status == "player" || status == "opponent"
+				n_player = 2
+				s = "notstarted"
 			end
 		end
-		update(number_player: n_player, status: status, accepted: true)
+		update(number_player: n_player, status: s, accepted: (s == "notstarted"))
 	end
 	# after a ladder game is finished we need to update the users' scores
 	# for more info: https://github.com/mxhold/elo
@@ -96,15 +99,14 @@ class GameRoom < ApplicationRecord
 		end
 	end
 
-
 	private
 
     def set_defaults
 		self.accepted ||= false
 		self.player_score ||= 0
 		self.opponent_score ||= 0
-		# self.number_player ||= opponent ? 2 : 1
 		self.number_player ||= 0
+		self.status ||= "created"
 	end
 
 	def set_winner_and_loser

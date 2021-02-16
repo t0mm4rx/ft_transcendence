@@ -123,40 +123,18 @@ const Game = Backbone.Model.extend({
     );
   },
   open() {
-    this.set("accepted", true);
-    const players = this.get("number_player") || 0;
-    this.set("number_player", players);
-    this.save({
-      success: (data) => {
-        console.log("ACCEPTED GAME", data);
-
-        if (!data.tournament) {
-          window.globalSocket.sendMessage(
-            {
-              action: "to_broadcast",
-              infos: {
-                message: "game_request_reply",
-                content: {
-                  request_to: data.player.id,
-                  from: {
-                    id: window.currentUser.get("id"),
-                    login: window.currentUser.get("login"),
-                  },
-                  gameid: data.id,
-                },
-              },
-            },
-            false,
-            true
-          );
-        }
-        window.location.hash = "game_live/" + data.id;
-      },
-      error: (data) => {
-        console.log("ERROR", data);
-        toasts.notifyError(data.responseJSON.error);
-      },
-    });
+    this.save(
+      { accepted: true },
+      {
+        success: (data) => {
+          window.location.hash = "game_live/" + data.id;
+        },
+        error: (data) => {
+          console.log("ERROR", data);
+          toasts.notifyError(data.responseJSON.error);
+        },
+      }
+    );
   },
 });
 

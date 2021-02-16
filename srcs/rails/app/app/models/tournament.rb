@@ -1,6 +1,7 @@
 class Tournament < ApplicationRecord
-	has_many :tournament_users
+	has_many :tournament_users, dependent: :destroy
 	has_many :users, through: :tournament_users
+	has_many :game_rooms, dependent: :destroy
 
 	after_create :set_start_timer
 
@@ -34,26 +35,18 @@ class Tournament < ApplicationRecord
 		n_games.times do |index|
 			player = users[index]
 			opponent = users[index + n_games]
-			game = GameRoom.new(player: player, opponent: opponent, tournament_id: id, status: "created", number_player: 0)
+			game = GameRoom.new(player: player, opponent: opponent, tournament_id: id)
 			@games.push(game) if game.save
 			# todo: socket to each player
 			if (opponent)
-				content = {}
-				content['request_to'] = player.id
-				content['from'] = {}
-				content['from']['id'] = opponent.id
-				content['from']['login'] = opponent.login
-				GlobalChannel.broadcast_to "global_channel", sender: opponent.id, message: "game_request", content: content
-				content['request_to'] = opponent.id
-				content['from']['id'] = player.id
-				content['from']['login'] = player.login
-				GlobalChannel.broadcast_to "global_channel", sender: player.id, message: "game_request", content: content
+				GlobalChannel.send("game_request", opponent, player, game.id)
+				GlobalChannel.send("game_request", player, opponent, game.id)
 			end
 		end
 	end
 
 	def calculate_new_game (user)
-		existing = GameRoom.find_by(winner_id: nil, tournament_id: id)
+		existing = GameRoom.find_by(opponent: nil, winner_id: nil, tournament_id: id)
 		if tournament_users.where(eliminated: false).count > 1
 			if existing
 				existing.update(opponent: user)

@@ -28,6 +28,7 @@ export default Backbone.View.extend({
     },
     "click .notification-delete": function (el) {
       const elId = el.currentTarget.getAttribute("notification-id");
+      const index = el.currentTarget.getAttribute("index");
       const type = elId.split("-")[0];
       const id = parseInt(elId.split("-")[1]);
       if (type === "friend") {
@@ -35,17 +36,13 @@ export default Backbone.View.extend({
       }
       if (type === "war") {
         window.guilds.declineWar();
-        // } else if (type === "ladder") {
-        //   window.currentUser.declineLadderGame(id);
-        //   el.currentTarget.parentNode.parentNode.remove();
-        // } else if (type == "tournament") {
-        //   window.currentUser.forfeit(id);
       } else {
         const game = new Game({ id: id });
         game.destroy({
           success: (data) => {
             console.log("DENIED GAME");
-            toasts.notifySuccess("Game denied");
+            toasts.notifySuccess("Game declined");
+            this.removeNofif(parseInt(index));
           },
           error: (data) => {
             console.log("ERROR", data);
@@ -56,6 +53,7 @@ export default Backbone.View.extend({
     },
     "click .notification-accept": function (el) {
       const elId = el.currentTarget.getAttribute("notification-id");
+      const index = el.currentTarget.getAttribute("index");
       const type = elId.split("-")[0];
       console.log("NOTIF TYPE = ", type);
       const id = parseInt(elId.split("-")[1]);
@@ -99,16 +97,9 @@ export default Backbone.View.extend({
       } else if (type === "war_game") {
         window.currentUser.acceptWarGame();
       } else {
-        //if (type === "ladder")
-        console.log("OTHER");
-
         const game = new Game({ id: id });
         game.open();
-        // window.currentUser.openGame(id);
-        // TODO: something like this for all?
-        el.currentTarget.parentNode.parentNode.remove();
-        // } else if (type == "tournament") {
-        //   window.currentUser.openTournamentGame(id);
+        this.removeNofif(parseInt(index));
       }
     },
   },
@@ -208,5 +199,14 @@ export default Backbone.View.extend({
     $("#notification-list").html(
       _.template(template_list)({ notifs: this.notifs })
     );
+  },
+  removeNofif(index) {
+    this.notifs.splice(index, 1);
+    $("#notification-panel").removeClass("notification-panel-open");
+    if (this.notifs.length <= 0) {
+      $("#notification-badge").hide();
+    } else {
+      $("#notification-badge").text(this.notifs.length);
+    }
   },
 });
