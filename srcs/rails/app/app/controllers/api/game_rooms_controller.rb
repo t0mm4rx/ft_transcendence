@@ -17,7 +17,6 @@ module Api
                 render json: game_room
             else
                 render json: game_room.errors, status: 422
-                # render json: {errors: game.errors.full_messages}, status: 422
             end
         end
 

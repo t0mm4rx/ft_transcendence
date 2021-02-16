@@ -21,9 +21,9 @@ export default Backbone.View.extend({
   <div class="button-icon" id="block-user"><i class="fas fa-ban"></i></div>
   <% } else { if (model.get("admin") === true || model.get("owner") === true) { %>
     <div class="button-icon" id="edit-channel"><i class="fas fa-cog"></i></div>
-   <% } if (!adminPeak) {%>
+   <% } %>
     <div class="button-icon" id="leave-channel"><i class="fas fa-sign-out-alt"></i></div>
-   <% }} %>
+   <% } %>
    </div>`),
   messageTemplate: _.template(`<div class="chat-message-container<%= (sentByMe) ? " chat-message-container-me" : "" %><%= sentByLast ? " chat-message-container-no-margin": "" %>" id="<%= model.username %>">
   <% if (!sentByLast)  { %>
@@ -49,7 +49,6 @@ export default Backbone.View.extend({
   },
   events: {
     "click #edit-channel": "editChannel",
-    "click #leave-channel": "leaveChannel",
     "click #block-user": function ({ currentTarget }) {
       const login = $(currentTarget.parentNode).find("#chat-title").html();
       console.log(login);
@@ -82,29 +81,29 @@ export default Backbone.View.extend({
       }
     },
   },
-  render() {
+  render(adminPeak) {
+    this.adminPeak = adminPeak;
     this.messagesLength = this.collection.length;
     // console.log("RENDER CHANNEL");
-    this.renderHeader(false);
-    this.$el.append(`<div id="chat-messages"></div>
-    <div id="chat-input" id=${this.model.id}>
+    this.renderHeader();
+    let html = `<div id="chat-messages"></div>`;
+    if (!adminPeak)
+      html += `<div id="chat-input" id=${this.model.id}>
       <input type="text" class="chat-input" id=${this.model.id} placeholder="Send something"/>
-    </div>`);
+    </div>`;
+    this.$el.append(html);
     this.$(".chat-input").keyup((e) => this.onKeyUp(e));
     this.renderMessages();
     return this;
   },
-  renderAdminPeak() {
-    // todo: no message input, no join, no leave
-    this.messagesLength = this.collection.length;
-    // console.log("RENDER CHANNEL");
-    this.renderHeader(true);
-    this.$el.append(`<div id="chat-messages"></div>`);
-    this.renderMessages();
-    return this;
-  },
-  renderHeader(adminPeak) {
-    this.$el.html(this.template({ model: this.model, adminPeak: adminPeak }));
+  renderHeader() {
+    this.$el.html(this.template({ model: this.model }));
+    if (this.adminPeak) {
+      this.$("#leave-channel").hide();
+    } else {
+      // _.extend(this.events, { "click #leave-channel": "leaveChannel" });
+      this.$("#leave-channel").on("click", () => this.leaveChannel());
+    }
   },
   renderMessages() {
     const messages = this.collection.models;
@@ -175,7 +174,6 @@ export default Backbone.View.extend({
       this.model.leave();
       this.collection.closeSocket();
       this.$el.html("");
-      // todo: change to another channel
     }
   },
   joinChannel() {

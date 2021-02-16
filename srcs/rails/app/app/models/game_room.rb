@@ -36,7 +36,7 @@ class GameRoom < ApplicationRecord
 	end
 
 	def check_no_show
-		if number_player == 1
+		if number_player == 1 || status == "player" || status == "opponent"
 			@no_show = true
 			update_scores
 		end
@@ -106,7 +106,7 @@ class GameRoom < ApplicationRecord
 		self.player_score ||= 0
 		self.opponent_score ||= 0
 		self.number_player ||= 0
-		self.status ||= "created"
+		self.status ||= "notstarted"
 	end
 
 	def set_winner_and_loser
