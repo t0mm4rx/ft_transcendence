@@ -116,7 +116,9 @@ const Guilds = Backbone.Collection.extend({
 });
 
 const getGuildMembers = (guildId) => {
-	return window.users.filter(a => !!a.get('guild') && a.get('guild').id == guildId);
+	const ids = window.guilds.models.find(a => a.get('id') === guildId).get('user_ids');
+	console.log(ids);
+	return ids.map(id => window.users.models.find(a => a.get('id') === id));
 }
 
 export {Guild, Guilds, getGuildMembers};
