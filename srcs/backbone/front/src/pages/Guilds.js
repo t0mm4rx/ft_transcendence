@@ -159,6 +159,10 @@ export default Backbone.View.extend({
 			toasts.notifyError("Opponent's anagram not found.");
 			return;
 		}
+		if (opponent === window.currentUser.get('guild').anagram) {
+			toasts.notifyError("You cannot declare war to yourself!");
+			return;
+		}
 		if (!stake) {
 			toasts.notifyError("Stake cannot be empty.");
 			return;
