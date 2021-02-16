@@ -96,7 +96,7 @@ export default Backbone.View.extend({
       return;
     }
     $.ajax({
-      url: `http://localhost:3000/api/tournaments`,
+      url: `http://${window.location.hostname}:3000/api/tournaments`,
       type: "POST",
       data: {
         name: name,

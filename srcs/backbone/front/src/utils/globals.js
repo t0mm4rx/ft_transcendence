@@ -1,26 +1,33 @@
 import Cookies from "js-cookie";
+import toasts from "./toasts"
 import { FtSocket } from "../models/FtSocket"
 
 const connectGlobalSocket = () => {
-  if ( !window.globalSocket
+  if (( !window.globalSocket
     || !window.globalSocket.socket
     || window.globalSocket.socket.readyState === WebSocket.CLOSED
     || window.globalSocket.socket.readyState === WebSocket.CLOSING)
+    && window.currentUser.get('id') !== "me")
   {
     // Global socket
-    var globalSocket = new FtSocket({
+    window.globalSocket = new FtSocket({
       channel: "GlobalChannel",
       user_id: window.currentUser.get('id')
     });
 
-    globalSocket.socket.onmessage = function (event) {
+    console.log("Can send = ", window.globalSocket.cansend);
+    window.globalSocket.socket.onmessage = function (event) {
       const event_res = event.data;
       const msg = JSON.parse(event_res);
 
       // Ignores pings.
       if (msg.type === "ping") return;
 
+      console.log("MSG AEF : ", msg);
+
       if (msg.message) {
+        console.log("MSG (1): ", msg.message.message);
+        console.log("CONTENT (1): ", msg.message.content);
         if (msg.message.message == "new_client") {
           // Refresh HERE
           window.currentUser.fetch();
@@ -53,8 +60,6 @@ const connectGlobalSocket = () => {
           }
         }
       };
-
-      window.globalSocket = globalSocket;
   }
 }
 

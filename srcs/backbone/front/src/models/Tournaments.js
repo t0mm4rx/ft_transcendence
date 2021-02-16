@@ -4,14 +4,14 @@ import toasts from "../utils/toasts";
 
 const TournamentUsers = Backbone.Collection.extend({
   initialize(props) {
-    this.url = `http://localhost:3000/api/tournaments/${props.id}/users`;
+    this.url = `http://${window.location.hostname}:3000/api/tournaments/${props.id}/users`;
   },
 });
 const TournamentGames = Backbone.Collection.extend({
-  url: `http://localhost:3000/api/ladder_games`,
+  url: `http://${window.location.hostname}:3000/api/ladder_games`,
   initialize(props) {
     if (props)
-      this.url = `http://localhost:3000/api/tournaments/${props.id}/games`;
+      this.url = `http://${window.location.hostname}:3000/api/tournaments/${props.id}/games`;
   },
 });
 
@@ -81,7 +81,7 @@ const Tournament = Backbone.Model.extend({
 });
 
 const Tournaments = Backbone.Collection.extend({
-  url: "http://localhost:3000/api/tournaments/",
+  url: `http://${window.location.hostname}:3000/api/tournaments/`,
   model: Tournament,
 });
 

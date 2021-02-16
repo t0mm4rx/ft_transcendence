@@ -88,7 +88,7 @@ export default Backbone.View.extend({
             console.log("Success:", result);
             window.currentUser.save(
               "avatar_url",
-              `http://127.0.0.1:8080/assets/user_images/${result.filename}`
+              `http://${window.location.hostname}:8080/assets/user_images/${result.filename}`
             );
             this.model.trigger("change");
           })
