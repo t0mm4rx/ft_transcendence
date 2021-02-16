@@ -49,7 +49,7 @@ export default Backbone.View.extend({
         )}" />
 			</div></div>`,
         () => {
-          const value = $("#display-name-input").val();
+          const value = $("#display-name-input").val().replace(/[&<>"'\/]/g, "");
           if (value.length === 0) {
             toasts.notifyError("The display name cannot be empty.");
             return false;
