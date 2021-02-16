@@ -7,13 +7,13 @@ class User < ApplicationRecord
 	has_many :friendships_user, class_name: 'Friendship', dependent: :destroy
 	has_many :friendships_friend, class_name: 'Friendship', foreign_key: "friend_id", dependent: :destroy
 
-
 	has_many :channel_users, dependent: :destroy
 	has_many :channels, through: :channel_users
 	has_many :messages, dependent: :destroy
+	has_many :tournament_users, dependent: :destroy
 
 	has_many :game_pending_requests, -> {where accepted: false}, class_name: 'GameRequest', foreign_key: "opponent_id"
-	has_many :pending_games, -> {where accepted: false}, class_name: 'GameRoom', foreign_key: "opponent_id"
+	# has_many :pending_games, -> {where accepted: false}, class_name: 'GameRoom', foreign_key: "opponent_id"
 	has_many :game_player, class_name: 'GameRoom', foreign_key: "player_id", dependent: :destroy
 	has_many :game_opponent, class_name: 'GameRoom', foreign_key: "opponent_id", dependent: :destroy
 
@@ -25,17 +25,17 @@ class User < ApplicationRecord
 	validates :login, presence: true, length: { minimum:2, maximum: 30 }, uniqueness: { case_sensitive: false }#, format: {with: /\A[a-z]+\z/}
 	validates :avatar_url, presence: true, length: { minimum:5, maximum: 255 }#, format: URI::regexp(%w[http https])
 
-	# validates_format_of :username, :with => /\A[^0-9`!@#\$%\^&*+_=]+\z/
-
-
 	validate :first_is_admin, :on => :create
-	# has_many :games, class_name: 'GameRoom'
 
 	after_initialize :set_defaults
 
 	def games
 		# GameRoom.where("player_id = ? OR opponent_id = ?", id, id)
 		game_player + game_opponent
+	end
+
+	def pending_games 
+		games.filter {|game| !game.accepted && game.status == "notstarted" }
 	end
 
 	# def pending_games
@@ -112,7 +112,8 @@ class User < ApplicationRecord
 
 	def find_higher_ranked_user
 		# User.where("online = true AND ladder_score > ?", ladder_score).order(ladder_score: :asc).first
-		User.where("'status' = 'online' AND id != ? AND ladder_score >= ?", id, ladder_score).order(ladder_score: :asc).first
+		User.where("id != ? AND ladder_score >= ?", id, ladder_score).order(ladder_score: :asc).first
+		# User.where("'status' = 'online' AND id != ? AND ladder_score >= ?", id, ladder_score).order(ladder_score: :asc).first
 	end
 
 	private

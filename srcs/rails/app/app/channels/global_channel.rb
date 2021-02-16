@@ -23,4 +23,14 @@ class GlobalChannel < ApplicationCable::Channel
   def to_broadcast (data)
     GlobalChannel.broadcast_to "global_channel", sender: data['infos']['sender'], message: data['infos']['message'], content: data['infos']['content']
   end
+
+  def self.send(message, to, from, game_id) 
+    content = {}
+		content['request_to'] = to.id
+		content['from'] = {}
+		content['from']['id'] = from.id
+    content['from']['login'] = from.login
+    content['gameid'] = game_id
+    GlobalChannel.broadcast_to "global_channel", sender: from.id, message: message, content: content
+  end
 end

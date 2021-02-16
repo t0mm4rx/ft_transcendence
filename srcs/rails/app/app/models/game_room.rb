@@ -19,8 +19,6 @@ class GameRoom < ApplicationRecord
 
 	def update_scores
 		set_winner_and_loser
-		@winner.has_won
-		@loser.has_lost
 		calculate_new_user_score if self.ladder
 		update_tournament if tournament
 	end
@@ -30,16 +28,36 @@ class GameRoom < ApplicationRecord
 		eliminate_loser
 	end
 
-	def eliminate
-		tournament_user = TournamentUser.find_by(tournament_id: tournament_id, user_id: @loser.id)
-		tournament_user.update(eliminated: true)
-		if tournament_user.save
-			render json: {}
-		else
-			render json: tournament_user.errors, status: :unprocessable_entity
+	def eliminate_loser
+		tournament_user = TournamentUser.find_by(tournament_id: tournament.id, user_id: @loser.id)
+		tournament_user.update_attribute(:eliminated, true)
+	end
+
+	def set_no_show(user)
+		if number_player != 2 && status == "notstarted"
+			@loser = user
+			set_winner_and_loser
+			update_tournament if tournament
 		end
 	end
 
+	def accepted_by(user)
+		# n_player = number_player + 1
+		if tournament
+			# s = user === player ? "player" : "opponent"
+			other = user === player ? opponent : player
+			# return if s == status
+			if number_player === 0 #status == "created"
+				Rufus::Scheduler.singleton.in "3m" do
+					set_no_show(other)
+				end
+			# else #if status == "player" || status == "opponent"
+				# n_player = 2
+				# s = "notstarted"
+			end
+		end
+		update(accepted: (number_player >= 1))
+	end
 	# after a ladder game is finished we need to update the users' scores
 	# for more info: https://github.com/mxhold/elo
 	def calculate_new_user_score
@@ -72,22 +90,26 @@ class GameRoom < ApplicationRecord
 		end
 	end
 
-
 	private
 
     def set_defaults
 		self.accepted ||= false
 		self.player_score ||= 0
 		self.opponent_score ||= 0
-		# self.number_player ||= opponent ? 2 : 1
 		self.number_player ||= 0
+		self.status ||= "notstarted"
 	end
 
 	def set_winner_and_loser
-		if game_over?
+		if @loser
+			@winner = @loser == player ? opponent : player
+		elsif game_over?
 			@winner = player_score > opponent_score ? player : opponent
 			@loser = player_score < opponent_score ? player : opponent
-			update_attribute(:winner_id, @winner.id)
 		end
+		update_attribute(:winner_id, @winner.id)
+		update_attribute(:status, "ended")
+		@winner.has_won
+		@loser.has_lost
 	end
 end

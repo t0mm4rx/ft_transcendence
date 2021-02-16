@@ -60,15 +60,15 @@ module Api
     end
 
     def games
-      games = @user.games.reverse # todo: order by updated_at
-      render json: games
+      games = @user.games.filter { |game| game.status == "ended" }
+      render json: games.reverse.take(15)
     end
 
     private
 
     def set_user
       id = params[:id]
-      return if id.match(/\A[a-zA-Z0-9 ]*\z/).nil?
+      return if id.match(/\A[a-z0-9]*\z/).nil?
       id = current_user.id if id == "me"
       @user = User.find(id) rescue nil
       if !@user

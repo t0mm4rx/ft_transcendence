@@ -9,11 +9,15 @@ import _ from "underscore";
 const Channel = Backbone.Collection.extend({
   comparator: "date",
   url() {
-    return `http://` + window.location.hostname + `:3000/api/channels/${this.channel_id}/messages`;
+    return (
+      `http://` +
+      window.location.hostname +
+      `:3000/api/channels/${this.channel_id}/messages`
+    );
   },
   initialize(props) {
     this.channel_id = props.channel_id;
-    this.load();
+    this.load({ adminPeak: props.adminPeak });
   },
   load(auth) {
     this.fetch({
@@ -35,9 +39,9 @@ const Channel = Backbone.Collection.extend({
       },
     });
   },
-  loadMessages() {
+  loadMessages(adminPeak) {
     this.fetch({
-      data: { offset: this.length },
+      data: { offset: this.length, adminPeak: !!adminPeak },
       remove: false,
       success: (data) => {
         console.log("Successfully fetched more messages");
@@ -50,7 +54,10 @@ const Channel = Backbone.Collection.extend({
   },
   sendMessage(body) {
     $.ajax({
-      url: `http://` + window.location.hostname + `:3000/api/channels/${this.channel_id}/messages`,
+      url:
+        `http://` +
+        window.location.hostname +
+        `:3000/api/channels/${this.channel_id}/messages`,
       type: "POST",
       data: `body=${body}`,
       success: () => {},

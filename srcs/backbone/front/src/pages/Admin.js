@@ -57,7 +57,7 @@ export default Backbone.View.extend({
   showChannel(e) {
     const id = this.getId(e);
     $("#chat-panel").addClass("chat-panel-open");
-    $(`span.chat-channel#${id}`).trigger("click");
+    $(`span.chat-channel#${id}`).trigger("click", true);
   },
   deleteChannel(e) {
     const id = this.getId(e);
@@ -96,7 +96,7 @@ export default Backbone.View.extend({
       return;
     }
     $.ajax({
-      url: `http://localhost:3000/api/tournaments`,
+      url: `http://${window.location.hostname}:3000/api/tournaments`,
       type: "POST",
       data: {
         name: name,
