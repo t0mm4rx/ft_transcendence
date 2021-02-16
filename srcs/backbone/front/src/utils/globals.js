@@ -41,8 +41,8 @@ const connectGlobalSocket = () => {
             window.location.hash = "game_live/" + msg.message.content.gameid;
             return;
           }
-          window.currentUser.fetch();
-          console.log("From : ", msg.message.content.from);
+            window.currentUser.fetch();
+            console.log("From : ", msg.message.content.from);
           if (msg.message.message == "friend_request")
             toasts.notifySuccess(
               "Friend request received from " + msg.message.content.from.login
@@ -53,7 +53,6 @@ const connectGlobalSocket = () => {
             );
           } else if (msg.message.message == "client_quit") {
             console.log("AAAAAAAAAAAA");
-            window.currentUser.fetch();
           } else {
             console.log("MSG : ", msg.message.message);
             console.log("CONTENT : ", msg.message.content);

@@ -55,10 +55,5 @@ class GameRoomChannel < ApplicationCable::Channel
     # game_room = GameRoom.find(params[:id])
     GameRoomChannel.broadcast_to @game_room, sender: data['infos']['sender'], message: data['infos']['message'], content: data['infos']['content']
   end
-
-  def ready(data)
-    game_room = GameRoom.find(params[:id])
-    GameRoomChannel.broadcast_to game_room, message: "everyone_ready", opponent_infos: data['infos']
-  end
   
 end

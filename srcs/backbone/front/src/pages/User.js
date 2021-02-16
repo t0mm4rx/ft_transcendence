@@ -134,17 +134,11 @@ export default Backbone.View.extend({
 					<b class="friend-name" onclick="window.location.hash='user/${friend.login}/'">${
           friend.username
         }</b>
-					<span class="friend-status${friend.online ? " friend-status-online" : ""}">${
-          friend.online ? "Online" : "Offline"
-        }</span>
+        <span class="friend-status friend-status-${friend.status}">${(friend.status.charAt(0).toUpperCase() + friend.status.slice(1)) }</span>
+        </span>
 					<span class="button-icon message-button" id="message-${
             friend.login
           }"><i class="far fa-comment"></i></span>
-					${
-            friend.online
-              ? '<span class="button-icon button-icon-accent"><i class="fas fa-gamepad"></i></span>'
-              : ""
-          }
 				</div>`
       );
     });
