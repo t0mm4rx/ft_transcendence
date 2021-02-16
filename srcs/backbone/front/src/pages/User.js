@@ -100,13 +100,15 @@ export default Backbone.View.extend({
         return false;
       };
       reader.onerror = function (error) {
-        // console.log(error);
         toasts.notifyError("Unable to read the image you selected");
       };
     },
 	"click .game-button": function (event) {
 		const login = event.currentTarget.id.split('-')[1];
 		window.users.models.find(a => a.get('login') === login).askGame();
+	},
+	'click #user-add-guild': function () {
+		this.model.askGuild();
 	}
   },
   initialize: function (options) {
@@ -120,6 +122,7 @@ export default Backbone.View.extend({
     loadUsers();
   },
   render: function () {
+	  console.log(this.model);
     this.$el.html(_.template(template)({ data: this.model.toJSON() }));
     this.renderFriendsList();
     this.games.fetch();
