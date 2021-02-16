@@ -48,6 +48,7 @@ export default Backbone.View.extend({
     this.lastUser = null;
   },
   events: {
+    "click #leave-channel": "leaveChannel",
     "click #edit-channel": "editChannel",
     "click #block-user": function ({ currentTarget }) {
       const login = $(currentTarget.parentNode).find("#chat-title").html();
@@ -94,6 +95,11 @@ export default Backbone.View.extend({
     this.$el.append(html);
     this.$(".chat-input").keyup((e) => this.onKeyUp(e));
     this.renderMessages();
+    if (this.model.get("admin") === true || this.model.get("owner") === true) {
+      this.delegateEvents(
+        _.extend(this.events, { "click #edit-channel": "editChannel" })
+      );
+    }
     return this;
   },
   renderHeader() {
@@ -101,8 +107,9 @@ export default Backbone.View.extend({
     if (this.adminPeak) {
       this.$("#leave-channel").hide();
     } else {
-      // _.extend(this.events, { "click #leave-channel": "leaveChannel" });
-      this.$("#leave-channel").on("click", () => this.leaveChannel());
+      this.delegateEvents(
+        _.extend(this.events, { "click #leave-channel": "leaveChannel" })
+      );
     }
   },
   renderMessages() {
