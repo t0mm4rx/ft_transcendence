@@ -30,7 +30,7 @@ module Api
                 GlobalChannel.send("game_request", opponent, current_user, game_room.id)
                 render json: game_room
             else
-               render json: {}, status: :unprocessable_entity
+               render json: {error: "game already exists"}, status: :unprocessable_entity
             end
         end
 

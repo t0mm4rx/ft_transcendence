@@ -4,6 +4,7 @@ class GameRoom < ApplicationRecord
 	belongs_to :tournament, optional: true
 
 	validates :player, presence: true
+	validate :same_unstarted_exists, :on => :create
 
 	after_initialize :set_defaults
 
@@ -113,5 +114,11 @@ class GameRoom < ApplicationRecord
 		update_attribute(:status, "ended")
 		@winner.has_won
 		@loser.has_lost
+	end
+
+	def same_unstarted_exists
+		if GameRoom.find_by(ladder: ladder, player: player, opponent: opponent, status: "notstarted", accepted: false)
+			errors.add(:id, "game already exists")
+		end
 	end
 end
