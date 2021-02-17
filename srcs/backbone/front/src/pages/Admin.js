@@ -57,7 +57,7 @@ export default Backbone.View.extend({
   showChannel(e) {
     const id = this.getId(e);
     $("#chat-panel").addClass("chat-panel-open");
-    $(`span.chat-channel#${id}`).trigger("click", { admin: true });
+    $(`span.chat-channel#${id}`).trigger("click", true);
   },
   deleteChannel(e) {
     const id = this.getId(e);

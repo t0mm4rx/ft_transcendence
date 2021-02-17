@@ -18,7 +18,7 @@ export default Backbone.View.extend({
     <% if (time) { %>
     <span id="time">Start:</span><h3 id="time"><%= time %></h3>
     <% } else { %> 
-      <span id="time">Ongoing</span>
+      <span id="time"><%= model.get("finished") ? "Ended" : "Ongoing" %></span>
     <% } %>
     <span id="prize">title: </span><h3 id="prize"><%= model.escape("title") %></h3>
   </div>

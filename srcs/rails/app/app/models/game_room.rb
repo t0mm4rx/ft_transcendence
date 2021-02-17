@@ -4,6 +4,7 @@ class GameRoom < ApplicationRecord
 	belongs_to :tournament, optional: true
 
 	validates :player, presence: true
+	validate :same_unstarted_exists, :on => :create
 
 	after_initialize :set_defaults
 
@@ -19,8 +20,6 @@ class GameRoom < ApplicationRecord
 
 	def update_scores
 		set_winner_and_loser
-		@winner.has_won
-		@loser.has_lost
 		calculate_new_user_score if self.ladder
 		update_tournament if tournament
 	end
@@ -35,37 +34,32 @@ class GameRoom < ApplicationRecord
 		tournament_user.update_attribute(:eliminated, true)
 	end
 
-	def check_no_show
-		if number_player == 1
-			@no_show = true
-			update_scores
+	def set_no_show(user)
+		if number_player != 2 && status == "notstarted"
+			@loser = user
+			set_winner_and_loser
+			update_tournament if tournament
 		end
-	end
-
-	def declined(user)
-		status = user == opponent ? "player" : "opponent"
-		update_attribute(:status, status)
-		@no_show = true
-		update_scores
 	end
 
 	def accepted_by(user)
-		s = "notstarted"
-		n_player = number_player + 1
+		# n_player = number_player + 1
 		if tournament
-			s = user === player ? "player" : "opponent"
-			return if s == status
-			if status == "created"
-				n_player = 1
+			# s = user === player ? "player" : "opponent"
+			other = user === player ? opponent : player
+			# return if s == status
+			if number_player === 0 #status == "created"
 				Rufus::Scheduler.singleton.in "3m" do
-					check_no_show
+					set_no_show(other)
 				end
-			else #if status == "player" || status == "opponent"
-				n_player = 2
-				s = "notstarted"
+			# else #if status == "player" || status == "opponent"
+				# n_player = 2
+				# s = "notstarted"
 			end
+			update(accepted: (number_player >= 1))
+		elsif user === opponent
+			update(accepted: true)
 		end
-		update(number_player: n_player, status: s, accepted: (s == "notstarted"))
 	end
 	# after a ladder game is finished we need to update the users' scores
 	# for more info: https://github.com/mxhold/elo
@@ -110,15 +104,21 @@ class GameRoom < ApplicationRecord
 	end
 
 	def set_winner_and_loser
-		if game_over?
+		if @loser
+			@winner = @loser == player ? opponent : player
+		elsif game_over?
 			@winner = player_score > opponent_score ? player : opponent
 			@loser = player_score < opponent_score ? player : opponent
-			update_attribute(:winner_id, @winner.id)
-		elsif @no_show
-			@winner = status == "player" ? player : opponent
-			@loser = status == "player" ?  opponent : player
-			update_attribute(:winner_id, @winner.id)
-			update_attribute(:status, "ended")
+		end
+		update_attribute(:winner_id, @winner.id)
+		update_attribute(:status, "ended")
+		@winner.has_won
+		@loser.has_lost
+	end
+
+	def same_unstarted_exists
+		if GameRoom.find_by(ladder: ladder, player: player, opponent: opponent, status: "notstarted", accepted: false)
+			errors.add(:id, "game already exists")
 		end
 	end
 end

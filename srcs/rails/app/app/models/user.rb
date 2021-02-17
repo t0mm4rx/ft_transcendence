@@ -35,7 +35,11 @@ class User < ApplicationRecord
 	end
 
 	def pending_games 
-		games.filter {|game| !game.accepted }
+		games.filter do |game| 
+			!game.accepted && 
+			game.status == "notstarted" && 
+			(id === game.opponent.id || game.tournament || game.game_type == "war")
+		end
 	end
 
 	# def pending_games

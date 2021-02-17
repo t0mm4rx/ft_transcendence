@@ -4,6 +4,7 @@ class Api::TournamentsController < ApplicationController
 	before_action :check_registration_time, only: [:register, :unregister]
 
 	def index
+		# Tournament.all.each {|t| t.destroy if t.users.length < 2}
 		@tournaments = Tournament.all
 		render json: @tournaments
 	end

@@ -154,8 +154,13 @@ export default Backbone.View.extend({
 		const wtStart = document.querySelector("#war-time-start").value;
 		const wtEnd = document.querySelector("#war-time-end").value;
 		const allGamesCount = document.querySelector("#all-games-count").checked;
+		const timeToAnswer = document.querySelector("#time-to-answer-input").value;
 		if (!opponent || !guilds.models.find(a => a.get('anagram') === opponent)) {
 			toasts.notifyError("Opponent's anagram not found.");
+			return;
+		}
+		if (opponent === window.currentUser.get('guild').anagram) {
+			toasts.notifyError("You cannot declare war to yourself!");
 			return;
 		}
 		if (!stake) {
@@ -177,7 +182,8 @@ export default Backbone.View.extend({
 			'wt_end': wtEnd,
 			'wt_max_unanswers': max,
 			'prize': stake,
-			'add_count_all': allGamesCount
+			'add_count_all': allGamesCount,
+			'wt_time_to_answer': !!timeToAnswer ? parseInt(timeToAnswer) : 1
 		}, () => {
 			document.querySelector("#anagram-input").value = "";
 			document.querySelector("#stake-input").value = "";
@@ -186,6 +192,7 @@ export default Backbone.View.extend({
 			document.querySelector("#war-end-date").value = "";
 			document.querySelector("#war-time-start").value = "";
 			document.querySelector("#war-time-end").value = "";
+			document.querySelector("#time-to-answer-input").value = "";
 		});
 	}
 });

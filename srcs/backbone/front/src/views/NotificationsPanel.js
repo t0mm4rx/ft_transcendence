@@ -33,16 +33,17 @@ export default Backbone.View.extend({
       const id = parseInt(elId.split("-")[1]);
       if (type === "friend") {
         window.users.models.find((a) => a.get("id") === 3).unfriend();
-      }
-      if (type === "war") {
+      } else if (type === "war") {
         window.guilds.declineWar();
+      } else if (type === "guild_invite") {
+        window.currentUser.declineGuildInvite();
       } else {
         const game = new Game({ id: id });
         game.destroy({
           success: (data) => {
             console.log("DENIED GAME");
             toasts.notifySuccess("Game declined");
-            this.removeNofif(parseInt(index));
+            // this.removeNofif(parseInt(index));
           },
           error: (data) => {
             console.log("ERROR", data);
@@ -50,6 +51,8 @@ export default Backbone.View.extend({
           },
         });
       }
+      el.currentTarget.parentNode.parentNode.remove();
+      this.removeNofif();
     },
     "click .notification-accept": function (el) {
       const elId = el.currentTarget.getAttribute("notification-id");
@@ -96,11 +99,15 @@ export default Backbone.View.extend({
         );
       } else if (type === "war_game") {
         window.currentUser.acceptWarGame();
+      } else if (type === "guild_invite") {
+        window.currentUser.acceptGuildInvite();
       } else {
         const game = new Game({ id: id });
         game.open();
-        this.removeNofif(parseInt(index));
+        // this.removeNofif(parseInt(index));
       }
+      el.currentTarget.parentNode.parentNode.remove();
+      this.removeNofif();
     },
   },
   render: function () {
@@ -189,6 +196,17 @@ export default Backbone.View.extend({
       }
     }
 
+    if (window.currentUser.get("guild_invites") !== 0) {
+      const user = window.users.models.find(
+        (a) => a.get("id") === window.currentUser.get("guild_invites")
+      );
+      this.notifs.push({
+        title: `${user.get("username")} wants to invite you in his/her guild.`,
+        type: "guild_invite",
+        id: 0,
+      });
+    }
+    this.notifs.length_ = this.notifs.length;
     if (this.notifs.length <= 0) {
       $("#notification-panel").removeClass("notification-panel-open");
       $("#notification-badge").hide();
@@ -200,13 +218,15 @@ export default Backbone.View.extend({
       _.template(template_list)({ notifs: this.notifs })
     );
   },
-  removeNofif(index) {
-    this.notifs.splice(index, 1);
-    $("#notification-panel").removeClass("notification-panel-open");
-    if (this.notifs.length <= 0) {
+  removeNofif() {
+    // this.notifs.splice(index, 1);
+    // $("#notification-panel").removeClass("notification-panel-open");
+    this.notifs.length_ = this.notifs.length_ - 1;
+    if (this.notifs.length_ <= 0) {
       $("#notification-badge").hide();
+      $("#notification-panel").removeClass("notification-panel-open");
     } else {
-      $("#notification-badge").text(this.notifs.length);
+      $("#notification-badge").text(this.notifs.length_);
     }
   },
 });

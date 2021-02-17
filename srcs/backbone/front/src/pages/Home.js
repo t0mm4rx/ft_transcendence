@@ -9,6 +9,11 @@ export default Backbone.View.extend({
 	events: {
 		'click .message-button': function (event) {
 			$(document).trigger('chat', {chat: event.currentTarget.id.split('-')[1]});
+		},
+		'click .game-button': function (event) {
+			const login = event.currentTarget.id.split('-')[1];
+			console.log(login);
+			window.users.where('login', login).askGame();
 		}
 	},
 	render: function () {
@@ -57,7 +62,7 @@ export default Backbone.View.extend({
 					<b class="friend-name" onclick="window.location.hash='user/${friend.login}/'">${friend.username}</b>
 					<span class="friend-status friend-status-${friend.status}">${(friend.status.charAt(0).toUpperCase() + friend.status.slice(1)) }</span>
 					<span class="button-icon message-button" id="message-${friend.login}"><i class="far fa-comment"></i></span>
-					${friend.online ? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}
+					${friend.online ? `<span class="button-icon button-icon-accent game-button" id="game-${friend.login}"><i class="fas fa-gamepad"></i></span>` : ""}
 				</div>`
 			);
 		});
