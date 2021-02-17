@@ -85,7 +85,7 @@ export default Backbone.View.extend({
         })
           .then((response) => response.json())
           .then((result) => {
-            console.log("Success:", result);
+            // console.log("Success:", result);
             window.currentUser.save(
               "avatar_url",
               `http://${window.location.hostname}:8080/assets/user_images/${result.filename}`
@@ -100,7 +100,7 @@ export default Backbone.View.extend({
         return false;
       };
       reader.onerror = function (error) {
-        console.log(error);
+        // console.log(error);
         toasts.notifyError("Unable to read the image you selected");
       };
     },
@@ -116,7 +116,6 @@ export default Backbone.View.extend({
     loadUsers();
   },
   render: function () {
-    console.log("RENDER", this.model.toJSON());
     this.$el.html(_.template(template)({ data: this.model.toJSON() }));
     this.renderFriendsList();
     this.games.fetch();
@@ -153,7 +152,7 @@ export default Backbone.View.extend({
       let game_type = "direct";
       if (game.get("ladder")) game_type = "ladder";
       else if (game.get("game_type") == "war") game_type = "war";
-      else if (game.get("tournament_id")) game_type = "tournament";
+      else if (game.get("tournament")) game_type = "tournament";
       if (game.get("player") && game.get("opponent"))
         html += this.gameTemplate({
           game: game,

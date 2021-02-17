@@ -22,5 +22,6 @@ class Guild < ApplicationRecord
 		self.wt_game_invite ||= 0
 		self.war_invite_id ||= 0
 		self.isinwtgame ||= false
+		self.wt_date_to_answer ||= Time.now.year + 1
 	end
 end

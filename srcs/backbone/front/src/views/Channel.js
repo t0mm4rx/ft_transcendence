@@ -50,6 +50,20 @@ export default Backbone.View.extend({
   events: {
     "click #edit-channel": "editChannel",
     "click #leave-channel": "leaveChannel",
+    "click #block-user": function ({ currentTarget }) {
+      const login = $(currentTarget.parentNode).find("#chat-title").html();
+      console.log(login);
+      const user = new User({ id: login });
+      user.fetch({
+        success: () => {
+          if (user.get("blocked") === true) {
+            user.unblock();
+          } else {
+            user.block();
+          }
+        },
+      });
+    },
     "click #chat-title": function () {
       this.getUserProfile();
     },
@@ -57,7 +71,7 @@ export default Backbone.View.extend({
       this.getUserProfile();
     },
     "click #start-game": function () {
-      console.log("Model : ", this.model);
+      // console.log("Model : ", this.model);
       if (this.model.get("direct") == true) {
         const channel_users = this.model.get("channel_users");
         var user;
@@ -70,7 +84,7 @@ export default Backbone.View.extend({
   },
   render() {
     this.messagesLength = this.collection.length;
-    console.log("RENDER CHANNEL");
+    // console.log("RENDER CHANNEL");
     this.renderHeader();
     this.$el.append(`<div id="chat-messages"></div>
     <div id="chat-input" id=${this.model.id}>
@@ -79,6 +93,9 @@ export default Backbone.View.extend({
     this.$(".chat-input").keyup((e) => this.onKeyUp(e));
     this.renderMessages();
     return this;
+  },
+  renderAdmin() {
+    // todo: no message input, no join, no leave
   },
   renderHeader() {
     console.log("render header", this.model, this.model.escape("admin"));
@@ -96,7 +113,7 @@ export default Backbone.View.extend({
     if (this.collection.length == this.messagesLength) return;
     const newMessages = this.collection.length - this.messagesLength;
     this.messagesLength = this.collection.length;
-    console.log("ON MORE MESSAGES", newMessages, messages, this.collection);
+    // console.log("ON MORE MESSAGES", newMessages, messages, this.collection);
     const html = this.messagesToHTML(messages.models.slice(0, newMessages));
     this.$("#chat-messages").prepend(html);
     document.querySelector("#chat-messages").scrollTop = $(
@@ -104,41 +121,30 @@ export default Backbone.View.extend({
     ).offset().top;
   },
   onNewMessage(message) {
-    console.log("NEW MESSAGE", message);
+    // console.log("NEW MESSAGE", message);
     const username = message.username;
-    this.lastUser = username;
     this.$("#chat-messages").append(
       this.messageTemplate({
         model: message,
+        date: this.formatedDate(message.date),
         sentByMe: username == window.currentUser.get("username"),
         sentByLast: this.lastUser === username,
       })
     );
+    this.lastUser = username;
     document.querySelector("#chat-messages").scrollTop = document.querySelector(
       "#chat-messages"
     ).scrollHeight;
   },
   messagesToHTML(messages) {
-    const options = {
-      // weekday: "long",
-      // year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
-    };
     console.log("MSG -> HTML", messages.length);
     if (messages.length > 0) this.firstUser = messages[0].get("username");
     let html = "";
     messages.forEach((message) => {
       const username = message.get("username");
-      const date = new Date(
-        message.get("date").replace(/-/g, "/")
-      ).toLocaleString("en-US", options);
       html += this.messageTemplate({
         model: message.toJSON(),
-        date: date,
+        date: this.formatedDate(message.get("date")),
         sentByMe: username == window.currentUser.get("username"),
         sentByLast: this.lastUser == username,
       });
@@ -155,7 +161,6 @@ export default Backbone.View.extend({
     this.channelUsers.fetch({
       success: () => {
         console.log("Successfully fetched channel users");
-
         this.editView.render(this.model.get("owner"));
       },
       error: () => toasts.notifyError("Failed to get channel data."),
@@ -218,5 +223,20 @@ export default Backbone.View.extend({
     if (window.users.find((a) => a.get("login") === login)) {
       window.location.hash = `user/${login}/`;
     }
+  },
+  options: {
+    // weekday: "long",
+    // year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour12: false,
+    hour: "2-digit",
+    minute: "2-digit",
+  },
+  formatedDate(date) {
+    return new Date(date.replace(/-/g, "/")).toLocaleString(
+      "en-US",
+      this.options
+    );
   },
 });

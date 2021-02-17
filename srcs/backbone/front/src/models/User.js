@@ -14,19 +14,18 @@ const UserGames = Backbone.Collection.extend({
 const User = Backbone.Model.extend({
   urlRoot: `http://${window.location.hostname}:3000/api/users/`,
   save: function (key, value) {
-      $.ajax({
-        url:
-          `http://` +
-          window.location.hostname +
-          `:3000/api/users/${window.currentUser.get("id")}/`,
-        type: "PUT",
-        data: `${key}=${value}`,
-        success: () => {
-          this.set(key, value);
-        },
-        error: (model, response) => {
-        },
-      });
+    $.ajax({
+      url:
+        `http://` +
+        window.location.hostname +
+        `:3000/api/users/${window.currentUser.get("id")}/`,
+      type: "PUT",
+      data: `${key}=${value}`,
+      success: () => {
+        this.set(key, value);
+      },
+      error: (model, response) => {},
+    });
   },
   askFriend: function () {
     $.ajax({
@@ -311,62 +310,6 @@ const User = Backbone.Model.extend({
       },
     });
   },
-  acceptLadderGame(id) {
-    console.log("ACCEPT LADDER GAME");
-
-    $.ajax({
-      url: `http://${window.location.hostname}:3000/api/game_rooms/${id}`,
-      type: "PUT",
-      data: { accepted: true, status: "notstarted" },
-      success: (data) => {
-        console.log("ACCEPTED GAME", data);
-        toasts.notifySuccess("Game accepted");
-        if (data == null) {
-          toasts.notifyError("Error during game creation.");
-          return;
-        }
-
-        window.globalSocket.sendMessage(
-          {
-            action: "to_broadcast",
-            infos: {
-              message: "game_request_reply",
-              content: {
-                request_to: data.player.id,
-                from: {
-                  id: window.currentUser.get("id"),
-                  login: window.currentUser.get("login"),
-                },
-                gameid: data.id,
-              },
-            },
-          },
-          false,
-          true
-        );
-
-        window.location.hash = "game_live/" + data.id;
-      },
-      error: (data) => {
-        console.log("ERROR", data);
-        toasts.notifyError(data.responseJSON.error);
-      },
-    });
-  },
-  declineLadderGame(id) {
-    $.ajax({
-      url: `http://${window.location.hostname}:3000/api/game_rooms/${id}`,
-      type: "DELETE",
-      success: (data) => {
-        console.log("DENIED GAME");
-        toasts.notifySuccess("Game denied");
-      },
-      error: (data) => {
-        console.log("ERROR", data);
-        toasts.notifyError(data.responseJSON.error);
-      },
-    });
-  },
   acceptWarGame() {
     $.ajax({
       url: `http://${window.location.hostname}:3000/api/wars/${
@@ -374,10 +317,10 @@ const User = Backbone.Model.extend({
       }/wt_game_accept`,
       type: "POST",
       success: (data) => {
-        toasts.notifySuccess('Nice game start');
-        
+        toasts.notifySuccess("Nice game start");
+
         window.currentUser.fetch();
-        
+
         window.globalSocket.sendMessage(
           {
             action: "to_broadcast",
