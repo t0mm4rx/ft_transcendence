@@ -40,10 +40,11 @@ class ChannelUsersController < ApplicationController
 	end
 
 	#add a params to delete a specific person, if its owner he's not owner anymore
-	def destroy
-		return render json: {}, status: :forbidden unless params[:id].to_i === current_user.id
-		
-		@user = @channel.channel_users.find_by(user_id: params[:id]);
+	def destroy		
+		@user = @channel.channel_users.find_by(user_id: params[:id])
+		if @user.user_id != current_user.id || @user.banned || @user.muted
+			return render json: {}, status: :forbidden
+		end
 		if @user.destroy
 			render json: {}
 		else

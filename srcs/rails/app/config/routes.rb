@@ -56,7 +56,7 @@ Rails.application.routes.draw do
     post '/game/:id/update_status', to: 'game_rooms#update_status'
     get '/game/livestream_games', to: 'game_rooms#livestream_games'
 
-    resources :game_requests, only: [:index, :create, :update]
+    resources :game_requests, only: [:index, :create, :update, :destroy]
     get '/game/match_no_opponent', to: 'game_requests#first_no_oppenent'
     post '/game/:id/change_opponent', to: 'game_requests#change_opponent'
     post '/game/:userid/destroy_empty_requests', to: 'game_requests#destroy_empty_requests'

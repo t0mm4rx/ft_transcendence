@@ -30,6 +30,18 @@ module Api
           end
         end
 
+        def destroy
+          game_request = GameRequest.find(params[:id])
+          if game_request.opponent != current_user
+            return render json: {}, status: :forbidden
+          end
+          if game_request.destroy
+            render json: {}
+          else
+            render json: game_request.errors, status: :unprocessable_entity
+          end
+        end
+
         def first_no_oppenent
           gamerequest = GameRequest.where(opponent_id: -1).first
           render json: gamerequest

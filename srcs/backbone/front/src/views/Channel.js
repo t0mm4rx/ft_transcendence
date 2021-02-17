@@ -183,12 +183,12 @@ export default Backbone.View.extend({
       this.$el.html("");
     }
   },
-  joinChannel() {
+  joinChannel(response) {
     showModal(
       `Join channel`,
       `<div id="form-channel">
         ${
-          this.model.get("private")
+          response == "password"
             ? `<div class="input-wrapper">
                 <input type="password" placeholder="Enter password" id="new-channel-password" />
               </div>`

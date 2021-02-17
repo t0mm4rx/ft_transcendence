@@ -28,7 +28,7 @@ export default Backbone.View.extend({
     },
     "click .notification-delete": function (el) {
       const elId = el.currentTarget.getAttribute("notification-id");
-      const index = el.currentTarget.getAttribute("index");
+      // const index = el.currentTarget.getAttribute("index");
       const type = elId.split("-")[0];
       const id = parseInt(elId.split("-")[1]);
       if (type === "friend") {
@@ -56,7 +56,7 @@ export default Backbone.View.extend({
     },
     "click .notification-accept": function (el) {
       const elId = el.currentTarget.getAttribute("notification-id");
-      const index = el.currentTarget.getAttribute("index");
+      // const index = el.currentTarget.getAttribute("index");
       const type = elId.split("-")[0];
       console.log("NOTIF TYPE = ", type);
       const id = parseInt(elId.split("-")[1]);
