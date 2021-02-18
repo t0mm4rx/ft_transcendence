@@ -147,7 +147,9 @@ export default Backbone.View.extend({
     this.$("#history-panel-content").html("");
     this.games.each((game) => {
       let gameview = new GameListElement({ model: game });
-      this.$("#history-panel-content").append(gameview.render().el);
+      this.$("#history-panel-content").append(
+        gameview.render(this.model.id).el
+      );
     });
   },
 });
