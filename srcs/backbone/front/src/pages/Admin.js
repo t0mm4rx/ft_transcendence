@@ -72,16 +72,15 @@ export default Backbone.View.extend({
   renderAdminsList() {
     const list = $(".listing#admins");
     list.html("");
-
     this.admins.each((user) => {
-      list.append(`<div class="listing">
+      let html = `<div class="listing">
       <div class="listing-item">
-        <span>${user.get("username")}</span>
-        <div class="button-icon delete-admin" id="${user.id}">
-          <i class="fas fa-minus-circle"></i>
-        </div>
-      </div>
-      </div>`);
+        <span>${user.get("username")}</span>`;
+      if (!user.get("owner"))
+        html += `<div class="button-icon delete-admin" id="${user.id}">
+        <i class="fas fa-minus-circle"></i>
+      </div>`;
+      list.append(html + "</div></div>");
     });
   },
   renderChannelsList: function () {
