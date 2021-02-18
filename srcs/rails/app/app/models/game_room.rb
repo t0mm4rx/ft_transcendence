@@ -21,17 +21,10 @@ class GameRoom < ApplicationRecord
 	def update_scores
 		set_winner_and_loser
 		calculate_new_user_score if self.ladder
-		update_tournament if tournament
-	end
-
-	def update_tournament
-		tournament.calculate_new_game(@winner)
-		eliminate_loser
-	end
-
-	def eliminate_loser
-		tournament_user = TournamentUser.find_by(tournament_id: tournament.id, user_id: @loser.id)
-		tournament_user.update_attribute(:eliminated, true)
+		if tournament
+			tournament.calculate_new_game(@winner)
+			tournament.eliminate(@loser)
+		end
 	end
 
 	def set_no_show(user)

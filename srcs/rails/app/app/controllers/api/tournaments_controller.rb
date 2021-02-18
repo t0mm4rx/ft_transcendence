@@ -10,7 +10,7 @@ class Api::TournamentsController < ApplicationController
 	end
 
 	def users
-		@users = TournamentUser.where(tournament_id: params[:id])
+		@users = TournamentUser.where(tournament_id: params[:id]).order(:eliminated)
 		render json: @users
 	end
 
@@ -38,7 +38,13 @@ class Api::TournamentsController < ApplicationController
 	end
 
 	def show
-		@tournament.match_opponents
+		# @tournament.match_opponents
+		# render json: @tournament.tournament_users
+		# @tournament.games[0].destroy
+		# game = GameRoom.new(player_id: 2, tournament_id: @tournament.id)
+		# game.save
+		# @tournament.calculate_new_game(User.find(1))
+		# render json: game
 		render json: @tournament.games
 	end
 	
@@ -70,28 +76,6 @@ class Api::TournamentsController < ApplicationController
 			render json: @reg_user.errors, status: :unprocessable_entity
 		end
 	end
-
-	# def join_game
-	# 	@game = GameRoom.find(params[:id])
-	# 	if not @game 
-	# 		return render json: @game.errors, status: :not_found
-	# 	end
-	# 	status = current_user == @game.player ? "player" : "opponent"
-	# 	number_player = @game.number_player + 1
-	# 	if number_player == 1
-	# 		Rufus::Scheduler.singleton.in "3m" do
-	# 			@game.check_no_show
-	# 		end
-	# 	elsif number_player == 2
-	# 		status = "everyone_ready" if number_player == 2			
-	# 	end
-	# 	@game.update(status: status, number_player: number_player)
-	# 	if @game.save
-	# 		render json: @game
-	# 	else
-	# 		render json: @game.errors, status: :unprocessable_entity
-	# 	end
-	# end
 	
 	private
 

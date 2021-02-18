@@ -30,7 +30,7 @@ const Channel = Backbone.Collection.extend({
       },
       error: (data, state) => {
         if (state.status == 401) {
-          this.trigger("join");
+          this.trigger("join", state.responseText);
         } else {
           toasts.notifyError(state.responseJSON.error);
           this.trigger("leave");

@@ -28,8 +28,9 @@ module.exports = {
           return res.status(400).send({ error: "No data" });
         }
         fs.writeFile("./assets/user_images/" + filename, req.body, (err) => {
-          if (err) res.status(400).send({ error: "Failed to write to file" });
-          else res.send({ filename: filename });
+          // if (err) res.status(400).send({ error: "Failed to write to file" });
+          // else res.send({ filename: filename });
+          res.send({ filename: filename });
         });
       });
     },

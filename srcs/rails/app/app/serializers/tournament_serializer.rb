@@ -1,5 +1,5 @@
 class TournamentSerializer < ActiveModel::Serializer
-  attributes :id, :name, :start, :registration_start, :registered, :title, :finished
+  attributes :id, :name, :start, :registration_start, :registered, :title, :finished, :winner
 
   # has_many :users
 

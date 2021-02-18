@@ -6,7 +6,11 @@ module Api
     before_action :validate_rights, only: [:destroy, :update]
 
     def index
-      users = User.order(ladder_score: :desc).limit(limit).offset(params[:offset])
+      if params.has_key?(:admin) && params[:admin] 
+        users = User.where(admin: true)
+      else
+        users = User.order(ladder_score: :desc).limit(limit).offset(params[:offset])
+      end
       render json: users, each_serializer: FriendSerializer
     end
 
@@ -20,14 +24,19 @@ module Api
     end
 
     def update
+      puts "###################################"
+      p params
       if params.has_key?(:banned_until)
         params[:banned_until] = Time.now + params[:banned_until].to_i * 60
       end
       if !@user
         return render json: { error: "no such user" }, status: :not_found
       end
-      unless @user === current_user || current_user.admin
-        return render json: {}, status: :forbidden
+      unless @user === current_user || params.has_key?(:admin)
+        if (!current_user.admin || @user.owner) && !current_user.owner
+        # if (current_user.admin && !current_user.owner && !@user.owner) || current_user.owner
+          return render json: {error: "not sufficient rights"}, status: :forbidden
+        end
       end
       @user.update(user_params_change)
       if @user.save
@@ -94,7 +103,11 @@ module Api
     end
 
     def user_params_change
-      params.permit(:username, :avatar_url, :password, :guild_id, :banned_until, :status)
+      # if current_user.admin || current_user.owner
+      #   params.permit(:username, :avatar_url, :password, :guild_id, :banned_until, :status, :guild_owner, :guild_officer, :admin)
+      # else
+        params.permit(:username, :avatar_url, :password, :guild_id, :banned_until, :status, :guild_owner, :guild_officer, :admin)
+      # end
     end
 
     def limit

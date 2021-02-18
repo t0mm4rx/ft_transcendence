@@ -21,6 +21,10 @@ class Tournament < ApplicationRecord
 		GameRoom.where(tournament_id: id)
 	end
 
+	def winner
+		tournament_users.find_by(eliminated: false) if finished
+	end
+
 	def start_tournament
 		if tournament_users.count < 2
 			destroy
@@ -31,34 +35,41 @@ class Tournament < ApplicationRecord
 
 	def match_opponents
 		n_games = users.count.odd? ? (users.count + 1) / 2 : users.count / 2
-		@games = []
+		# @games = []
 		n_games.times do |index|
 			player = users[index]
 			opponent = users[index + n_games]
 			game = GameRoom.new(player: player, opponent: opponent, tournament_id: id)
-			@games.push(game) if game.save
+			# @games.push(game) if game.save
 			# todo: socket to each player
-			if (opponent)
+			if game.save && opponent
 				GlobalChannel.send("game_request", opponent, player, game.id)
 				GlobalChannel.send("game_request", player, opponent, game.id)
+				# game.eliminate_if_no_answer
 			end
 		end
 	end
 
-	def calculate_new_game (user)
-		existing = GameRoom.find_by(opponent: nil, winner_id: nil, tournament_id: id)
+	def calculate_new_game(winner)
+		existing = game_rooms.find_by(opponent: nil)
 		if tournament_users.where(eliminated: false).count > 1
 			if existing
-				existing.update(opponent: user)
+				existing.update(opponent: winner)
 			else
-				GameRoom.new(player: user, tournament_id: id)
+				GameRoom.new(player: winner, tournament_id: id).save
 			end
 		else
-			winner = tournament_users.find_by(eliminated: false)
-			winner = User.find(winner.user_id)
+			existing.destroy if existing
+			# winner = tournament_users.find_by(eliminated: false)
+			# winning_user = User.find(winner.user_id)
 			winner.update_attribute(:title, title) if title
 			update_attribute(:finished, true)
 		end
+	end
+
+	def eliminate(loser)
+		tournament_user = TournamentUser.find_by(tournament_id: id, user_id: loser.id)
+		tournament_user.update_attribute(:eliminated, true)
 	end
 
 	private
