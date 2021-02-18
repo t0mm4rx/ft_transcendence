@@ -5,6 +5,22 @@
     </div>
     <div id="users-management-content">
       <div class="input-wrapper">
+        <span>Admins</span>
+        <div id="listing-wrapper">
+          <div class="listing" id="admins"></div>
+        </div>
+        <div class="input-row">
+          <input
+            type="text"
+            placeholder="Login of the user"
+            id="admin-login-input"
+          />
+          <div class="button" id="admin">
+            <span>Add</span>
+          </div>
+        </div>
+      </div>
+      <div class="input-wrapper">
         <span>Ban a user</span>
         <div class="input-row">
           <input
@@ -13,15 +29,21 @@
             id="ban-login-input"
           />
           <input type="number" placeholder="Minutes" id="ban-time-input" />
-          <div class="button">
-            <span id="ban-button">Ban</span>
+          <div class="button" id="ban">
+            <span>Ban</span>
           </div>
         </div>
       </div>
       <div class="input-wrapper">
         <span>Channels</span>
-        <div id="channels-listing-wrapper">
-          <div id="channels-listing"></div>
+        <div id="listing-wrapper">
+          <div class="listing" id="channels"></div>
+        </div>
+      </div>
+      <div class="input-wrapper">
+        <span>Guilds</span>
+        <div id="listing-wrapper">
+          <div class="listing" id="guilds"></div>
         </div>
       </div>
     </div>

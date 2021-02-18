@@ -25,7 +25,7 @@ class User < ApplicationRecord
 	validates :login, presence: true, length: { minimum:2, maximum: 30 }, uniqueness: { case_sensitive: false }#, format: {with: /\A[a-z]+\z/}
 	validates :avatar_url, presence: true, length: { minimum:5, maximum: 255 }#, format: URI::regexp(%w[http https])
 
-	validate :first_is_admin, :on => :create
+	validate :first_is_owner, :on => :create
 
 	after_initialize :set_defaults
 
@@ -123,8 +123,12 @@ class User < ApplicationRecord
 
 	private
 
-	def first_is_admin
-		update_attribute(:admin, true) if User.count(:all) < 2
+	def first_is_owner
+		if User.count(:all) < 1
+			update_attribute(:admin, true) 
+			update_attribute(:owner, true) 
+		end
+		
 	end
 
     def set_defaults

@@ -35,16 +35,17 @@ class Tournament < ApplicationRecord
 
 	def match_opponents
 		n_games = users.count.odd? ? (users.count + 1) / 2 : users.count / 2
-		@games = []
+		# @games = []
 		n_games.times do |index|
 			player = users[index]
 			opponent = users[index + n_games]
 			game = GameRoom.new(player: player, opponent: opponent, tournament_id: id)
-			@games.push(game) if game.save
+			# @games.push(game) if game.save
 			# todo: socket to each player
-			if (opponent)
+			if game.save && opponent
 				GlobalChannel.send("game_request", opponent, player, game.id)
 				GlobalChannel.send("game_request", player, opponent, game.id)
+				# game.eliminate_if_no_answer
 			end
 		end
 	end

@@ -4,43 +4,53 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	> .panel {
+
+	>.panel {
 		flex: 1;
 		margin: 10px;
 	}
+
 	#users-management-content {
 		padding: 20px;
 		box-sizing: border-box;
+		overflow: auto;
 	}
-	#channels-listing-wrapper {
+
+	#listing-wrapper {
 		max-height: 400px;
 		overflow: hidden;
 		border-radius: 10px;
 		margin: 10px;
 	}
-	#channels-listing {
+
+	.listing {
 		box-sizing: border-box;
 		background-color: $grey_dark_light;
 		overflow-y: auto;
 		max-height: 400px;
-		.channel-item {
+
+		.listing-item {
 			padding: 10px;
 			display: flex;
 			align-items: center;
+
 			span {
 				margin-right: auto;
 			}
+
 			.button-icon {
 				margin: 5px;
 			}
 		}
 	}
+
 	#tournament-form {
 		padding: 20px;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 	}
+
 	#create-tournament-button {
 		align-self: center;
 		margin: 10px;
