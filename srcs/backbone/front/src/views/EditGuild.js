@@ -134,7 +134,6 @@ export default Backbone.View.extend({
       if (user.hasChanged()) {
         // const tmp = new User({ id: user.id });
         user.save(user.changed, {
-          patch: true,
           success: () => console.log("Saved user", user),
           error: () => console.log("Error on save", user),
         });

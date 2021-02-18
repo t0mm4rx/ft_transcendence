@@ -56,9 +56,9 @@ export default Backbone.View.extend({
     if (!window.currentUser.get("friends")) return;
     const friends = $("#live-friends-list");
     friends.html("");
-    const friendsel = new FriendListElement();
+    // const friendsel = new FriendListElement();
     window.currentUser.get("friends").forEach((friend) => {
-      // const friendsel = new FriendListElement();
+      const friendsel = new FriendListElement();
       friends.append(friendsel.render(friend).el);
     });
   },

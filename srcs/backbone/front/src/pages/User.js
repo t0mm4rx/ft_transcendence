@@ -75,6 +75,7 @@ export default Backbone.View.extend({
       if (!document.querySelector("#avatar-file").files.length) return;
       const file = document.querySelector("#avatar-file").files[0];
       if (!file) return;
+
       const reader = new FileReader();
       const login = this.model.get("login");
       reader.readAsBinaryString(file);
@@ -135,9 +136,10 @@ export default Backbone.View.extend({
     if (!this.model.get("friends")) return;
     const friends = $("#friends-panel-content");
     friends.html("");
-    const friendsel = new FriendListElement();
+
     this.model.get("friends").forEach((friend) => {
-      // const friendsel = new FriendListElement();
+      console.log("FRIEND", friend);
+      const friendsel = new FriendListElement();
       friends.append(friendsel.render(friend).el);
     });
   },

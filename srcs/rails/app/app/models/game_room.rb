@@ -22,8 +22,8 @@ class GameRoom < ApplicationRecord
 		set_winner_and_loser
 		calculate_new_user_score if self.ladder
 		if tournament
-			tournament.calculate_new_game(@winner)
 			tournament.eliminate(@loser)
+			tournament.calculate_new_game(@winner)
 		end
 	end
 
