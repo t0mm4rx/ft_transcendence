@@ -131,6 +131,14 @@
 				grid-area: img2;
 			}
 
+			.avatar#img2 {
+				grid-area: img2;
+				height: 70px;
+				width: 70px;
+				border-radius: 50px;
+				justify-self: center;
+			}
+
 			#img3 {
 				grid-area: img3;
 			}
@@ -161,6 +169,8 @@
 
 			.tournament-item {
 				justify-content: center;
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
 			}
 
 			#user-1 {

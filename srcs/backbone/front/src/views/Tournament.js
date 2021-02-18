@@ -36,10 +36,10 @@ export default Backbone.View.extend({
     </div>`
   ),
   gameTemplate: _.template(
-    `<div class="tournament-item"><span id="#user-1"><%= 
-    model.get("player").username
-    %><span class="score"><%= model.escape("player_score") %></span></span><span>-</span><span id="#user-2"><span class="score"><%= model.escape("opponent_score") %></span><%= 
-    model.get("opponent").username
+    `<div class="tournament-item"><b><span id="#user-1"><%=
+    model.get(winner).username
+    %><span class="score"><%= model.escape(winner + "_score") %></span></span></b><span>-</span><span id="#user-2"><span class="score"><%= model.escape(loser + "_score") %></span><%=
+    model.get(loser).username
     %></span></div>`
   ),
   className: "tournament panel",
@@ -54,6 +54,7 @@ export default Backbone.View.extend({
   },
   render() {
     if (!this.model.get("users")) return;
+
     const now = new Date();
     const registrationOpen =
       new Date(this.model.get("start").replace(/-/g, "/")) > now &&
@@ -77,11 +78,22 @@ export default Backbone.View.extend({
         time: time,
       })
     );
+    if (this.model.get("winner")) {
+      const winner = this.model.get("winner");
+      console.log("WINNER :", winner);
+
+      this.$("#img2").replaceWith(
+        `<img src="${winner.avatar_url}" id="img2" class="avatar"/>`
+      );
+      this.$("#time").replaceWith(
+        `<span id="time">Winner:</span><h3 id="time">${winner.username}</h3>`
+      );
+    }
     this.renderUsers(
       this.model.get("users").map((user) => (user ? user.get("user") : user)),
       !registrationOpen
     );
-    // this.renderGames();
+    this.renderGames();
     return this;
   },
   renderPermanent() {
@@ -115,8 +127,19 @@ export default Backbone.View.extend({
     console.log("GAMES:", this.model.get("games"));
     let html = "";
     this.model.get("games").each((game) => {
-      if (game.get("player") != null && game.get("opponent") != null)
-        html += this.gameTemplate({ model: game });
+      if (game.get("player") != null && game.get("opponent") != null) {
+        console.log("##### GAME", game);
+        const winner =
+          game.get("winner_id") === game.get("player").id
+            ? "player"
+            : "opponent";
+        const loser = winner == "player" ? "opponent" : "player";
+        html += this.gameTemplate({
+          model: game,
+          winner: winner,
+          loser: loser,
+        });
+      }
     });
     this.$("#games").html(html);
   },

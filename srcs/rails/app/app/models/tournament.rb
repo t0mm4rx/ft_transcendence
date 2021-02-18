@@ -42,6 +42,8 @@ class Tournament < ApplicationRecord
 	end
 
 	def calculate_new_game(winner)
+		t_user = tournament_users.find_by(user_id: winner.id)
+		t_user.update_attribute(wins: t_user.wins + 1)
 		game = game_rooms.find_by(opponent: nil)
 		if tournament_users.where(eliminated: false).count > 1
 			if game
@@ -51,7 +53,7 @@ class Tournament < ApplicationRecord
 			end
 			notify_players(game) if game.save
 		else
-			existing.destroy if existing
+			game.destroy if game
 			winner.update_attribute(:title, title) if title
 			update_attribute(:finished, true)
 		end
