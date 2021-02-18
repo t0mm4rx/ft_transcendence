@@ -1,6 +1,6 @@
 module Api
 	class AdminController < ApplicationController
-	#	before_action :check_if_admin to active again after coding tests
+		before_action :check_if_admin #to active again after coding tests
 
 		def create
 			target = User.find_by_id(params[:user_id]) rescue nil
