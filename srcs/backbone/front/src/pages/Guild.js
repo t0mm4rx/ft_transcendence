@@ -15,7 +15,6 @@ export default Backbone.View.extend({
 		this.listenTo(window.guilds, 'change', this.render);
 		this.listenTo(window.currentUser, 'change', this.render);
 		this.anagram = options.anagram;
-
 	},
 	events: {
 		'click .message-button': function (event) {
@@ -46,6 +45,7 @@ export default Backbone.View.extend({
 		console.log("Guild : ", this.guild);
 		this.$el.html(_.template(template)({guild: this.guild}));
 		this.renderUsers();
+		this.renderHistory();
 	},
 	renderUsers: function () {
 		this.guild = window.guilds.models.find(a => a.get('anagram') === this.anagram);
@@ -56,6 +56,8 @@ export default Backbone.View.extend({
 		console.log("Id: ", this.guild.get("id"));
 		console.log(getGuildMembers(this.guild.get("id")));
 		getGuildMembers(this.guild.get("id")).forEach(friend => {
+			if (!friend)
+				return;
 			friends.append(
 				`<div class="friend-item">
 					<img src="${friend.get('avatar_url')}" onclick="window.location.hash='user/${friend.get('login')}/'"/>
@@ -67,6 +69,35 @@ export default Backbone.View.extend({
 					${!!window.currentUser.get('admin') ? `<span class="button-icon user-settings" login="${friend.get('login')}"><i class="fas fa-cog"></i></span>` : ""}
 				</div>`
 			);
+		});
+	},
+	renderHistory: function () {
+		console.log("RENDER HISTORY");
+		const guild = window.guilds.find(a => !!a && a.get('anagram') === this.anagram);
+		if (!guild)
+			return;
+		const id = guild.get('id');
+		$.ajax({
+			url: `http://${window.location.hostname}:3000/api/guilds/${id}`,
+			success: res => {
+				$("#guild-history-list").html("");
+				res.forEach(game => {
+					if (!game.accepted)
+						return;
+					const guild_1 = window.guilds.models.find(a => a.get('id') === game.guild1_id);
+					const guild_2 = window.guilds.models.find(a => a.get('id') === game.guild2_id);
+					const win = game.guild1_id === id ? game.guild1_score >= game.guild2_score : game.guild1_score <= game.guild2_score;
+					$("#guild-history-list").append(
+						`<div class="history-item">
+							<span>${!!guild_1 ? guild_1.get('name') : "..."} vs ${!!guild_2 ? guild_2.get('name') : "..."}</span>
+							<span class="history-${win ? 'win' : 'loss'}">${win ? 'Win' : 'Loss'}</span>
+						</div>`
+					);
+				})
+			},
+			error: () => {
+				console.log("Cannot get guild history");
+			}
 		});
 	}
 });
