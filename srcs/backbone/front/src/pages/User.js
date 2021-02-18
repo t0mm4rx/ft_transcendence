@@ -7,6 +7,8 @@ import _ from "underscore";
 import { showModal } from "../utils/modal";
 import toasts from "../utils/toasts";
 import { loadUsers } from "../utils/globals";
+import GameListElement from "../views/GameListElement";
+import FriendListElement from "../views/FriendListElement";
 
 export default Backbone.View.extend({
   el: "#page",
@@ -49,7 +51,9 @@ export default Backbone.View.extend({
         )}" />
 			</div></div>`,
         () => {
-          const value = $("#display-name-input").val().replace(/[&<>"'\/]/g, "");
+          const value = $("#display-name-input")
+            .val()
+            .replace(/[&<>"'\/]/g, "");
           if (value.length === 0) {
             toasts.notifyError("The display name cannot be empty.");
             return false;
@@ -103,13 +107,13 @@ export default Backbone.View.extend({
         toasts.notifyError("Unable to read the image you selected");
       };
     },
-	"click .game-button": function (event) {
-		const login = event.currentTarget.id.split('-')[1];
-		window.users.models.find(a => a.get('login') === login).askGame();
-	},
-	'click #user-add-guild': function () {
-		this.model.askGuild();
-	}
+    "click .game-button": function (event) {
+      const login = event.currentTarget.id.split("-")[1];
+      window.users.models.find((a) => a.get("login") === login).askGame();
+    },
+    "click #user-add-guild": function () {
+      this.model.askGuild();
+    },
   },
   initialize: function (options) {
     this.listenTo(window.currentUser, "change", this.render);
@@ -122,7 +126,7 @@ export default Backbone.View.extend({
     loadUsers();
   },
   render: function () {
-	  console.log(this.model);
+    console.log(this.model);
     this.$el.html(_.template(template)({ data: this.model.toJSON() }));
     this.renderFriendsList();
     this.games.fetch();
@@ -131,50 +135,17 @@ export default Backbone.View.extend({
     if (!this.model.get("friends")) return;
     const friends = $("#friends-panel-content");
     friends.html("");
+    const friendsel = new FriendListElement();
     this.model.get("friends").forEach((friend) => {
-      friends.append(
-        `<div class="friend-item">
-					<img src="${friend.avatar_url}" onclick="window.location.hash='user/${
-          friend.login
-        }/'"/>
-					<b class="friend-name" onclick="window.location.hash='user/${friend.login}/'">${
-          friend.username
-        }</b>
-					<span class="friend-status${
-            friend.status == "online" ? " friend-status-online" : ""
-          }">${
-          friend.status.charAt(0).toUpperCase() + friend.status.slice(1)
-        }</span>
-					<span class="button-icon message-button" id="message-${
-            friend.login
-          }"><i class="far fa-comment"></i></span>
-					${
-            friend.online
-              ? `<span class="button-icon button-icon-accent game-button" id="game-${friend.login}"><i class="fas fa-gamepad"></i></span>`
-              : ""
-          }
-				</div>`
-      );
+      // const friendsel = new FriendListElement();
+      friends.append(friendsel.render(friend).el);
     });
   },
-  gameTemplate: _.template(`<div class="history-item">
-    <span><b><%= game.get("player").username %></b> <span class="history-item-win"><%= game.escape("player_score") %></span> - <span><%= game.escape("opponent_score") %></span> <%= game.get("opponent").username %><span class="history-item-info"> - <%= game_type %> game</span></span>
-    <span class="history-item-<%= result %>"><%= result %></span>
-    </div>`),
   renderHistoryList() {
-    let html = "";
+    this.$("#history-panel-content").html("");
     this.games.each((game) => {
-      let game_type = "direct";
-      if (game.get("ladder")) game_type = "ladder";
-      else if (game.get("game_type") == "war") game_type = "war";
-      else if (game.get("tournament")) game_type = "tournament";
-      if (game.get("player") && game.get("opponent"))
-        html += this.gameTemplate({
-          game: game,
-          result: game.get("winner_id") == this.model.id ? "win" : "loss",
-          game_type: game_type,
-        });
+      let gameview = new GameListElement({ model: game });
+      this.$("#history-panel-content").append(gameview.render().el);
     });
-    this.$("#history-panel-content").html(html);
   },
 });
