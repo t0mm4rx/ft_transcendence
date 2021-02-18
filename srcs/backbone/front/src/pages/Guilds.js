@@ -56,7 +56,7 @@ export default Backbone.View.extend({
 		const isInWar = !!window.currentUser.get('guild') && !!window.currentUser.get('guild').isinwar;
 
 		if (isInWar) {
-			war = window.wars.where('id', window.currentUser.get('guild').present_war_id);
+			war = window.wars.models.find(a => a.get('id') === window.currentUser.get('guild').present_war_id);
 			if (war) {
 				console.log(war);
 				guild1 = window.guilds.find(a => a.get('id') === war.get('guild1_id'));
