@@ -88,7 +88,8 @@ export default Backbone.View.extend({
         <p>Max unanswered games: ${war.get("wt_max_unanswers")}</p>
 		<p>All games count for the war: ${
       war.get("add_count_all") ? "yes" : "no"
-    }</p></div>`,
+    }</p>
+	<p>You'll have ${war.get('wt_time_to_answer')} days to answer game requests.</p></div>`,
           () => {
             window.guilds.acceptWar();
             return true;

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_12_170419) do
+ActiveRecord::Schema.define(version: 2021_02_17_221713) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -169,6 +169,7 @@ ActiveRecord::Schema.define(version: 2021_02_12_170419) do
     t.integer "ladder_score", default: 1000
     t.string "title"
     t.string "status"
+    t.boolean "owner"
     t.index ["guild_id"], name: "index_users_on_guild_id"
   end
 
