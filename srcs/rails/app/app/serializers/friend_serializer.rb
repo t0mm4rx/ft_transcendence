@@ -1,3 +1,3 @@
 class FriendSerializer < ActiveModel::Serializer
-  attributes :id, :username, :login, :avatar_url, :status, :guild_officer, :guild_owner, :ladder_score, :admin
+  attributes :id, :username, :login, :avatar_url, :status, :guild_officer, :guild_owner, :ladder_score, :admin, :owner
 end

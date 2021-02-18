@@ -55,7 +55,14 @@ export default Backbone.View.extend({
             this.admins.remove(user);
             e.currentTarget.parentNode.remove();
           },
-          error: (e) => console.log("ERROR", e),
+          error: (a, state) => {
+            // console.log(a, b);
+
+            if (state.status == 403)
+              toasts.notifyError(
+                "you don't have the rights to make this change"
+              );
+          },
         }
       );
     },
@@ -64,7 +71,17 @@ export default Backbone.View.extend({
       const user = new User({ id: login });
       user.save(
         { admin: true },
-        { success: () => this.admins.add(user), error: console.log("error") }
+        {
+          patch: true,
+          success: () => this.admins.add(user),
+          error: (a, state) => {
+            // console.log(a, b);
+            if (state.status == 403)
+              toasts.notifyError(
+                "you don't have the rights to make this change"
+              );
+          },
+        }
       );
     },
     "click #ban.button": "banUser",
