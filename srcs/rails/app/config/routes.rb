@@ -27,6 +27,7 @@ Rails.application.routes.draw do
       post '/guilds/accept_invitation', to: 'guilds#accept_invitation'
       post '/guilds/delete_member', to: 'guilds#delete_member'
       post '/guilds/:id/join', to: 'guilds#join'
+      get '/guilds/:id/users', to: 'guilds#users'
 
     resources :tournaments#, only: [:index, :create, :update, :destroy]
     get 'ladder_games', to: 'game_rooms#ladder_games'

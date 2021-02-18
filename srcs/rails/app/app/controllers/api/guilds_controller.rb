@@ -1,6 +1,6 @@
 module Api
 	class GuildsController < ApplicationController
-		before_action :set_guild, only: [:show, :update, :destroy]
+		before_action :set_guild, only: [:show, :update, :destroy, :users]
 		before_action :set_target, only: [:send_request, :delete_member]
 		def index
 			#sort them by score from higher to lower
@@ -24,7 +24,6 @@ module Api
 
 		def destroy
 			if current_user.guild_id && Guild.check_rights(current_user)
-				@guild = Guild.find(params[:id])
 				if @guild.destroy
 					render json: {}
 				else
@@ -53,6 +52,10 @@ module Api
 			else
 				render json: @guild.errors, status: :unprocessable_entity
 			end
+		end
+
+		def users
+			render json: @guild.users, each_serializer: FriendSerializer
 		end
 
 		def delete_member

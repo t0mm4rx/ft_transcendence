@@ -4,6 +4,7 @@ import $ from "jquery";
 import template from "../../templates/admin.html";
 import { ChannelUsers } from "../models/ChannelUsers";
 import EditChat from "../views/EditChat";
+import EditGuild from "../views/EditGuild";
 import toasts from "../utils/toasts";
 // import { User } from "../models/User";
 import { Guilds } from "../models/Guild";
@@ -113,35 +114,9 @@ export default Backbone.View.extend({
   editGuild(e) {
     const id = this.getId(e);
     const guild = this.guilds.get(id);
-    showModal(
-      "Edit Guild",
-      `<div class="form-channel" id="edit">
-      <div class="input-wrapper">
-        <h3>Owners</h3>
-        <div class="user-container" id="owner">
-        <%= owners %>
-        </div>
-        <div class="input-field">
-        <input class="username" type="text" placeholder="Username" id="owner" />
-        <div class="autocomplete" id="owner"></div>
-        <div style="display: inline;" class="button add" id="owner">Add</div>
-        </div>
-      </div>
-      <div class="input-wrapper">
-        <h3>Officers</h3>
-        <div class="user-container" id="admin">
-        <%= officers %>
-        </div>
-        <div class="input-field">
-        <input class="username" type="text" placeholder="Username" id="admin" />
-        <div class="autocomplete" id="admin"></div>
-        <div style="display: inline;" class="button add" id="admin">Add</div>
-        </div>
-      </div>
-    </div>`,
-      () => {},
-      () => {}
-    );
+    console.log("G USERS", guild.get("users"));
+    const editGuild = new EditGuild({ model: guild });
+    // editGuild.render();
   },
   editChannel(e) {
     const id = this.getId(e);
