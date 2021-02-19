@@ -21,6 +21,7 @@ export default Backbone.View.extend({
 		{
 			this.gamelive.ended(this.game_id);
 			this.ftsocket.closeConnection();
+			window.currentUser.changeStatus("online");
 			window.location.hash = "home";
 		}
 	},
@@ -41,6 +42,10 @@ export default Backbone.View.extend({
 			return;
 		}
 
+		console.log("User status (1): ", window.currentUser.get('status') );
+		window.currentUser.changeStatus("ingame");
+		console.log("User status (2): ", window.currentUser.get('status') );
+
 		$("#player-name").text(self.gameinfos.player.username);
 		$("#opponent-name").text(self.gameinfos.opponent.username);
 
@@ -55,17 +60,29 @@ export default Backbone.View.extend({
 			connect_type: 'normal'
 		});
 
-		setTimeout(function() {
+		if (self.gameinfos.status == "notstarted")
+		{
+			$("#game-canvas-div").append('<div id="waiting" class="panel-header"><h3>Waiting for everyone...</h3></div>');
+			self.ftsocket.socket.onmessage = function(event) {  
+				const response = event.data;
+				const msg = JSON.parse(response);
+				
+				// Ignores pings.
+				if (msg.type === "ping")
+					return;
 
-			if (self.gameinfos.status == "active")
-				self.game = new GameCanvas(self.ftsocket, self.gameinfos, "reconnection");
-			else if (self.gameinfos.status == "notstarted")
-			{
-				self.gamelive.active(self.game_id);
-				self.game = new GameCanvas(self.ftsocket, self.gameinfos, "normal");
-			}
-			
-		}, 1000);
+				console.log("Message : ", msg);
+				
+				if (msg.message && msg.message.message === "everyone_here")
+				{
+					$("#waiting").remove();
+					self.gamelive.active(self.game_id);
+					self.game = new GameCanvas(self.ftsocket, self.gameinfos, "normal");
+				}
+			};
+		}
+		else if (self.gameinfos.status == "active")
+			self.game = new GameCanvas(self.ftsocket, self.gameinfos, "reconnection");
 	},
 
     render: function() {

@@ -62,9 +62,9 @@ export default Backbone.View.extend({
 				`<div class="friend-item">
 					<img src="${friend.get('avatar_url')}" onclick="window.location.hash='user/${friend.get('login')}/'"/>
 					<b class="friend-name" onclick="window.location.hash='user/${friend.get('login')}/'">${friend.get('username')}</b>
-					<span class="friend-status${friend.get('online') ? " friend-status-online" : ""}">${friend.get('online') ? "Online" : "Offline"}</span>
+					<span class="friend-status friend-status-${friend.get('status')}">${(friend.get('status').charAt(0).toUpperCase() + friend.get('status').slice(1)) }</span>
 					<span class="button-icon message-button" id="message-${friend.get('login')}"><i class="far fa-comment"></i></span>
-					${friend.get('online') ? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}
+					${(friend.get('status') == "online" )? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}
 					${!!friend.get('guild_owner') ? "<i class=\"fas fa-crown owner-icon\"></i>" : ""}
 					${!!friend.get('guild_officer') ? "<i class=\"fas fa-star owner-icon\"></i>" : ""}
 					${!!window.currentUser.get('admin') ? `<span class="button-icon user-settings" login="${friend.get('login')}"><i class="fas fa-cog"></i></span>` : ""}

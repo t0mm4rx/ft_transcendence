@@ -25,8 +25,10 @@ class ApplicationController < ActionController::API
 		if @current_user && @current_user.banned
 			return render json: { error: "You are banned from the website until #{@current_user.banned_until}"}, status: :forbidden
 		end
-		if @current_user 
-			@current_user.update_attribute(:status, "online")
+		if @current_user
+			if @current_user === "offline"
+				@current_user.update_attribute(:status, "online")
+			end
 		else
 			render json: { error: 'Not Authorized' }, status: 401 
 		end

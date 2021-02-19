@@ -17,12 +17,16 @@ class GameRoomChannel < ApplicationCable::Channel
     @display_name = params[:display_name]
 
     GameRoom.find(params[:id]).with_lock do
-      if @connect_type == "normal"
+      if @connect_type == "normal" 
         GameRoom.find(params[:id]).increment(:number_player, 1).save
       end
     end
     @game_room = GameRoom.find(params[:id])
     stream_for @game_room
+
+    if @game_room.number_player >= 2
+      GameRoomChannel.broadcast_to @game_room, message: "everyone_here"
+    end
   end
 
   # Disconnect from the channel
@@ -54,11 +58,6 @@ class GameRoomChannel < ApplicationCable::Channel
   def to_broadcast (data)
     # game_room = GameRoom.find(params[:id])
     GameRoomChannel.broadcast_to @game_room, sender: data['infos']['sender'], message: data['infos']['message'], content: data['infos']['content']
-  end
-
-  def ready(data)
-    game_room = GameRoom.find(params[:id])
-    GameRoomChannel.broadcast_to game_room, message: "everyone_ready", opponent_infos: data['infos']
   end
   
 end

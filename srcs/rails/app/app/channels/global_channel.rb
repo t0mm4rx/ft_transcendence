@@ -6,7 +6,10 @@ class GlobalChannel < ApplicationCable::Channel
     puts "UUUUUUUUUUUU"
 
     @user_id = params["user_id"]
-    User.find(@user_id).update_attribute(:status, "online");
+    user = User.find(@user_id)
+    if user.status === "offline"
+      user.update_attribute(:status, "online");
+    end
     GlobalChannel.broadcast_to "global_channel", message:"new_client", content: {}
 
     # stream_from "some_channel"
@@ -15,7 +18,9 @@ class GlobalChannel < ApplicationCable::Channel
   end
 
   def unsubscribed
-    User.find(@user_id).update_attribute(:status, "offline");
+    @user_id = params["user_id"]
+    user = User.find(@user_id)
+    user.update_attribute(:status, "offline");
     GlobalChannel.broadcast_to "global_channel", message:"client_quit", content: { "quit" => "plop" }.to_json
       # Any cleanup needed when channel is unsubscribed
   end
