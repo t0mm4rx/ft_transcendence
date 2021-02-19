@@ -71,18 +71,20 @@ class War < ApplicationRecord
 	end
 
 	def self.close_war(war)
-		war.guild1.isinwar = false
-		war.guild2.isinwar = false
-		war.guild1.present_war_id = 0
-		war.guild2.present_war_id = 0
-		war.guild2.wt_game_invite = 0
-		war.guild1.wt_game_invite = 0
-		war.guild1.isinwtgame = false
-		war.guild2.isinwtgame = false
+		guild1 = Guild.find_by(id: war.guild1_id)
+		guild2 = Guild.find_by(id: war.guild2_id)
+		guild1.isinwar = false
+		guild2.isinwar = false
+		guild1.present_war_id = 0
+		guild2.present_war_id = 0
+		guild2.wt_game_invite = 0
+		guild1.wt_game_invite = 0
+		guild1.isinwtgame = false
+		guild2.isinwtgame = false
 		war.war_closed = true
 		war.save
-		war.guild1.save
-		war.guild2.save
+		guild1.save
+		guild2.save
 	end
 
 	def set_defaults
