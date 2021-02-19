@@ -80,27 +80,6 @@ window.wars = new Wars();
 loadWars();
 
 window.liveGames = new GameCollection();
-window.liveGames.add(
-  new Game({
-    player1: "Jean",
-    player2: "Romain",
-    type: "War game",
-  })
-);
-window.liveGames.add(
-  new Game({
-    player1: "Fredrika",
-    player2: "Mathis",
-    type: "Direct game",
-  })
-);
-window.liveGames.add(
-  new Game({
-    player1: "Manu",
-    player2: "Donald",
-    type: "Ladder game",
-  })
-);
 
 if (token) {
   window.chat = new Chat();
@@ -109,15 +88,6 @@ if (token) {
 }
 
 window.notifications = new NotificationCollection();
-window.notifications.add(
-  new Notification({
-    title: "Romain vous a défier pour un match direct",
-    id: Math.random(),
-  })
-);
-window.notifications.add(
-  new Notification({ title: "Manu veut être votre amis", id: Math.random() })
-);
 
 // Page layout
 window.layoutView = new PageLayout().render();

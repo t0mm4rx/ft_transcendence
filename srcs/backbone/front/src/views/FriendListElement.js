@@ -21,7 +21,7 @@ export default Backbone.View.extend({
                 user.login
               }"><i class="far fa-comment"></i></span>
       				${
-                user.online
+                user.status == "online"
                   ? `<span class="button-icon button-icon-accent game-button" id="game-${user.login}"><i class="fas fa-gamepad"></i></span>`
                   : ""
               }`

@@ -10,7 +10,7 @@ class Api::TournamentsController < ApplicationController
 	end
 
 	def users
-		@users = TournamentUser.where(tournament_id: params[:id]).order(:eliminated)
+		@users = TournamentUser.where(tournament_id: params[:id]).order(eliminated: :asc, wins: :desc)
 		render json: @users
 	end
 
@@ -45,7 +45,8 @@ class Api::TournamentsController < ApplicationController
 		# game.save
 		# @tournament.calculate_new_game(User.find(1))
 		# render json: game
-		render json: @tournament.games
+		# @tournament.calculate_new_game(User.find(2))
+		render json: @tournament.tournament_users.order(eliminated: :asc)
 	end
 	
 	def destroy

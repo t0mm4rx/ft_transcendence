@@ -75,6 +75,7 @@ export default Backbone.View.extend({
       if (!document.querySelector("#avatar-file").files.length) return;
       const file = document.querySelector("#avatar-file").files[0];
       if (!file) return;
+
       const reader = new FileReader();
       const login = this.model.get("login");
       reader.readAsBinaryString(file);
@@ -135,7 +136,7 @@ export default Backbone.View.extend({
     if (!this.model.get("friends")) return;
     const friends = $("#friends-panel-content");
     friends.html("");
-    const friendsel = new FriendListElement();
+
     this.model.get("friends").forEach((friend) => {
       friends.append(
         `<div class="friend-item">
@@ -146,13 +147,14 @@ export default Backbone.View.extend({
           friend.username
         }</b>
         <span class="friend-status friend-status-${friend.status}">${(friend.status.charAt(0).toUpperCase() + friend.status.slice(1)) }</span>
-        </span>
 					<span class="button-icon message-button" id="message-${
             friend.login
           }"><i class="far fa-comment"></i></span>
 				</div>`
       );
       // const friendsel = new FriendListElement();
+      console.log("FRIEND", friend);
+      const friendsel = new FriendListElement();
       friends.append(friendsel.render(friend).el);
     });
   },
@@ -160,7 +162,9 @@ export default Backbone.View.extend({
     this.$("#history-panel-content").html("");
     this.games.each((game) => {
       let gameview = new GameListElement({ model: game });
-      this.$("#history-panel-content").append(gameview.render().el);
+      this.$("#history-panel-content").append(
+        gameview.render(this.model.id).el
+      );
     });
   },
 });

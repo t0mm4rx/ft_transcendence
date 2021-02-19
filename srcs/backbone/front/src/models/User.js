@@ -387,6 +387,28 @@ const User = Backbone.Model.extend({
       },
     });
   },
+  changeStatus(statu)
+  {
+    $.ajax({
+      url: `http://` + window.location.hostname + `:3000/api/users/${this.id}/change_status`,
+      type: "POST",
+      data: { status: statu},
+      success: () => {
+        this.set("status", statu);
+        window.globalSocket.sendMessage(
+          {
+            action: "to_broadcast",
+            infos: {
+              message: "new_client",
+              content: {},
+            },
+          },
+          false,
+          true
+        );
+      },
+    });
+  }
 });
 
 const Users = Backbone.Collection.extend({

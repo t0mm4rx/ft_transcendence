@@ -21,6 +21,7 @@ export default Backbone.View.extend({
 		{
 			this.gamelive.ended(this.game_id);
 			this.ftsocket.closeConnection();
+			window.currentUser.changeStatus("online");
 			window.location.hash = "home";
 		}
 	},
@@ -40,6 +41,10 @@ export default Backbone.View.extend({
 			window.location.hash = "home";
 			return;
 		}
+
+		console.log("User status (1): ", window.currentUser.get('status') );
+		window.currentUser.changeStatus("ingame");
+		console.log("User status (2): ", window.currentUser.get('status') );
 
 		$("#player-name").text(self.gameinfos.player.username);
 		$("#opponent-name").text(self.gameinfos.opponent.username);

@@ -8,13 +8,15 @@
 	>.panel {
 		flex: 1;
 		margin: 10px;
+		height: 500px;
+
 	}
 
 	#users-management-content {
 		padding: 20px;
 		box-sizing: border-box;
-		max-height: 400px;
 		overflow: auto;
+		max-height: 90%;
 	}
 
 	#listing-wrapper {
@@ -55,5 +57,10 @@
 	#create-tournament-button {
 		align-self: center;
 		margin: 10px;
+	}
+
+	.button {
+		width: 60px !important;
+		max-width: 60px;
 	}
 }

@@ -258,7 +258,8 @@ export default Backbone.Router.extend({
     const actual = window.currentView;
   if (actual && (!!actual.game || !!actual.game_live)) {
       const router = new Router();
-      if (actual.game) router.clearRequests();
+      if (!!actual.game) router.clearRequests();
+      if (!!actual.game_live) window.currentUser.changeStatus("online");
       if (actual.ftsocket) actual.ftsocket.closeConnection();
       console.log("Page : ", actual);
     }

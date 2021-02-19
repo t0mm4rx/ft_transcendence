@@ -24,8 +24,6 @@ module Api
     end
 
     def update
-      puts "###################################"
-      p params
       if params.has_key?(:banned_until)
         params[:banned_until] = Time.now + params[:banned_until].to_i * 60
       end
@@ -34,7 +32,6 @@ module Api
       end
       unless @user === current_user || params.has_key?(:admin)
         if (!current_user.admin || @user.owner) && !current_user.owner
-        # if (current_user.admin && !current_user.owner && !@user.owner) || current_user.owner
           return render json: {error: "not sufficient rights"}, status: :forbidden
         end
       end
@@ -47,7 +44,6 @@ module Api
     end
 
     def destroy
-      # user = User.find(params[:id])
       if !@user
         return render json: {}, status: :not_found
       end
@@ -71,6 +67,15 @@ module Api
     def games
       games = @user.games.filter { |game| game.status == "ended" }
       render json: games.reverse.take(15)
+    end
+
+    def change_status
+      @user.update_attribute(:status, params[:status]);
+      if @user.save
+        render json: @user
+      else
+        render json: @user.errors, status: :unprocessable_entity # 422
+      end
     end
 
     private
@@ -103,11 +108,7 @@ module Api
     end
 
     def user_params_change
-      # if current_user.admin || current_user.owner
-      #   params.permit(:username, :avatar_url, :password, :guild_id, :banned_until, :status, :guild_owner, :guild_officer, :admin)
-      # else
         params.permit(:username, :avatar_url, :password, :guild_id, :banned_until, :status, :guild_owner, :guild_officer, :admin)
-      # end
     end
 
     def limit
@@ -117,9 +118,5 @@ module Api
       ].min
     end
 
-    # def get_relation_to(user)
-    #   return "current_user" if user === current_user
-    #   current_user.friendship_status(user)
-    # end
   end
 end

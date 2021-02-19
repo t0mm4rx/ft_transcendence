@@ -29,9 +29,7 @@ const connectGlobalSocket = () => {
         console.log("MSG (1): ", msg.message.message);
         console.log("CONTENT (1): ", msg.message.content);
         if (msg.message.message == "new_client") {
-          // Refresh HERE
           window.currentUser.fetch();
-          console.log("[TMP] New client.");
         } else if (msg.message.content.request_to == window.currentUser.get("id")) {
           console.log("(2) MSG : ", msg.message.message);
           console.log("(2) CONTENT : ", msg.message.content);

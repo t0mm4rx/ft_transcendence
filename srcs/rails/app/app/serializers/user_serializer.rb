@@ -17,4 +17,7 @@ class UserSerializer < ActiveModel::Serializer
   def ladder_ranking
     User.order(ladder_score: :desc).index(object) + 1
   end
+  def admin
+		object.owner || object.admin
+	end
 end

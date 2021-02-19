@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     end
     get '/users/:id/games', to: 'users#games'
     get 'search', to: 'search#search'
+    post '/users/:id/change_status', to: 'users#change_status'
 
     resources :friends, controller: 'friendships', only: [:create, :update, :destroy]
 

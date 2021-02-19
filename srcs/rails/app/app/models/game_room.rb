@@ -22,8 +22,8 @@ class GameRoom < ApplicationRecord
 		set_winner_and_loser
 		calculate_new_user_score if self.ladder
 		if tournament
-			tournament.calculate_new_game(@winner)
 			tournament.eliminate(@loser)
+			tournament.calculate_new_game(@winner)
 		end
 	end
 
@@ -97,11 +97,13 @@ class GameRoom < ApplicationRecord
 	end
 
 	def set_winner_and_loser
-		if @loser
-			@winner = @loser == player ? opponent : player
-		elsif game_over?
+		if game_over?
 			@winner = player_score > opponent_score ? player : opponent
-			@loser = player_score < opponent_score ? player : opponent
+			@loser = @winner == opponent ? player : opponent
+		elsif @loser
+			@winner = @loser == player ? opponent : player
+		else
+			return
 		end
 		update_attribute(:winner_id, @winner.id)
 		update_attribute(:status, "ended")
