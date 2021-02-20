@@ -28,7 +28,6 @@ export default Backbone.View.extend({
     },
     "click .notification-delete": function (el) {
       const elId = el.currentTarget.getAttribute("notification-id");
-      // const index = el.currentTarget.getAttribute("index");
       const type = elId.split("-")[0];
       const id = parseInt(elId.split("-")[1]);
       if (type === "friend") {
@@ -43,11 +42,10 @@ export default Backbone.View.extend({
           success: (data) => {
             console.log("DENIED GAME");
             toasts.notifySuccess("Game declined");
-            // this.removeNofif(parseInt(index));
           },
-          error: (data) => {
-            console.log("ERROR", data);
-            toasts.notifyError(data.responseJSON.error);
+          error: (model, response) => {
+            console.log("ERROR", response);
+            toasts.notifyError(response.responseJSON.error);
           },
         });
       }
@@ -86,10 +84,10 @@ export default Backbone.View.extend({
           "en-FR"
         )} to ${new Date(war.get("wt_end")).toLocaleString("en-FR")}</p>
         <p>Max unanswered games: ${war.get("wt_max_unanswers")}</p>
-		<p>All games count for the war: ${
-      war.get("add_count_all") ? "yes" : "no"
-    }</p>
-	<p>You'll have ${war.get('wt_time_to_answer')} days to answer game requests.</p></div>`,
+		<p>All games count for the war: ${war.get("add_count_all") ? "yes" : "no"}</p>
+	<p>You'll have ${war.get(
+    "wt_time_to_answer"
+  )} days to answer game requests.</p></div>`,
           () => {
             window.guilds.acceptWar();
             return true;
@@ -136,6 +134,7 @@ export default Backbone.View.extend({
         this.notifs.push({
           title: `${user[0].get("username")} sent you a game request`,
           type: "game",
+          // id: req.id,
           id: user[0].get("id"),
           name: user[0].get("username"),
         });
@@ -196,7 +195,6 @@ export default Backbone.View.extend({
         }
       }
     }
-
     if (window.currentUser.get("guild_invites") !== 0) {
       const user = window.users.models.find(
         (a) => a.get("id") === window.currentUser.get("guild_invites")
@@ -220,8 +218,6 @@ export default Backbone.View.extend({
     );
   },
   removeNofif() {
-    // this.notifs.splice(index, 1);
-    // $("#notification-panel").removeClass("notification-panel-open");
     this.notifs.length_ = this.notifs.length_ - 1;
     if (this.notifs.length_ <= 0) {
       $("#notification-badge").hide();
