@@ -69,6 +69,15 @@ module Api
       render json: games.reverse.take(15)
     end
 
+    def change_status
+      @user.update_attribute(:status, params[:status]);
+      if @user.save
+        render json: @user
+      else
+        render json: @user.errors, status: :unprocessable_entity # 422
+      end
+    end
+
     private
 
     def set_user

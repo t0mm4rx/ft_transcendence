@@ -138,6 +138,21 @@ export default Backbone.View.extend({
     friends.html("");
 
     this.model.get("friends").forEach((friend) => {
+      friends.append(
+        `<div class="friend-item">
+					<img src="${friend.avatar_url}" onclick="window.location.hash='user/${
+          friend.login
+        }/'"/>
+					<b class="friend-name" onclick="window.location.hash='user/${friend.login}/'">${
+          friend.username
+        }</b>
+        <span class="friend-status friend-status-${friend.status}">${(friend.status.charAt(0).toUpperCase() + friend.status.slice(1)) }</span>
+					<span class="button-icon message-button" id="message-${
+            friend.login
+          }"><i class="far fa-comment"></i></span>
+				</div>`
+      );
+      // const friendsel = new FriendListElement();
       console.log("FRIEND", friend);
       const friendsel = new FriendListElement();
       friends.append(friendsel.render(friend).el);

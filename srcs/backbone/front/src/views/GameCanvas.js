@@ -159,17 +159,31 @@ export default Backbone.View.extend({
      */
 	collision: function(b, p)
 	{
-		b.top = b.y - b.radius;
-		b.bottom = b.y + b.radius;
-		b.left = b.x - b.radius;
-		b.right = b.x + b.radius;
+        console.log("Player side : ", p.player.side);
+        if (p.player.side === "left")
+        {
+            if (b.previous.x - b.radius >= p.x + p.width && b.x - b.radius <= p.x + p.width)
+            {
+                var percentAlong = (p.x - b.previous.x) / (b.x - b.previous.x);
+                var yIntersection = percentAlong * (b.y - b.previous.y) + b.previous.y;
 
-		p.top = p.y;
-		p.bottom = p.y + p.height;
-		p.left = p.x;
-		p.right = p.x + p.width;
+                if (yIntersection > p.y && yIntersection < p.y + p.height)
+                    return (yIntersection);
+            }
+        }
+        else
+        {
+            if (b.previous.x + b.radius <= p.x && b.x + b.radius >= p.x )
+            {
+                console.log("MEH");
+                var percentAlong = (p.x + b.previous.x) / (b.x + b.previous.x);
+                var yIntersection = percentAlong * (b.y - b.previous.y) + b.previous.y;
 
-		return (b.right > p.left && b.bottom > p.top && b.left < p.right && b.top < p.bottom);
+                if (yIntersection > p.y && yIntersection < p.y + p.height)
+                    return (yIntersection);
+            }
+        }
+        return (-1);
     },
     
     /**
@@ -275,7 +289,7 @@ export default Backbone.View.extend({
 	gameUpdate: function()
 	{
         var ball_update = JSON.parse(JSON.stringify(this.ball));
-
+        
 		ball_update.x += ball_update.velocityX;
 		ball_update.y += ball_update.velocityY;
     
@@ -287,9 +301,22 @@ export default Backbone.View.extend({
             ball_update.velocityY = -ball_update.velocityY;
         }
 	
-		let player = (ball_update.x < this.canvas.width / 2) ? this.left : this.right;
-        if (this.collision(ball_update, player))
+        let player = (ball_update.x < this.canvas.width / 2) ? this.left : this.right;
+        console.log("Player : ", player);
+        let colidY = this.collision(ball_update, player);
+        if (colidY !== -1)
         {
+            if (player.player.side == "left")
+                ball_update.x = player.x + player.width;
+            else
+                ball_update.x = player.x;
+            ball_update.y = colidY;
+            
+            // Increase difficulty
+            if (ball_update.speed < 8)
+                ball_update.speed = 8;
+            ball_update.speed += 1;
+
             // Where the ball hit the player
             let collidePoint = ball_update.y - (player.y + player.height / 2);
 
@@ -307,10 +334,7 @@ export default Backbone.View.extend({
             // console.log("OPPONENT HIT");
             ball_update.velocityY = ball_update.speed * Math.sin(angleRad);
 
-            // Increase difficulty
-            if (ball_update.speed < 8)
-                ball_update.speed = 8;
-            ball_update.speed += 0.5;
+
             // this.playSound('../../assets/game_sound/wall_hit.ogg');
         }
 
@@ -323,6 +347,9 @@ export default Backbone.View.extend({
                 content: ball_update
         }}, false);
 
+        var to_give = JSON.parse(JSON.stringify(this.ball));
+        to_give.previous = null;
+        ball_update.previous = to_give;
         // Set new position of the ball.
         this.ball = ball_update;
 
@@ -836,6 +863,16 @@ export default Backbone.View.extend({
                 velocityX: 5,
                 velocityY: 0,
                 color: "WHITE",
+            }
+
+            this.ball.previous = {
+                x: this.canvas.width/2,
+                y: this.canvas.height/2,
+                radius: 10,
+                speed: 8,
+                velocityX: 5,
+                velocityY: 0,
+                color: "WHITE", 
             }
 
             // Set the players sides to the players.
