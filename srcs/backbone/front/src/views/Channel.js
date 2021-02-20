@@ -15,7 +15,7 @@ export default Backbone.View.extend({
   <% if (model.escape('avatar')) { %>
   <img id="chat-avatar" src="<%= model.escape("avatar") %>" />
   <% } %>
-  <span id="chat-title"><%= model.escape('name') %></span>
+  <span id="chat-title"><%= prefix %><%= model.escape('name') %></span>
   <% if (model.escape('avatar')) { %>
   <div class="button-icon" id="start-game"><i class="fas fa-gamepad"></i></div>
   <div class="button-icon" id="block-user"><i class="fas fa-ban"></i></div>
@@ -103,7 +103,17 @@ export default Backbone.View.extend({
     return this;
   },
   renderHeader() {
-    this.$el.html(this.template({ model: this.model }));
+    const user = window.users.models.find(a => a.get('id') === this.model.get('id'));
+    let prefix = "";
+    if (!!user) {
+      console.log("User!", user);
+      if (!!user.get('guild')) {
+        prefix = `[${user.get('guild').anagram}] `;
+        console.log("PREFIX", prefix);
+      }
+    }
+    console.log("prefix", prefix);
+    this.$el.html(this.template({ model: this.model, prefix: prefix }));
     if (this.adminPeak) {
       this.$("#leave-channel").hide();
     } else {

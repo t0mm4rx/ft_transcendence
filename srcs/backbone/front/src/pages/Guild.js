@@ -23,7 +23,7 @@ export default Backbone.View.extend({
 		'click .user-settings': function (event) {
 			const login = event.currentTarget.getAttribute("login");
 			showModal("Manage rights", 
-			`<div id="rights-management-wrapper"><div class="button"><span>Make owner</span></div><div class="button"><span>Make officer</span></div></div>`
+			`<div id="rights-management-wrapper"><div class="button" id="make-owner"><span>Make owner</span></div><div class="button" id="make-officer"><span>Make officer</span></div></div>`
 			, () => {
 				return true;
 			}, () => true);
@@ -31,6 +31,12 @@ export default Backbone.View.extend({
 		'click #join_guild': function()
 		{
 			this.guild.join();
+		},
+		'click #make-owner': function () {
+
+		},
+		'click #make-officer': function () {
+			
 		}
 	},
 	render: function () {
