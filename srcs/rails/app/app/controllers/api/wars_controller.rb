@@ -36,14 +36,16 @@ module Api
 				return render json: { error: "One war at a time bro! You are already in war"}, status: :unprocessable_entity
 			elsif @guild2.isinwar
 				return render json: { error: "One war at a time bro! The other guild are already in war"}, status: :unprocessable_entity
+			elsif @guild1.war_invites != 0 || @guild2.war_invites != 0
+				return render json: { error: "You or ennemy already have a war invite waiting, accept/refuse your wair invites pending, or wait that they accept/refuse their invites to send a new one"}, status: :unprocessable_entity
 			end
-
 			@war = War.create(guild1_id: current_user.guild_id, guild2_id: @guild2.id)
 			if @war.save
 				@guild2.war_invites = current_user.guild_id
 				@guild2.war_invite_id = @war.id
 				@guild2.save
 				@war.update(war_params)
+				@war.save
 				render json: @war, status: :created
 			else
 				render json: @war.errors
@@ -82,7 +84,7 @@ module Api
 			end
 		end
 
-		#current user can ignore4 invitation to war no params needed
+		#current user can ignore invitation to war no params needed
 		def ignore_invitation
 			if current_user.guild && current_user.guild.war_invites != 0
 				current_user.guild.war_invites = 0

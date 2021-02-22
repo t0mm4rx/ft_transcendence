@@ -27,6 +27,14 @@ class War < ApplicationRecord
 	def self.update_guilds_score(war)
 		guild1 = Guild.find_by(id: war.guild1_id)
 		guild2 = Guild.find_by(id: war.guild2_id)
+		guild1.isinwar = false
+		guild2.isinwar = false
+		guild1.present_war_id = 0
+		guild2.present_war_id = 0
+		guild2.wt_game_invite = 0
+		guild1.wt_game_invite = 0
+		guild1.isinwtgame = false
+		guild2.isinwtgame = false
 		if war.guild_win && war.guild_win == guild1.id
 			guild1.score += war.prize
 			guild2.score -= war.prize
@@ -45,7 +53,7 @@ class War < ApplicationRecord
 			war.guild1.wt_date_to_answer = war.end_date + 1
 			war.guild1.wt_game_invite = 0
 			check_max_unanswered(war)
-		elsif war.guild1.wt_date_to_answer != nil && war.guild2.wt_date_to_answer != nil && war.guild1.wt_date_to_answer && war.guild2.wt_date_to_answer < DateTime.now
+		elsif war.guild2.wt_date_to_answer && war.guild2.wt_date_to_answer < DateTime.now
 			war.guild2_unanswers += 1
 			war.guild1_score += 1
 			war.guild2.wt_date_to_answer = war.end_date + 1
@@ -71,20 +79,8 @@ class War < ApplicationRecord
 	end
 
 	def self.close_war(war)
-		guild1 = Guild.find_by(id: war.guild1_id)
-		guild2 = Guild.find_by(id: war.guild2_id)
-		guild1.isinwar = false
-		guild2.isinwar = false
-		guild1.present_war_id = 0
-		guild2.present_war_id = 0
-		guild2.wt_game_invite = 0
-		guild1.wt_game_invite = 0
-		guild1.isinwtgame = false
-		guild2.isinwtgame = false
 		war.war_closed = true
 		war.save
-		guild1.save
-		guild2.save
 	end
 
 	def set_defaults
