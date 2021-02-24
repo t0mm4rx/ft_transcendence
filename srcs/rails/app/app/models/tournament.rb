@@ -42,16 +42,17 @@ class Tournament < ApplicationRecord
 	end
 
 	def calculate_new_game(winner)
-		t_user = tournament_users.find_by(user_id: winner.id)
-		t_user.update_attribute(wins: t_user.wins + 1)
+		tournament_user = tournament_users.find_by(user_id: winner.id)
+		tournament_user.update_attribute(:wins, tournament_user.wins + 1)
 		game = game_rooms.find_by(opponent: nil)
 		if tournament_users.where(eliminated: false).count > 1
 			if game
-				game.update(opponent: winner)
+				game.update_attribute(:opponent, winner)
+				notify_players(game)
 			else
 				game = GameRoom.new(player: winner, tournament_id: id)
+				game.save
 			end
-			notify_players(game) if game.save
 		else
 			game.destroy if game
 			winner.update_attribute(:title, title) if title
@@ -76,7 +77,7 @@ class Tournament < ApplicationRecord
 	end
 
 	def eliminate(loser)
-		tournament_user = TournamentUser.find_by(tournament_id: id, user_id: loser.id)
+		tournament_user = tournament_users.find_by(user_id: loser.id)
 		tournament_user.update_attribute(:eliminated, true)
 	end
 

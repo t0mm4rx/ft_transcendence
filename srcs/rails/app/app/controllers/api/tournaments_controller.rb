@@ -46,6 +46,9 @@ class Api::TournamentsController < ApplicationController
 		# @tournament.calculate_new_game(User.find(1))
 		# render json: game
 		# @tournament.calculate_new_game(User.find(2))
+		# @tournament.game_rooms.find_by(status: "ended").update_scores
+		# @tournament.eliminate(User.find(2))
+		# @tournament.calculate_new_game(User.find(1))
 		render json: @tournament.tournament_users.order(eliminated: :asc)
 	end
 	

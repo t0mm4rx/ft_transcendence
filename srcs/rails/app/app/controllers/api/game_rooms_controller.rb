@@ -110,7 +110,6 @@ module Api
             game_room.update_attribute(:player_score, params[:player_score])
             game_room.update_attribute(:opponent_score, params[:opponent_score])
             if game_room.game_over? && !game_room.winner_id
-                game_room.update_attribute(:status, "ended")
                 game_room.update_scores
                 game_room.update_war_scores(current_user)
             end

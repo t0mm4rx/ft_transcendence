@@ -30,8 +30,7 @@ class GameRoom < ApplicationRecord
 	def set_no_show(user)
 		if number_player != 2 && status == "notstarted"
 			@loser = user
-			set_winner_and_loser
-			update_tournament if tournament
+			update_scores
 		end
 	end
 
@@ -97,13 +96,11 @@ class GameRoom < ApplicationRecord
 	end
 
 	def set_winner_and_loser
-		if game_over?
-			@winner = player_score > opponent_score ? player : opponent
-			@loser = @winner == opponent ? player : opponent
-		elsif @loser
+		if @loser
 			@winner = @loser == player ? opponent : player
 		else
-			return
+			@winner = player_score > opponent_score ? player : opponent
+			@loser = @winner == opponent ? player : opponent
 		end
 		update_attribute(:winner_id, @winner.id)
 		update_attribute(:status, "ended")
