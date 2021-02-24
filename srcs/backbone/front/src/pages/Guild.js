@@ -15,6 +15,7 @@ export default Backbone.View.extend({
 		this.listenTo(window.guilds, 'change', this.render);
 		this.listenTo(window.currentUser, 'change', this.render);
 		this.anagram = options.anagram;
+		this.lastClickedUser = null;
 	},
 	events: {
 		'click .message-button': function (event) {
@@ -22,21 +23,30 @@ export default Backbone.View.extend({
 		},
 		'click .user-settings': function (event) {
 			const login = event.currentTarget.getAttribute("login");
+			this.lastClickedUser = window.users.find(a => a.get('login') === login);
 			showModal("Manage rights", 
 			`<div id="rights-management-wrapper"><div class="button" id="make-owner"><span>Make owner</span></div><div class="button" id="make-officer"><span>Make officer</span></div></div>`
 			, () => {
 				return true;
 			}, () => true);
+			document.querySelector("#make-owner").onclick = () => {
+				this.lastClickedUser.save('guild_owner', !this.guild_owner);
+			};
+			document.querySelector("#make-officer").onclick = () => {
+				this.lastClickedUser.save('guild_officer', !this.guild_officer);
+			};
 		},
 		'click #join_guild': function()
 		{
 			this.guild.join();
 		},
 		'click #make-owner': function () {
-
 		},
-		'click #make-officer': function () {
+		'click #make-officer': function (el) {
 			
+		},
+		'click #guild-war': function () {
+			window.location.hash = "guilds/";
 		}
 	},
 	render: function () {
