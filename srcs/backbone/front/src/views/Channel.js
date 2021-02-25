@@ -28,6 +28,7 @@ export default Backbone.View.extend({
   messageTemplate: _.template(`<div class="chat-message-container<%= (sentByMe) ? " chat-message-container-me" : "" %><%= sentByLast ? " chat-message-container-no-margin": "" %>" id="<%= model.username %>">
   <% if (!sentByLast)  { %>
   <div class="chat-message-infos">
+  <span class="guild-anagram"><%= model.guild_anagram %></span>
   <a href="/#user/<%= model.login %>/" class="chat-message-username" id="<%= model.login %>"><%= model.username %></a><span><%= date %></span>
   </div>
   <% } %>
@@ -103,12 +104,14 @@ export default Backbone.View.extend({
     return this;
   },
   renderHeader() {
-    const user = window.users.models.find(a => a.get('id') === this.model.get('id'));
+    const user = window.users.models.find(
+      (a) => a.get("id") === this.model.get("id")
+    );
     let prefix = "";
     if (!!user) {
       console.log("User!", user);
-      if (!!user.get('guild')) {
-        prefix = `[${user.get('guild').anagram}] `;
+      if (!!user.get("guild")) {
+        prefix = `[${user.get("guild").anagram}] `;
         console.log("PREFIX", prefix);
       }
     }
