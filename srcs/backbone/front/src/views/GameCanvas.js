@@ -568,8 +568,21 @@ export default Backbone.View.extend({
             if (msg.type === "ping" || self.state == state_enum["END"])
                 return;
 
+            if (msg.type === "confirm_subscription" && self.connection_type === "reconnection")
+            {
+                self.ftsocket.sendMessage({ 
+                    action: "to_broadcast", 
+                    infos: {
+                        sender: {id: window.currentUser.get('id'), connection_type: self.connection_type},
+                        message: "need_infos",
+                        content: {}
+                }}, true, true);   
+            }
+
             if (msg.message)
             {
+                console.log("(A)");
+                console.log("PUTAIN DE MESSAGE : ", msg.message);
                 if ((msg.message.message == "update_y"
                     || msg.message.message == "update_ball")
                     && msg.message.sender == self.player_info.id
@@ -580,6 +593,7 @@ export default Backbone.View.extend({
                     && (msg.message.message == "update_y"
                     || msg.message.message == "update_ball"))
                 {
+                    console.log("(1)");
                     if (self.connection_type == "live")
                         console.log("Update data")
                     // Update opponent paddle position
@@ -612,6 +626,7 @@ export default Backbone.View.extend({
                 // Update state.
                 else if (msg.message.message == "update_state")
                 {
+                    console.log("(2)");
                     if (self.connection_type == "live")
                         console.log("BAD (1)");
                     self.state = msg.message.content.state;
@@ -619,26 +634,30 @@ export default Backbone.View.extend({
                         self.begin_date = new Date();
                 }
 
-                else if (msg.message.message == "amipresent")
-				{
-                    if (self.connection_type == "live")
-                        console.log("BAD (2)");
-					if (msg.message.sender.id == window.currentUser.get('id')
-						&& msg.message.sender.connection_type != "live"
-						&& msg.message.sender.uuid != self.uuid)
-					{
-						self.ftsocket.sendMessage({
-							action: "to_broadcast",
-							infos: {
-								message: "youcantbehere",
-								content: { reply_to: msg.message.sender }
-						}}, true, true);
-					}
-				}
+                // else if (msg.message.message == "amipresent")
+				// {
+                //     console.log("(3)");
+                //     if (self.connection_type == "live")
+                //         console.log("BAD (2)");
+				// 	if (msg.message.sender.id == window.currentUser.get('id')
+				// 		&& msg.message.sender.connection_type != "live"
+				// 		&& msg.message.sender.uuid != self.uuid)
+				// 	{
+				// 		self.ftsocket.sendMessage({
+				// 			action: "to_broadcast",
+				// 			infos: {
+				// 				message: "youcantbehere",
+				// 				content: { reply_to: msg.message.sender }
+				// 		}}, true, true);
+				// 	}
+				// }
 
-                else if (msg.message.message == "need_infos"
-                    && self.connection_type == "normal")
+                else if (msg.message.message == "need_infos")
                 {
+                    console.log("(B");
+                    if(self.connection_type == "normal")
+                    {
+                    console.log("(4)");
                     if (self.connection_type == "live")
                         console.log("BAD (3)");
                     var left_values = {
@@ -676,6 +695,7 @@ export default Backbone.View.extend({
                                 reply_to: msg.message.sender
                             }
                     }}, true, true);
+                }
                 }
 
                 else if (msg.message.message == "force_infos"
@@ -830,6 +850,8 @@ export default Backbone.View.extend({
             right_player = this.player_info
         }
 
+        console.log("CONNECTION TYPE : ", self.connection_type);
+
         if (this.connection_type == "normal")
         {
             // Init left player.
@@ -882,6 +904,7 @@ export default Backbone.View.extend({
         }
         else if (this.connection_type != "normal")
         {
+            console.log("PUTAIN");
             this.ftsocket.sendMessage({ 
                 action: "to_broadcast", 
                 infos: {

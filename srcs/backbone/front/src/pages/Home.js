@@ -15,9 +15,11 @@ export default Backbone.View.extend({
       });
     },
     "click .game-button": function (event) {
+      // console.log("ID : ", event.currentTarget);
       const login = event.currentTarget.id.split("-")[1];
-      console.log(login);
-      window.users.where("login", login).askGame();
+      // console.log("Login : ", login);
+      console.log("User : ", window.users.where("login", login));
+      // window.users.where("login", login).askGame();
     },
   },
   render: function () {

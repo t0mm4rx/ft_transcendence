@@ -22,6 +22,7 @@ class ApplicationController < ActionController::API
 
 	def authenticate_request
 		@current_user = AuthorizeApiRequest.call(request.headers).result
+		
 		if @current_user && @current_user.banned
 			return render json: { error: "You are banned from the website until #{@current_user.banned_until}"}, status: :forbidden
 		end
