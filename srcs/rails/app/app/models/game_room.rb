@@ -12,11 +12,6 @@ class GameRoom < ApplicationRecord
 		status == "ended" || player_score >= 11 || opponent_score >= 11
 	end
 
-	def winner
-		if game_over?
-			player_score > opponent_score ? player : opponent
-		end
-	end
 
 	def update_scores
 		set_winner_and_loser
@@ -28,25 +23,19 @@ class GameRoom < ApplicationRecord
 	end
 
 	def set_no_show(user)
-		if number_player != 2 && status == "notstarted"
+		if number_player != 2 && status == "notstarted" && player_score == 0 && opponent_score == 0 && !winner_id
 			@loser = user
 			update_scores
 		end
 	end
 
 	def accepted_by(user)
-		# n_player = number_player + 1
 		if tournament
-			# s = user === player ? "player" : "opponent"
 			other = user === player ? opponent : player
-			# return if s == status
 			if number_player === 0 #status == "created"
 				Rufus::Scheduler.singleton.in "3m" do
 					set_no_show(other)
 				end
-			# else #if status == "player" || status == "opponent"
-				# n_player = 2
-				# s = "notstarted"
 			end
 			update(accepted: (number_player >= 1))
 		elsif user === opponent
