@@ -159,7 +159,7 @@ export default Backbone.View.extend({
      */
 	collision: function(b, p)
 	{
-        console.log("Player side : ", p.player.side);
+        // console.log("Player side : ", p.player.side);
         if (p.player.side === "left")
         {
             if (b.previous.x - b.radius >= p.x + p.width && b.x - b.radius <= p.x + p.width)
@@ -175,7 +175,7 @@ export default Backbone.View.extend({
         {
             if (b.previous.x + b.radius <= p.x && b.x + b.radius >= p.x )
             {
-                console.log("MEH");
+                // console.log("MEH");
                 var percentAlong = (p.x + b.previous.x) / (b.x + b.previous.x);
                 var yIntersection = percentAlong * (b.y - b.previous.y) + b.previous.y;
 
@@ -302,7 +302,7 @@ export default Backbone.View.extend({
         }
 	
         let player = (ball_update.x < this.canvas.width / 2) ? this.left : this.right;
-        console.log("Player : ", player);
+        // console.log("Player : ", player);
         let colidY = this.collision(ball_update, player);
         if (colidY !== -1)
         {
@@ -315,7 +315,7 @@ export default Backbone.View.extend({
             // Increase difficulty
             if (ball_update.speed < 8)
                 ball_update.speed = 8;
-            ball_update.speed += 1;
+            ball_update.speed += 0.5;
 
             // Where the ball hit the player
             let collidePoint = ball_update.y - (player.y + player.height / 2);
@@ -331,21 +331,22 @@ export default Backbone.View.extend({
 
             // Valocity x & Y
             ball_update.velocityX = dir * ball_update.speed * Math.cos(angleRad);
-            // console.log("OPPONENT HIT");
             ball_update.velocityY = ball_update.speed * Math.sin(angleRad);
-
 
             // this.playSound('../../assets/game_sound/wall_hit.ogg');
         }
 
+        let self = this;
         // Send ball position to other clients.
-        this.ftsocket.sendMessage({
-            action: "to_broadcast",
-            infos: {
-                sender: window.currentUser.get('id'),
-                message: "update_ball",
-                content: ball_update
-        }}, false);
+        if (window.currentUser.get('id') == player.player.id)
+            _.throttle(
+            self.ftsocket.sendMessage({
+                action: "to_broadcast",
+                infos: {
+                    sender: window.currentUser.get('id'),
+                    message: "update_ball",
+                    content: ball_update
+                }}, false), 250);
 
         var to_give = JSON.parse(JSON.stringify(this.ball));
         to_give.previous = null;
@@ -354,7 +355,8 @@ export default Backbone.View.extend({
         this.ball = ball_update;
 
         // Detect goal.
-        this.detectGoal();
+        if (window.currentUser.get('id') == player.player.id)
+            this.detectGoal();
     },
 
     /**
@@ -535,10 +537,10 @@ export default Backbone.View.extend({
             
             // In game state. gameUpdate() , gameRender().
             case state_enum["INGAME"]:
-                if (window.currentUser.get('id') == this.left.player.id)
+                // if (window.currentUser.get('id') == this.left.player.id)
                     this.gameRender();
-                if (window.currentUser.get('id') == this.left.player.id
-                    && this.connection_type != "live")
+                // if (window.currentUser.get('id') == this.left.player.id
+                    if(this.connection_type != "live")
                         this.gameUpdate();
                 break;
 
@@ -581,8 +583,8 @@ export default Backbone.View.extend({
 
             if (msg.message)
             {
-                console.log("(A)");
-                console.log("PUTAIN DE MESSAGE : ", msg.message);
+                // console.log("(A)");
+                // console.log("PUTAIN DE MESSAGE : ", msg.message);
                 if ((msg.message.message == "update_y"
                     || msg.message.message == "update_ball")
                     && msg.message.sender == self.player_info.id
@@ -593,9 +595,9 @@ export default Backbone.View.extend({
                     && (msg.message.message == "update_y"
                     || msg.message.message == "update_ball"))
                 {
-                    console.log("(1)");
-                    if (self.connection_type == "live")
-                        console.log("Update data")
+                    // console.log("(1)");
+                    // if (self.connection_type == "live")
+                        // console.log("Update data")
                     // Update opponent paddle position
                     if (msg.message.message == "update_y")
                     {
@@ -617,8 +619,10 @@ export default Backbone.View.extend({
                     // Update ball position.
                     else if (msg.message.message == "update_ball")
                     {
-                        self.ball = msg.message.content;
-                        self.gameRender();
+                        let ball_side = (self.ball.x < self.canvas.width / 2) ? self.left : self.right;
+                        if (ball_side.player.id == msg.message.sender)
+                            self.ball = msg.message.content;
+                        // self.gameRender();
                         return;
                     }
                 }
@@ -626,9 +630,9 @@ export default Backbone.View.extend({
                 // Update state.
                 else if (msg.message.message == "update_state")
                 {
-                    console.log("(2)");
-                    if (self.connection_type == "live")
-                        console.log("BAD (1)");
+                    // console.log("(2)");
+                    // if (self.connection_type == "live")
+                        // console.log("BAD (1)");
                     self.state = msg.message.content.state;
                     if (self.state == state_enum["BEGIN"])
                         self.begin_date = new Date();
@@ -636,9 +640,9 @@ export default Backbone.View.extend({
 
                 // else if (msg.message.message == "amipresent")
 				// {
-                //     console.log("(3)");
+                    // console.log("(3)");
                 //     if (self.connection_type == "live")
-                //         console.log("BAD (2)");
+                        // console.log("BAD (2)");
 				// 	if (msg.message.sender.id == window.currentUser.get('id')
 				// 		&& msg.message.sender.connection_type != "live"
 				// 		&& msg.message.sender.uuid != self.uuid)
@@ -652,14 +656,12 @@ export default Backbone.View.extend({
 				// 	}
 				// }
 
-                else if (msg.message.message == "need_infos")
-                {
-                    console.log("(B");
-                    if(self.connection_type == "normal")
+                else if (msg.message.message == "need_infos"
+                    && self.connection_type == "normal")
                     {
-                    console.log("(4)");
-                    if (self.connection_type == "live")
-                        console.log("BAD (3)");
+                    // console.log("(4)");
+                    // if (self.connection_type == "live")
+                        // console.log("BAD (3)");
                     var left_values = {
                         player: {id: self.left.player.id, name: self.left.player.username},
                         x: self.left.x,
@@ -696,13 +698,12 @@ export default Backbone.View.extend({
                             }
                     }}, true, true);
                 }
-                }
 
                 else if (msg.message.message == "force_infos"
                     && (self.connection_type == "live"
                         || self.state == state_enum["DISCONNECTION"]))
                 {
-                    console.log("FORCE INFOS GETTED");
+                    // console.log("FORCE INFOS GETTED");
                     // console.log("MSG RECO = ", msg.message)
                     if (window.currentUser.get('id') == msg.message.content.reply_to.id)
                     {
@@ -763,8 +764,8 @@ export default Backbone.View.extend({
 
                 else if (self.state != state_enum["DISCONNECTION"])
                 {
-                    if (self.connection_type == "live")
-                        console.log("BAD (4)");
+                    // if (self.connection_type == "live")
+                        // console.log("BAD (4)");
                     // Update score.
                     if (msg.message.message == "update_score")
                     {
@@ -850,7 +851,7 @@ export default Backbone.View.extend({
             right_player = this.player_info
         }
 
-        console.log("CONNECTION TYPE : ", self.connection_type);
+        // console.log("CONNECTION TYPE : ", self.connection_type);
 
         if (this.connection_type == "normal")
         {
@@ -904,7 +905,7 @@ export default Backbone.View.extend({
         }
         else if (this.connection_type != "normal")
         {
-            console.log("PUTAIN");
+            // console.log("PUTAIN");
             this.ftsocket.sendMessage({ 
                 action: "to_broadcast", 
                 infos: {

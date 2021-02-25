@@ -38,6 +38,8 @@ done
 
 echo "Database up detected !"
 
+export SECRET_KEY_BASE="ITNeFfU0vcINB091HKBGjEvSGxUlyxRLfDOSDT9KZWMqhEwBqC7/N2XHCH/ahE+NtBbWVnk/0uHUsXzkjqznm2NZ+7pgy97JxmGIA4Tqposkc4ZoxUYRGsx1b53ExNIoEBIqTSW3c0kg4q2a+uqetSB1Ktwa5YC6QXLNcr4tUDPhVDhjklFQJ0UNGWONKCwZgPDYR5vKi+EbUzJB87YoK0D/gGEdIwAMOPYLOdMZzhhUcbN6jFeYw4buATSZa1W4PPbzLVt8nABLXyIAKoUa4ZhkqYaQzcOmsKzzUKQFezmUqLzZ+i6C3Wgyhn/fKu1XmElRovLa7SdjOWxYMhaqwbO69OhUgF60a+jfBBtzDK6XIUFppgeTmIE6XEj+S7NkizypltTIhaImCM10MDi/WqxejzQg+BNkAqag--O8l39sdX14LCQkt/--Ys2+UcQKGAj2y23j+ODeLQ=="
+
 # Execute rails initialization commands.
 bundle exec rake db:create db:migrate
 
