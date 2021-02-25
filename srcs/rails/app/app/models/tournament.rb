@@ -9,6 +9,10 @@ class Tournament < ApplicationRecord
 	validate :valid_dates, :on => :create
 
 	# register the timer
+	def remaining_users
+		tournament_users.where(eliminated: false)
+	end
+
 	def set_start_timer
 		Rufus::Scheduler.singleton.at start_date do
 			start_tournament
@@ -45,7 +49,7 @@ class Tournament < ApplicationRecord
 		tournament_user = tournament_users.find_by(user_id: winner.id)
 		tournament_user.update_attribute(:wins, tournament_user.wins + 1)
 		game = game_rooms.find_by(opponent: nil)
-		if tournament_users.where(eliminated: false).count > 1
+		if remaining_users.count > 1
 			if game
 				game.update_attribute(:opponent, winner)
 				notify_players(game)
@@ -60,19 +64,26 @@ class Tournament < ApplicationRecord
 		end
 	end
 
+	### Don't want the tournaments to go on forever so a 
+	### timer will call this to eliminate too slow users
+	def game_timeout(id)
+		game = GameRoom.find(id)
+		if game.status == "notstarted" && game.number_player == 0 && game.player_score == 0 && game.opponent_score == 0 && !game.winner_id
+			eliminate(game.opponent)
+			eliminate(game.player)
+			remaining = remaining_users
+			if remaining.count <= 1
+				User.find(remaining[0].user_id).update_attribute(:title, title) if remaining.count == 1
+				update_attribute(:finished, true)
+			end
+		end
+	end
+
 	def notify_players(game)
 		GlobalChannel.send("game_request", game.opponent, game.player, game.id)
 		GlobalChannel.send("game_request", game.player, game.opponent, game.id)
 		Rufus::Scheduler.singleton.in "15m" do
-			if game.status == "notstarted" && game.number_player == 0
-				eliminate(game.opponent)
-				eliminate(game.player)
-				remaining = tournament_users.where(eliminated: false)
-				if remaining.count < 2
-					User.find(remaining[0].user_id).update_attribute(:title, title) if remaining.count == 1
-					update_attribute(:finished, true)
-				end
-			end
+			game_timeout(game.id)
 		end
 	end
 
