@@ -44,7 +44,7 @@ export default Backbone.View.extend({
   </div>`),
   userTemplate: _.template(
     `<div class="chat-edit user-profile" id="<%= user.id %>">
-      <img id="chat-avatar" src="<%= user.escape("avatar_url") %>" />
+      <img class="avatar" id="chat-avatar" src="<%= user.escape("avatar_url") %>" />
       <span id="chat-username"><%= user.escape("username") %></span>
       <div class="button-icon delete" id="<%= category %>"><i class="fas fa-times-circle"></i></div>
     </div>`
