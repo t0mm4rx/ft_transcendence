@@ -77,12 +77,12 @@ export default Backbone.View.extend({
 				{
 					$("#waiting").remove();
 					self.gamelive.active(self.game_id);
-					self.game = new GameCanvas(self.ftsocket, self.gameinfos, "normal");
+					self.game_canvas = new GameCanvas(self.ftsocket, self.gameinfos, "normal");
 				}
 			};
 		}
 		else if (self.gameinfos.status == "active")
-			self.game = new GameCanvas(self.ftsocket, self.gameinfos, "reconnection");
+			self.game_canvas = new GameCanvas(self.ftsocket, self.gameinfos, "reconnection");
 	},
 
     render: function() {
