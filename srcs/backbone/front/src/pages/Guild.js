@@ -83,7 +83,7 @@ export default Backbone.View.extend({
 					${(friend.get('status') == "online" )? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}
 					${!!friend.get('guild_owner') ? "<i class=\"fas fa-crown owner-icon\"></i>" : ""}
 					${!!friend.get('guild_officer') ? "<i class=\"fas fa-star owner-icon\"></i>" : ""}
-					${!!window.currentUser.get('admin') ? `<span class="button-icon user-settings" login="${friend.get('login')}"><i class="fas fa-cog"></i></span>` : ""}
+					${!!window.currentUser.get('admin') || (window.currentUser.get('guild_owner') && window.currentUser.get('guild_id') === this.guild.id) ? `<span class="button-icon user-settings" login="${friend.get('login')}"><i class="fas fa-cog"></i></span>` : ""}
 				</div>`
 			);
 		});
