@@ -291,6 +291,7 @@ const User = Backbone.Model.extend({
             player_id: window.currentUser.get("id"),
             opponent_id: this.get("id"),
             status: "notstarted",
+            game_type: "direct",
             number_player: 0,
           }),
         })
@@ -400,7 +401,8 @@ const User = Backbone.Model.extend({
             action: "to_broadcast",
             infos: {
               message: "new_client",
-              content: {},
+              sender: window.currentUser.get('id'),
+              content: {desc: "Changement status", status: statu},
             },
           },
           false,

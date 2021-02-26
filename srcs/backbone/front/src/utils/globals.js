@@ -3,12 +3,14 @@ import toasts from "./toasts"
 import { FtSocket } from "../models/FtSocket"
 
 const connectGlobalSocket = () => {
-  if (( !window.globalSocket
+  console.log("Global Socket : ", window.globalSocket);
+  if ((!window.globalSocket
     || !window.globalSocket.socket
     || window.globalSocket.socket.readyState === WebSocket.CLOSED
     || window.globalSocket.socket.readyState === WebSocket.CLOSING)
     && window.currentUser.get('id') !== "me")
   {
+    console.log("CREATE NEW CONNECTION");
     // Global socket
     window.globalSocket = new FtSocket({
       channel: "GlobalChannel",

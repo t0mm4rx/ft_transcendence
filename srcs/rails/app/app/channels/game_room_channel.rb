@@ -22,7 +22,7 @@ class GameRoomChannel < ApplicationCable::Channel
     @display_name = params[:display_name]
 
     GameRoom.find(params[:id]).with_lock do
-      if @connect_type == "normal" && last_number_player < 2
+      if @connect_type == "normal" && GameRoom.find(params[:id]).number_player < 2
         GameRoom.find(params[:id]).increment(:number_player, 1).save
       end
     end
@@ -40,7 +40,7 @@ class GameRoomChannel < ApplicationCable::Channel
   def unsubscribed
 
     puts "BBBBBBBBBBBB"
-    puts connect_type
+    puts @connect_type
     puts "BBBBBBBBBBBB"
 
     GameRoom.find(params[:id]).with_lock do
@@ -51,7 +51,7 @@ class GameRoomChannel < ApplicationCable::Channel
 
     game_room = GameRoom.find(params[:id])
 
-    if game_room.status != "notstarted" && game_room.number_player <= 0
+    if (game_room.status != "notstarted" && game_room.number_player <= 0) || game_room.number_player < 0
       game_room.update(status: "ended")
     end
 

@@ -926,5 +926,10 @@ export default Backbone.View.extend({
         
         // Setup message treatment.
         this.messageTreatment(self);
+    },
+
+    close: function(){
+        this.remove();
+        this.unbind();
     }
 });
