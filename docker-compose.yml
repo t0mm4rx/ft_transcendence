@@ -13,8 +13,8 @@ services:
             context: ./srcs/rails
             dockerfile: Dockerfile
         entrypoint: ["/tmp/setup.sh", "postgresql_db"]
-        command: ["rails", "server", "-e", "production", "-b", "0.0.0.0"]
-        # command: ["rails", "server", "-b", "0.0.0.0"]
+        # command: ["rails", "server", "-e", "production", "-b", "0.0.0.0"]
+        command: ["rails", "server", "-b", "0.0.0.0"]
         volumes:
             - ./srcs/rails/app:/usr/app
         ports:

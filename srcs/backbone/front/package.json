@@ -6,7 +6,8 @@
 	"scripts": {
 		"compile-dev": "webpack --mode development --watch",
 		"compile": "webpack --watch",
-		"serve": "webpack serve --host 0.0.0.0"
+		"serve": "webpack serve --mode development --hot --host 0.0.0.0",
+		"prod": "webpack serve --host 0.0.0.0"
 	},
 	"author": "Tom Marx",
 	"license": "ISC",

@@ -257,8 +257,9 @@ export default Backbone.Router.extend({
   closeGame: function () {
     const actual = window.currentView;
     console.log("Actual : ", actual);
-  if (actual && (!!actual.game || !!actual.game_live)) {
+  if (actual && (!!actual.game || !!actual.gamelive)) {
       const router = new Router();
+      console.log("I LEEEEEEEEEEEEEEEEAVE IT");
       if (!!actual.game) { router.clearRequests(); }
       if (!!actual.gamelive) { window.currentUser.changeStatus("online");}
       // if (!!actual.game_live.game) actual.game_live.game.remove();
