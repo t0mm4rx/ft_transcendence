@@ -83,6 +83,18 @@ class War < ApplicationRecord
 		war.save
 	end
 
+	def self.close_wt_game_request()
+		@game_room = GameRoom.where(["game_type = ? and accepted = ?", "war_time", "false"])
+		if @game_room.nil?
+			return
+		end
+		@game_room.each do |game_room|
+			game_room.status = "ended"
+			game_room.accepted = true
+			game_room.save
+		end
+	end
+
 	def set_defaults
 
 		self.add_count_all ||= false

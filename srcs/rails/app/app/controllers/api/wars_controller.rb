@@ -202,6 +202,7 @@ module Api
 					return render json: { error: "A war has been created without updating the rules. It's because a war request has been accepted, but you did't update the dates, etc."}, status: :unprocessable_entity
 				end
 				if war.end_date < DateTime.now
+					War.close_wt_game_request()
 					War.winner_is(war)
 					War.update_guilds_score(war)
 					War.close_war(war)
