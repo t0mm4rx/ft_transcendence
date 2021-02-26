@@ -1,7 +1,32 @@
 const path = require("path");
-const bodyParser = require("body-parser");
-const fs = require("fs");
+const multer = require("multer");
 const mime = require("mime-types");
+
+const storage = multer.diskStorage({
+  destination: "./assets/user_images",
+  filename: function (req, file, cb) {
+    const fileExtension = mime.extension(file.mimetype);
+    cb(null, `${req.header("X-Login")}.${fileExtension}`);
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1000000,
+  },
+  filename: function (req, file, cb) {
+    const fileExtension = mime.extension(file.mimetype);
+    return `${req.header("X-Login")}.${fileExtension}`;
+  },
+  fileFilter(req, file, cb) {
+    if (!file.mimetype.startsWith("image/")) {
+      cb(new Error("Please upload an image."));
+    }
+    console.log("FILE FILTER", file);
+    cb(undefined, true);
+  },
+});
 
 module.exports = {
   entry: {
@@ -13,26 +38,16 @@ module.exports = {
   },
   devServer: {
     before: function (app, server, compiler) {
-      app.use(
-        bodyParser.raw({
-          type: "image/*",
-          limit: "1000mb",
-        })
-      );
-      app.post("/upload", function (req, res) {
-        console.log("UPLOAD POST", req.body);
-        const fileExtension = mime.extension(req.header("Content-Type"));
-        const filename = `${req.header("X-Login")}.${fileExtension}`;
-        console.log("FILE NAME:", filename);
-        if (!req.body || !req.header("X-Login")) {
-          return res.status(400).send({ error: "No data" });
+      app.post(
+        "/upload",
+        upload.single("file"),
+        (req, res) => {
+          res.send({ filepath: req.file.path });
+        },
+        (error, req, res, next) => {
+          res.status(400).send({ error: error.message });
         }
-        fs.writeFile("./assets/user_images/" + filename, req.body, (err) => {
-          // if (err) res.status(400).send({ error: "Failed to write to file" });
-          // else res.send({ filename: filename });
-          res.send({ filename: filename });
-        });
-      });
+      );
     },
     publicPath: "/server/",
     contentBase: path.resolve(__dirname, "./"),

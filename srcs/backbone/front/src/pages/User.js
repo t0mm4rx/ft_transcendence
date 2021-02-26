@@ -9,6 +9,7 @@ import toasts from "../utils/toasts";
 import { loadUsers } from "../utils/globals";
 import GameListElement from "../views/GameListElement";
 import FriendListElement from "../views/FriendListElement";
+import Compressor from "compressorjs";
 
 export default Backbone.View.extend({
   el: "#page",
@@ -71,43 +72,7 @@ export default Backbone.View.extend({
     "click .avatar-current-user": function () {
       $("#avatar-file").trigger("click");
     },
-    "change #avatar-file": function () {
-      if (!document.querySelector("#avatar-file").files.length) return;
-      const file = document.querySelector("#avatar-file").files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      const login = this.model.get("login");
-      reader.readAsBinaryString(file);
-      reader.onload = function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        fetch("/upload", {
-          method: "post",
-          headers: { "Content-Type": file.type, "X-Login": login },
-          body: file,
-        })
-          .then((response) => response.json())
-          .then((result) => {
-            // console.log("Success:", result);
-            window.currentUser.save(
-              "avatar_url",
-              `http://${window.location.hostname}:8080/assets/user_images/${result.filename}`
-            );
-            this.model.trigger("change");
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            toasts.notifyError("Unable to read the image you selected");
-          });
-
-        return false;
-      };
-      reader.onerror = function (error) {
-        toasts.notifyError("Unable to read the image you selected");
-      };
-    },
+    "change #avatar-file": "updateProfilePicture",
     "click .game-button": function (event) {
       const login = event.currentTarget.id.split("-")[1];
       window.users.models.find((a) => a.get("login") === login).askGame();
@@ -150,4 +115,84 @@ export default Backbone.View.extend({
       );
     });
   },
+  updateProfilePicture() {
+    if (!document.querySelector("#avatar-file").files.length) return;
+    const file = document.querySelector("#avatar-file").files[0];
+    if (!file) return;
+    var login = this.model.get("login");
+
+    new Compressor(file, {
+      minWidth: 150,
+      minHeight: 150,
+      maxWidth: 240,
+      maxHeight: 240,
+
+      // The compression process is asynchronous,
+      // which means you have to access the `result` in the `success` hook function.
+      success(result) {
+        const formData = new FormData();
+
+        // The third parameter is required for server
+        formData.append("file", result, result.name);
+
+        fetch("/upload", {
+          method: "post",
+          headers: { "X-Login": login },
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            window.currentUser.save(
+              "avatar_url",
+              `http://${window.location.hostname}:8080/${result.filepath}`
+            );
+            this.model.trigger("change");
+          })
+          .catch((err) => {
+            console.log(err);
+            toasts.notifyError("Unable to read the image you selected");
+          });
+      },
+      error(err) {
+        console.log(err.message);
+      },
+    });
+  },
+  // updateProfilePicture() {
+  //   if (!document.querySelector("#avatar-file").files.length) return;
+  //   const file = document.querySelector("#avatar-file").files[0];
+  //   if (!file) return;
+
+  //   const reader = new FileReader();
+  //   const login = this.model.get("login");
+  //   reader.readAsBinaryString(file);
+  //   reader.onload = function (event) {
+  //     event.preventDefault();
+  //     event.stopPropagation();
+
+  //     fetch("/upload", {
+  //       method: "post",
+  //       headers: { "Content-Type": file.type, "X-Login": login },
+  //       body: file,
+  //     })
+  //       .then((response) => response.json())
+  //       .then((result) => {
+  //         // console.log("Success:", result);
+  //         window.currentUser.save(
+  //           "avatar_url",
+  //           `http://${window.location.hostname}:8080/assets/user_images/${result.filename}`
+  //         );
+  //         this.model.trigger("change");
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error:", error);
+  //         toasts.notifyError("Unable to read the image you selected");
+  //       });
+
+  //     return false;
+  //   };
+  //   reader.onerror = function (error) {
+  //     toasts.notifyError("Unable to read the image you selected");
+  //   };
+  // },
 });
