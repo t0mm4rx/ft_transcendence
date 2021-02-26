@@ -1,12 +1,17 @@
 class GameRoomChannel < ApplicationCable::Channel
 
   def reco_to_normal
-    game_room = GameRoom.find(params[:id])
-
     @connect_type = "normal"
-
-    last_number_player = game_room.number_player
-    game_room.update(number_player: last_number_player + 1)
+    GameRoom.find(params[:id]).with_lock do
+      game_room = GameRoom.find(params[:id]);
+      last_number_player = game_room.number_player
+      if last_number_player < 2
+        GameRoom.find(params[:id]).increment(:number_player, 1).save
+      end
+      if game_room.status == "notstarted" && game_room.number_player >= 2
+        GameRoomChannel.broadcast_to game_room, message: "everyone_here"
+      end
+    end
   end
 
   # Connect to channel
@@ -17,20 +22,26 @@ class GameRoomChannel < ApplicationCable::Channel
     @display_name = params[:display_name]
 
     GameRoom.find(params[:id]).with_lock do
-      if @connect_type == "normal" 
+      if @connect_type == "normal" && last_number_player < 2
         GameRoom.find(params[:id]).increment(:number_player, 1).save
       end
     end
+
     @game_room = GameRoom.find(params[:id])
     stream_for @game_room
 
     if @game_room.number_player >= 2
       GameRoomChannel.broadcast_to @game_room, message: "everyone_here"
     end
+
   end
 
   # Disconnect from the channel
   def unsubscribed
+
+    puts "BBBBBBBBBBBB"
+    puts connect_type
+    puts "BBBBBBBBBBBB"
 
     GameRoom.find(params[:id]).with_lock do
       if @connect_type == "normal"

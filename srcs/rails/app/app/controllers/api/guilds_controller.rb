@@ -59,15 +59,20 @@ module Api
 		end
 
 		def delete_member
-			if current_user.guild_id && Guild.check_rights(current_user) && (@target.guild_id == current_user.guild_id)
+			if (@target.nil?)
+				return render json: { error: "Target doesn't exist bro"}, status: :unprocessable_entity
+			elsif (@target.guild_owner == true)
+				return render json: { error: "You cannot remove the guild's owner bro"}, status: :unprocessable_entity
+			elsif current_user.guild_id && Guild.check_rights(current_user) && (@target.guild_id == current_user.guild_id)
 					@target.guild_invites = 0
 					@target.guild_owner = false
 					@target.guild_officer = false
 					@target.guild_locked = false
+					@target.guild_id = nil;
 					@target.save
 					render json: {}
 			else
-				return render json: { error: "You don't have the rights or he is not member of your guild"}
+				return render json: { error: "You don't have the rights or he is not member of your guild"}, status: :unprocessable_entity
 			end
 		end
 
