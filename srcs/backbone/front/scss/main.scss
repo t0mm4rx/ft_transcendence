@@ -40,6 +40,10 @@ a {
 	text-decoration: none;
 }
 
+img {
+	object-fit: cover;
+}
+
 /*
 - Panel -------------------------------------------------------------------------------------------------------------------
 */
@@ -313,10 +317,11 @@ input[type="datetime-local"],
 }
 
 .input-row-checkbox {
-	> label {
+	>label {
 		flex: 1;
 	}
-	> input {
+
+	>input {
 		flex: 0;
 	}
 }
