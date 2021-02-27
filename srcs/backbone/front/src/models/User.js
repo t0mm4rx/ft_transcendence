@@ -24,7 +24,10 @@ const User = Backbone.Model.extend({
       success: () => {
         this.set(key, value);
       },
-      error: (model, response) => {},
+      error: (error) => {
+		  toasts.notifyError("Cannot update property.");
+		  console.log("ERRRORORROOROR", error);
+	  },
     });
   },
   askFriend: function () {

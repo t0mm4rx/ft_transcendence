@@ -5,6 +5,7 @@ import template from '../../templates/guild.html';
 import {Guild, getGuildMembers} from '../models/Guild';
 import _ from 'underscore';
 import {showModal} from '../utils/modal';
+import toasts from '../utils/toasts';
 
 export default Backbone.View.extend({
 	el: "#page",
@@ -25,24 +26,47 @@ export default Backbone.View.extend({
 			const login = event.currentTarget.getAttribute("login");
 			this.lastClickedUser = window.users.find(a => a.get('login') === login);
 			showModal("Manage rights", 
-			`<div id="rights-management-wrapper"><div class="button" id="make-owner"><span>Make owner</span></div><div class="button" id="make-officer"><span>Make officer</span></div></div>`
+			`<div id="rights-management-wrapper"><div class="button" id="make-owner"><span>Make owner</span></div><div class="button" id="make-officer"><span>Make officer</span></div><div class="button" id="remove" data-login=${login}><span>Kick out</span></div></div>`
 			, () => {
 				return true;
 			}, () => true);
 			document.querySelector("#make-owner").onclick = () => {
-				this.lastClickedUser.save('guild_owner', !this.guild_owner);
+				console.log(this.lastClickedUser.get('username'));
+				this.lastClickedUser.save('guild_owner', !this.lastClickedUser.get('guild_owner'));
 			};
 			document.querySelector("#make-officer").onclick = () => {
-				this.lastClickedUser.save('guild_officer', !this.guild_officer);
+				console.log(this.lastClickedUser.get('username'));
+				this.lastClickedUser.save('guild_officer', !this.lastClickedUser.get('guild_officer'));
+			};
+			// document.querySelector("#make-officer").onclick = () => {
+			// 	this.lastClickedUser.save('guild_officer', !this.guild_officer);
+			// };
+			document.querySelector("#remove").onclick = () => {
+				console.log("EVVEENT");
+				const user = window.users.find(a => a.get('login') === login);
+				if (!user)
+					return;
+				console.log(`target_id=${user.get('id')}`);
+				$.ajax({
+					url: `http://${window.location.hostname}:3000/api/guilds/delete_member?target_id=${user.get('id')}`,
+					type: 'POST',
+					// body: `target_id=${user.get('id')}`,
+					success: () => {
+						toasts.notifySuccess("Removed the user from the guild.");
+						window.guilds.fetch();
+					},
+					error: (err) => {
+						console.log(err);
+						toasts.notifyError("Cannot remove user from the guild.");
+					}
+				});
 			};
 		},
 		'click #join_guild': function()
 		{
 			this.guild.join();
 		},
-		'click #make-owner': function () {
-		},
-		'click #make-officer': function (el) {
+		'click #remove': function (el) {
 			
 		},
 		'click #guild-war': function () {

@@ -12,7 +12,7 @@ class GameRoom < ApplicationRecord
 		status == "ended" || player_score >= 11 || opponent_score >= 11
 	end
 
-	def update_scores(loser)
+	def update_scores(loser, current_user)
 		@loser = loser if loser
 		set_winner_and_loser
 		calculate_new_user_score if self.ladder
@@ -20,6 +20,7 @@ class GameRoom < ApplicationRecord
 			tournament.eliminate(@loser)
 			tournament.calculate_new_game(@winner)
 		end
+		game_room.update_war_scores(current_user)
 	end
 
 	def set_no_show(user)
