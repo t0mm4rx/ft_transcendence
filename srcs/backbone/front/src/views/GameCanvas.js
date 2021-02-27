@@ -1,9 +1,12 @@
-/* User preview displayed in the top right corner. */
+/**
+ * Game canvas, is the game engine of the pong.
+ */
+
 import Backbone from 'backbone';
-import $, { event, uniqueSort } from 'jquery';
 import _ from 'underscore';
 import { Game } from '../models/Game';
 
+// States of the game.
 const state_enum = {
     "BEGIN": 1,
     "INGAME": 2,
@@ -159,35 +162,44 @@ export default Backbone.View.extend({
      */
 	collision: function(b, p)
 	{
-        console.log("Player side : ", p.player.side);
+        // Player side left
         if (p.player.side === "left")
         {
+            // The ball is passed by the "x" position of the left player.
             if (b.previous.x - b.radius >= p.x + p.width && b.x - b.radius <= p.x + p.width)
             {
                 var percentAlong = (p.x - b.previous.x) / (b.x - b.previous.x);
                 var yIntersection = percentAlong * (b.y - b.previous.y) + b.previous.y;
 
-                if (yIntersection > p.y && yIntersection < p.y + p.height)
+                // The "y" position of the ball when it in the "x" player hit box is in the "y" player hit box.
+                if (yIntersection > p.y - b.radius
+                    && yIntersection < p.y + p.height + b.radius)
                     return (yIntersection);
             }
         }
+
+        // Player side right
         else
         {
+            // The ball is passed by the "x" position of the right player.
             if (b.previous.x + b.radius <= p.x && b.x + b.radius >= p.x )
             {
-                // console.log("MEH");
                 var percentAlong = (p.x + b.previous.x) / (b.x + b.previous.x);
                 var yIntersection = percentAlong * (b.y - b.previous.y) + b.previous.y;
 
-                if (yIntersection > p.y && yIntersection < p.y + p.height)
+                // The "y" position of the ball when it in the "x" player hit box is in the "y" player hit box.
+                if (yIntersection > p.y - b.radius
+                    && yIntersection < p.y + p.height + b.radius)
                     return (yIntersection);
             }
         }
+
+        // No collision.
         return (-1);
     },
     
     /**
-     * Play a sound.
+     * Play a sound. (Can be usefull...)
      * @param {string} sound_path the sound path.
      */
     playSound: function(sound_path)
@@ -228,6 +240,9 @@ export default Backbone.View.extend({
         this.ball = ball_update;
     },
 
+    /**
+     * Detect if a player scored.
+     */
     detectGoal: function()
     {
         // Detect if the ball is before the left player on the canvas.
@@ -492,6 +507,9 @@ export default Backbone.View.extend({
         }, 3000);
     },
 
+    /**
+     * Print disconnection message.
+     */
     disconnection: function()
     {
         // Background.
@@ -570,34 +588,42 @@ export default Backbone.View.extend({
             if (msg.type === "ping" || self.state == state_enum["END"])
                 return;
 
-            if (msg.type === "confirm_subscription" && self.connection_type === "reconnection")
+            // The player is well connected to the game after a reconnection
+            if (msg.type === "confirm_subscription"
+                && self.connection_type === "reconnection")
             {
+                // Ask infos
                 self.ftsocket.sendMessage({ 
                     action: "to_broadcast", 
                     infos: {
-                        sender: {id: window.currentUser.get('id'), connection_type: self.connection_type},
+                        sender: {
+                            id: window.currentUser.get('id'),
+                            connection_type: self.connection_type
+                        },
                         message: "need_infos",
                         content: {}
-                }}, true, true);   
+                }}, true, true);
             }
 
             if (msg.message)
             {
-                // console.log("(A)");
-                // console.log("PUTAIN DE MESSAGE : ", msg.message);
-                if ((msg.message.message == "update_y"
-                    || msg.message.message == "update_ball")
+                /**
+                 * The sender of the message is the actual user
+                 * and the message is "update_y" || "update_ball",
+                 * but it's not a livestream connection, just return; 
+                 */
+                if ((msg.message.message === "update_y"
+                    || msg.message.message === "update_ball")
                     && msg.message.sender == self.player_info.id
                     && self.connection_type != "live")
                     return;
 
+                // Anyone isn't disconnected.
                 else if (self.state != state_enum["DISCONNECTION"]
-                    && (msg.message.message == "update_y"
-                    || msg.message.message == "update_ball"))
+                    && (msg.message.message === "update_y"
+                    || msg.message.message === "update_ball"))
                 {
-                    // console.log("(1)");
-                    // if (self.connection_type == "live")
-                        // console.log("Update data")
+
                     // Update opponent paddle position
                     if (msg.message.message == "update_y")
                     {
@@ -622,7 +648,6 @@ export default Backbone.View.extend({
                         let ball_side = (self.ball.x < self.canvas.width / 2) ? self.left : self.right;
                         if (ball_side.player.id == msg.message.sender)
                             self.ball = msg.message.content;
-                        // self.gameRender();
                         return;
                     }
                 }
@@ -630,38 +655,16 @@ export default Backbone.View.extend({
                 // Update state.
                 else if (msg.message.message == "update_state")
                 {
-                    // console.log("(2)");
-                    // if (self.connection_type == "live")
-                        // console.log("BAD (1)");
                     self.state = msg.message.content.state;
                     if (self.state == state_enum["BEGIN"])
                         self.begin_date = new Date();
                 }
 
-                // else if (msg.message.message == "amipresent")
-				// {
-                    // console.log("(3)");
-                //     if (self.connection_type == "live")
-                        // console.log("BAD (2)");
-				// 	if (msg.message.sender.id == window.currentUser.get('id')
-				// 		&& msg.message.sender.connection_type != "live"
-				// 		&& msg.message.sender.uuid != self.uuid)
-				// 	{
-				// 		self.ftsocket.sendMessage({
-				// 			action: "to_broadcast",
-				// 			infos: {
-				// 				message: "youcantbehere",
-				// 				content: { reply_to: msg.message.sender }
-				// 		}}, true, true);
-				// 	}
-				// }
-
+                // Give back the informations of the game.
                 else if (msg.message.message == "need_infos"
                     && self.connection_type == "normal")
-                    {
-                    // console.log("(4)");
-                    // if (self.connection_type == "live")
-                        // console.log("BAD (3)");
+                {
+
                     var left_values = {
                         player: {id: self.left.player.id, name: self.left.player.username},
                         x: self.left.x,
@@ -684,6 +687,7 @@ export default Backbone.View.extend({
 
                     var ball_values = JSON.parse(JSON.stringify(self.ball));
 
+                    // Send message to send infos.
                     self.ftsocket.sendMessage({ 
                         action: "to_broadcast", 
                         infos: {
@@ -699,12 +703,15 @@ export default Backbone.View.extend({
                     }}, true, true);
                 }
 
+                /**
+                 * Force to get and use the informations sended in the message.
+                 * Work for a livestream or durring a disconnection (for a reconnection).
+                 */
                 else if (msg.message.message == "force_infos"
                     && (self.connection_type == "live"
                         || self.state == state_enum["DISCONNECTION"]))
                 {
-                    // console.log("FORCE INFOS GETTED");
-                    // console.log("MSG RECO = ", msg.message)
+                    // The user is who asked for.
                     if (window.currentUser.get('id') == msg.message.content.reply_to.id)
                     {
                         self.left = msg.message.content.left;
@@ -720,9 +727,6 @@ export default Backbone.View.extend({
                         self.left.player.side = "left";
                         self.right.player.is = self.right;
                         self.right.player.side = "right";
-
-                        // console.log("LEFT = ", self.left);
-                        // console.log("RIGHT = ", self.right);
 
                         if ((self.connection_type != "live"
                             && self.left.player.id == window.currentUser.get('id'))
@@ -740,6 +744,7 @@ export default Backbone.View.extend({
                         }
                     }
 
+                    // If it's a player reset the game to begin state. (No change of scores)
                     if (window.currentUser.get('id') == self.left.player.id
                         && self.connection_type != "live"
                         && msg.message.content.reply_to.connection_type != "live"
@@ -766,8 +771,6 @@ export default Backbone.View.extend({
 
                 else if (self.state != state_enum["DISCONNECTION"])
                 {
-                    // if (self.connection_type == "live")
-                        // console.log("BAD (4)");
                     // Update score.
                     if (msg.message.message == "update_score")
                     {
@@ -781,8 +784,6 @@ export default Backbone.View.extend({
                     else if (msg.message.message == "client_quit")
                     {
                         self.disconnect_values = JSON.parse(msg.message.content);
-                        // console.log("Message : ", msg.message);
-                        // console.log("Disco value : ", self.disconnect_values);
                         if (self.disconnect_values.connection_type == "normal")
                         {
                             self.state = state_enum["DISCONNECTION"];

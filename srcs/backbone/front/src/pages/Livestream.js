@@ -1,10 +1,13 @@
-/* The home page. */
+/**
+ * Livestream, page where another user
+ * of the website can see a match.
+*/
+
 import Backbone from 'backbone';
 import GameCanvas from '../views/GameCanvas';
-import {FtSocket, FtSocketCollection} from '../models/FtSocket'
+import { FtSocket } from '../models/FtSocket'
 import { Livestream } from '../models/Livestream'
 import template from '../../templates/livestream.html';
-import Cookies from "js-cookie";
 import $ from 'jquery';
 import toasts from '../utils/toasts';
 
@@ -17,37 +20,39 @@ export default Backbone.View.extend({
 	},
 
 	events: {
+		// Event called when a game is ended.
 		'end_game' : function(event, info)
 		{
 			this.ftsocket.closeConnection();
 		}
 	},
 
+	// Similar to GameLive but here the user just watch the game
 	getGame: async function(self)
 	{
+		// Get game id.
 		var gameid = window.location.hash.split('/')[1];
-		console.log('GameID : ', gameid);
-
 		self.gameinfos = await this.model.gamebyid(gameid);
 
-		console.log("Game infos : ", self.gameinfos);
-
+		// Game found but ended or error appen.
 		if (self.gameinfos == null
 			|| self.gameinfos.error
 			|| self.gameinfos.errors)
 		{
+			// Send user to home page.
 			toasts.notifyError("Game doesn't exist.");
 			window.location.hash = "home";
 			return;
 		}
 		else if (self.gameinfos.status == "ended")
 		{
+			// Send user to home page.
 			toasts.notifyError("Game is ended.");
 			window.location.hash = "home";
 			return;
 		}
 		
-			console.log("Avatar URL : ", self.gameinfos.player);
+		// Update players informations in the panel.
 		$("#player_one").text(self.gameinfos.player.username);
 		$("#player_one_div").attr("onclick", "window.location.hash='user/" + self.gameinfos.player.login + "/'");
 		$("#player_one_image").attr("src", self.gameinfos.player.avatar_url);
@@ -55,14 +60,14 @@ export default Backbone.View.extend({
 		$("#player_two_div").attr("onclick", "window.location.hash='user/" + self.gameinfos.opponent.login + "/'");
 		$("#player_two_image").attr("src", self.gameinfos.opponent.avatar_url);
 
-		console.log(self.gameinfos);
-
+		// Connect the user to the game room.
 		self.ftsocket = new FtSocket({
 			id: self.gameinfos.id,
 			channel: 'GameRoomChannel',
 			connect_type: 'live'
 		});
 
+		// Add game canvas.
 		setTimeout(function() {
 			self.game = new GameCanvas(self.ftsocket, self.gameinfos, "live");
 		}, 1000);

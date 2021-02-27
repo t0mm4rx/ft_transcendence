@@ -6,7 +6,6 @@ import Home from "./pages/Home";
 import Game from "./pages/Game";
 import GameLive from "./pages/GameLive";
 import Tournaments from "./pages/Tournaments";
-import Test from "./pages/Test";
 import Auth from "./pages/Auth";
 import NotificationsPanel from "./views/NotificationsPanel";
 import Chat from "./views/Chat";
@@ -44,8 +43,6 @@ export default Backbone.Router.extend({
     "tournaments/:id/": "tournaments",
     "guild/:id": "guild",
     "guild/:id/": "guild",
-    test: "test",
-    "test/": "test",
     admin: "admin",
     "admin/": "admin",
     auth: "auth",
@@ -158,18 +155,6 @@ export default Backbone.Router.extend({
       window.currentView.stopListening();
     }
     window.currentView = new Guild({ anagram: id });
-    window.currentView.render();
-  },
-  test: function () {
-    this.closeGame();
-    this.checkLogged();
-    this.showLayout();
-    if (window.currentView) {
-      window.currentView.undelegateEvents();
-      window.currentView.unbind();
-      window.currentView.stopListening();
-    }
-    window.currentView = new Test();
     window.currentView.render();
   },
   admin: function () {
