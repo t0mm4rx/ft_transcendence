@@ -36,7 +36,19 @@ export default Backbone.View.extend({
         window.guilds.declineWar();
       } else if (type === "guild_invite") {
         window.currentUser.declineGuildInvite();
-      } else {
+      } else if (type === "game") {
+		$.ajax({
+			url: `http://${window.location.hostname}:3000/api/game_requests/${id}`,
+			type: 'DELETE',
+			success: () => {
+				toasts.notifySuccess("Denied game request.");
+				window.currentUser.fetch();
+			},
+			error: () => {
+				toasts.notifyError("Failed to deny game request.");
+			}
+		});
+	  } else {
         const game = new Game({ id: id });
         game.destroy({
           success: (data) => {
@@ -118,7 +130,9 @@ export default Backbone.View.extend({
       return;
     this.notifs = [];
     window.currentUser.get("pending_requests").forEach((req) => {
-      const user = window.users.where({ id: req.user_id });
+      const user = window.users.models.find(a => a.get('id') === req.user_id);
+	  if (!user)
+		return;
       if (user.length) {
         this.notifs.push({
           title: `${user[0].get("username")} sent you a friend request`,
@@ -129,14 +143,17 @@ export default Backbone.View.extend({
       }
     });
     window.currentUser.get("game_pending_requests").forEach((req) => {
-      const user = window.users.where({ id: req.user_id });
-      if (user.length) {
+    //   const user = window.users.where({ id: req.user_id });
+	  const user = window.users.find(a => a.get('id') === req.user_id);
+	//   if (!user)
+	// 	return;
+      if (!!user) {
         this.notifs.push({
-          title: `${user[0].get("username")} sent you a game request`,
+          title: `${user.get("username")} sent you a game request`,
           type: "game",
-          // id: req.id,
-          id: user[0].get("id"),
-          name: user[0].get("username"),
+          id: req.id,
+        //   id: user.get("id"),
+          name: user.get("username"),
         });
       }
     });
