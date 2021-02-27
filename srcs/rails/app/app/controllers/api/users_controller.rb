@@ -3,10 +3,10 @@ module Api
     LIMIT_PAGINATION_MAX = 20
     skip_before_action :authenticate_request, only: :create
     before_action :set_user, except: [:create, :index]
-    before_action :validate_rights, only: [:destroy, :update]
+    before_action :validate_rights, only: [:destroy]
 
     def index
-      if params.has_key?(:admin) && params[:admin] 
+      if params.has_key?(:admin) && params[:admin]
         users = User.where(admin: true)
       else
         users = User.order(ladder_score: :desc).limit(limit).offset(params[:offset])
@@ -24,6 +24,11 @@ module Api
     end
 
     def update
+      if (current_user.guild_owner || current_user.guild_officer) && current_user.guild_id == @user.guild_id
+          @user.update(user_params_change)
+          @user.save
+          return render json: @user
+      end
       if params.has_key?(:banned_until)
         params[:banned_until] = Time.now + params[:banned_until].to_i * 60
       end
