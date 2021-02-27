@@ -85,9 +85,15 @@ export default Backbone.View.extend({
 			self.game_canvas = new GameCanvas(self.ftsocket, self.gameinfos, "reconnection");
 	},
 
+	// killGame: function()
+	// {
+	// 	if (self.game_canvas)
+	// 		delete self.game_canvas;
+	// },
+
     render: function() {
         var self = this;
         this.$el.html(_.template(template)({model: this.model}));  
         this.getGame(self);
-    }
+	},
 });

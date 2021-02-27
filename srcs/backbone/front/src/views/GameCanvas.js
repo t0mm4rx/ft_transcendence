@@ -159,7 +159,7 @@ export default Backbone.View.extend({
      */
 	collision: function(b, p)
 	{
-        // console.log("Player side : ", p.player.side);
+        console.log("Player side : ", p.player.side);
         if (p.player.side === "left")
         {
             if (b.previous.x - b.radius >= p.x + p.width && b.x - b.radius <= p.x + p.width)
@@ -307,9 +307,9 @@ export default Backbone.View.extend({
         if (colidY !== -1)
         {
             if (player.player.side == "left")
-                ball_update.x = player.x + player.width;
+                ball_update.x = player.x + player.width + ball_update.radius;
             else
-                ball_update.x = player.x;
+                ball_update.x = player.x - ball_update.radius;
             ball_update.y = colidY;
             
             // Increase difficulty
@@ -717,7 +717,9 @@ export default Backbone.View.extend({
 
                         // Set the players sides to the players.
                         self.left.player.is = self.left;
+                        self.left.player.side = "left";
                         self.right.player.is = self.right;
+                        self.right.player.side = "right";
 
                         // console.log("LEFT = ", self.left);
                         // console.log("RIGHT = ", self.right);
@@ -927,9 +929,4 @@ export default Backbone.View.extend({
         // Setup message treatment.
         this.messageTreatment(self);
     },
-
-    close: function(){
-        this.remove();
-        this.unbind();
-    }
 });

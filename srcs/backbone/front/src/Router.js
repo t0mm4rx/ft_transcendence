@@ -260,9 +260,13 @@ export default Backbone.Router.extend({
   if (actual && (!!actual.game || !!actual.gamelive)) {
       const router = new Router();
       console.log("I LEEEEEEEEEEEEEEEEAVE IT");
-      if (!!actual.game_canvas) { console.log("IMMMMM GAME CANVAS"); actual.game_canvas.close(); }
-      if (!!actual.gamelive && window.currentUser.get('status') !== "online") { window.currentUser.changeStatus("online");}
-      if (!!actual.game) { router.clearRequests(); }
+      // if (!!actual.game_canvas && !!actual.game_canvas) { console.log("IMMMMM GAME CANVAS"); actual.gamelive.close(); }
+      if (!!actual.gamelive)
+      {
+        if(!!actual.game_canvas) { clearInterval(actual.game_canvas.timer); }
+        if(window.currentUser.get('status') !== "online") { window.currentUser.changeStatus("online");}
+      }
+        if (!!actual.game) { router.clearRequests(); }
       // if (!!actual.game_live.game) actual.game_live.game.remove();
       if (actual.ftsocket) actual.ftsocket.closeConnection();
       console.log("Page : ", actual);
