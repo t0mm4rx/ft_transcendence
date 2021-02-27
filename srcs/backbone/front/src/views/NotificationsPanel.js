@@ -31,7 +31,7 @@ export default Backbone.View.extend({
       const type = elId.split("-")[0];
       const id = parseInt(elId.split("-")[1]);
       if (type === "friend") {
-        window.users.models.find((a) => a.get("id") === 3).unfriend();
+        window.users.models.find((a) => a.get("id") === id).unfriend();
       } else if (type === "war") {
         window.guilds.declineWar();
       } else if (type === "guild_invite") {
@@ -126,27 +126,26 @@ export default Backbone.View.extend({
     this.renderList();
   },
   renderList: async function () {
+	console.log("HEEEEEERE");
     if (!window.currentUser || !window.currentUser.get("pending_requests"))
       return;
     this.notifs = [];
+	console.log("Requests", window.currentUser.get("pending_requests"));
     window.currentUser.get("pending_requests").forEach((req) => {
+	console.log("REQ", req);
       const user = window.users.models.find(a => a.get('id') === req.user_id);
-	  if (!user)
-		return;
-      if (user.length) {
+	  console.log("MOTIF", user);
+      if (!!user) {
         this.notifs.push({
-          title: `${user[0].get("username")} sent you a friend request`,
+          title: `${user.get("username")} sent you a friend request`,
           type: "friend",
-          id: user[0].get("id"),
-          name: user[0].get("username"),
+          id: user.get("id"),
+          name: user.get("username"),
         });
       }
     });
     window.currentUser.get("game_pending_requests").forEach((req) => {
-    //   const user = window.users.where({ id: req.user_id });
 	  const user = window.users.find(a => a.get('id') === req.user_id);
-	//   if (!user)
-	// 	return;
       if (!!user) {
         this.notifs.push({
           title: `${user.get("username")} sent you a game request`,
