@@ -41,6 +41,22 @@ module Api
             render json: game_request.errors, status: :unprocessable_entity
           end
         end
+        
+        def deny
+          game_request = GameRequest.find_by(user_id: params[:userid], opponent_id: params[:opponentid], accepted: false)
+          puts "AAAAAAAAAAAAAAAA"
+          puts game_request
+          puts "AAAAAAAAAAAAAAAA"
+          if !game_request
+            return render json: { error: "no existing request from user"}, status: :not_found
+          end
+
+          if game_request.destroy
+            render json: {}
+          else
+            render json: game_request.errors, status: :unprocessable_entity
+          end
+        end
 
         def first_no_oppenent
           gamerequest = GameRequest.where(opponent_id: -1).first

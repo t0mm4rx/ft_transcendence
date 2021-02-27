@@ -39,10 +39,6 @@ class GameRoomChannel < ApplicationCable::Channel
   # Disconnect from the channel
   def unsubscribed
 
-    puts "BBBBBBBBBBBB"
-    puts @connect_type
-    puts "BBBBBBBBBBBB"
-
     GameRoom.find(params[:id]).with_lock do
       if @connect_type == "normal"
         GameRoom.find(params[:id]).decrement(:number_player, 1).save
@@ -52,6 +48,13 @@ class GameRoomChannel < ApplicationCable::Channel
     game_room = GameRoom.find(params[:id])
 
     if (game_room.status != "notstarted" && game_room.number_player <= 0) || game_room.number_player < 0
+      if (game_room.player_score < 11 && game_room.opponent_score < 11)
+        if @player_id == game_room.player_id
+          game_room.update_scores(User.find(game_room.opponent_id))
+        elsif @player_id == game_room.opponent_id
+          game_room.update_scores(User.find(game_room.player_id))
+        end
+      end
       game_room.update(status: "ended")
     end
 

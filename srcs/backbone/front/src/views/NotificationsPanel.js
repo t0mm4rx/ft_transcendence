@@ -38,8 +38,9 @@ export default Backbone.View.extend({
         window.currentUser.declineGuildInvite();
       } else if (type === "game") {
 		$.ajax({
-			url: `http://${window.location.hostname}:3000/api/game_requests/${id}`,
-			type: 'DELETE',
+			url: `http://${window.location.hostname}:3000/api/game/deny`,
+      type: 'PUT',
+      data: `opponentid=${window.currentUser.id}&userid=${id}`,
 			success: () => {
 				toasts.notifySuccess("Denied game request.");
 				window.currentUser.fetch();
@@ -150,8 +151,8 @@ export default Backbone.View.extend({
         this.notifs.push({
           title: `${user.get("username")} sent you a game request`,
           type: "game",
-          id: req.id,
-        //   id: user.get("id"),
+          // id: req.id,
+          id: user.get("id"),
           name: user.get("username"),
         });
       }

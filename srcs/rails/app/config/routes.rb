@@ -62,6 +62,8 @@ Rails.application.routes.draw do
     get '/game/match_no_opponent', to: 'game_requests#first_no_oppenent'
     post '/game/:id/change_opponent', to: 'game_requests#change_opponent'
     post '/game/:userid/destroy_empty_requests', to: 'game_requests#destroy_empty_requests'
+    put '/game/deny', to: 'game_requests#deny'
+
 end
 
   mount ActionCable.server => '/cable'

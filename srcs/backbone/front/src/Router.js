@@ -211,6 +211,8 @@ export default Backbone.Router.extend({
       window.location.hash = "auth/";
     }
     connectGlobalSocket();
+    if (window.currentUser.get('status') === "offline")
+      window.currentUser.changeStatus("online");
   },
   /* Show chat panel, notification panel and other elements only visible when logged */
   showLayout: function () {
