@@ -6,7 +6,7 @@ class GameRoomChannel < ApplicationCable::Channel
       game_room = GameRoom.find(params[:id]);
       last_number_player = game_room.number_player
       if last_number_player < 2
-        game_room.update(number_player: last_number_player + 1)
+        GameRoom.find(params[:id]).increment(:number_player, 1).save
       end
       if game_room.status == "notstarted" && game_room.number_player >= 2
         GameRoomChannel.broadcast_to game_room, message: "everyone_here"
@@ -22,17 +22,14 @@ class GameRoomChannel < ApplicationCable::Channel
     @display_name = params[:display_name]
 
     GameRoom.find(params[:id]).with_lock do
-      if @connect_type == "normal" 
+      if @connect_type == "normal" && GameRoom.find(params[:id]).number_player < 2
         GameRoom.find(params[:id]).increment(:number_player, 1).save
       end
-
-      @game_room = GameRoom.find(params[:id])
-      stream_for @game_room
-
     end
 
-    sleep 5
     @game_room = GameRoom.find(params[:id])
+    stream_for @game_room
+
     if @game_room.number_player >= 2
       GameRoomChannel.broadcast_to @game_room, message: "everyone_here"
     end
@@ -43,7 +40,7 @@ class GameRoomChannel < ApplicationCable::Channel
   def unsubscribed
 
     puts "BBBBBBBBBBBB"
-    puts connect_type
+    puts @connect_type
     puts "BBBBBBBBBBBB"
 
     GameRoom.find(params[:id]).with_lock do
@@ -54,7 +51,7 @@ class GameRoomChannel < ApplicationCable::Channel
 
     game_room = GameRoom.find(params[:id])
 
-    if game_room.status != "notstarted" && game_room.number_player <= 0
+    if (game_room.status != "notstarted" && game_room.number_player <= 0) || game_room.number_player < 0
       game_room.update(status: "ended")
     end
 

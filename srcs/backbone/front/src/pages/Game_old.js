@@ -107,7 +107,7 @@ export default Backbone.View.extend({
 					<h3>` + self.gameinfos.opponent.name + `</h3>
 				</div>
 			</div>
-			<canvas id="game-canvas" width="600" height="400"></canvas>
+			<canvas id="game-canvas" width="800" height="600"></canvas>
 			</div>
 		`);
 		
