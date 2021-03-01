@@ -17,7 +17,7 @@ export default Backbone.View.extend({
     "click .game-button": function (event) {
       console.log("ID : ", event.currentTarget.id);
       const login = event.currentTarget.id.split("-")[1];
-      window.users.find(a => a.get("login") === login).askGame();
+      window.users.find((a) => a.get("login") === login).askGame();
     },
   },
   render: function () {
@@ -32,7 +32,7 @@ export default Backbone.View.extend({
     const to_stream = await new Livestream().gamestostream();
     console.log("To stream : ", to_stream);
 
-    if (to_stream !== null) {
+    if (to_stream !== null && to_stream.player && player.opponent) {
       games.append(
         `<div class="game-item">
 					<span><b>${to_stream.player.username}</b> vs. <b>${to_stream.opponent.username}</b></span>

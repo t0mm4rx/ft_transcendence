@@ -133,7 +133,6 @@ export default Backbone.View.extend({
     let html = "";
     this.model.get("games").each((game) => {
       if (game.get("player") != null && game.get("opponent") != null) {
-        console.log("##### GAME", game);
         const winner =
           game.get("winner_id") === game.get("player").id
             ? "player"
