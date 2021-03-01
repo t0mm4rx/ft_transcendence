@@ -121,7 +121,7 @@ module Api
         end
 
         def livestream_games
-            gameroom_normal = GameRoom.where(status: "active").first;
+            gameroom_normal = GameRoom.where(status: "active");
             render json: gameroom_normal
         end
 

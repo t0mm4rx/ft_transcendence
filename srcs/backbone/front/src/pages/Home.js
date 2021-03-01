@@ -32,13 +32,15 @@ export default Backbone.View.extend({
     console.log("To stream : ", to_stream);
 
     if (to_stream !== null) {
-      games.append(
-        `<div class="game-item">
-					<span><b>${to_stream.player.username}</b> vs. <b>${to_stream.opponent.username}</b></span>
-					<span>${to_stream.game_type}</span>
-					<a class="button-icon button-icon-accent" onclick="window.location.hash='livestream/${to_stream.id}/'"><i class="fas fa-tv"></i></a>
-				</div>`
-      );
+      to_stream.forEach((game) => {
+        games.append(
+          `<div class="game-item">
+            <span><b>${game.player.username}</b> vs. <b>${game.opponent.username}</b></span>
+            <span>${game.game_type}</span>
+            <a class="button-icon button-icon-accent" onclick="window.location.hash='livestream/${game.id}/'"><i class="fas fa-tv"></i></a>
+          </div>`
+        );
+      });
     }
   },
   renderFriendsList: function () {

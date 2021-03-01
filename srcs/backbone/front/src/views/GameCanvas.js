@@ -351,7 +351,7 @@ export default Backbone.View.extend({
             // this.playSound('../../assets/game_sound/wall_hit.ogg');
             let self = this;
             // Send ball position to other clients.
-            if (window.currentUser.get('id') == player.player.id)
+            if (window.currentUser.get('id') == player.player.id && self.connection_type !== "live")
                 _.throttle(
                 self.ftsocket.sendMessage({
                     action: "to_broadcast",
@@ -369,7 +369,7 @@ export default Backbone.View.extend({
         this.ball = ball_update;
 
         // Detect goal.
-        if (window.currentUser.get('id') == player.player.id)
+        if (window.currentUser.get('id') == player.player.id && self.connection_type !== "live")
             this.detectGoal();
     },
 
@@ -557,7 +557,6 @@ export default Backbone.View.extend({
                 // if (window.currentUser.get('id') == this.left.player.id)
                     this.gameRender();
                 // if (window.currentUser.get('id') == this.left.player.id
-                    if(this.connection_type != "live")
                         this.gameUpdate();
                 break;
 
