@@ -24,7 +24,7 @@ module Api
     end
 
     def update
-      if (current_user.guild_owner || current_user.guild_officer) && current_user.guild_id == @user.guild_id
+      if current_user.guild_id && @user.guild_id && (current_user.guild_owner || current_user.guild_officer) && current_user.guild_id == @user.guild_id
           @user.update(user_params_change)
           @user.save
           return render json: @user
