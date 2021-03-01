@@ -1,4 +1,6 @@
 class Channel < ApplicationRecord
+	has_secure_password #password encryption in DB
+
 	has_many :channel_users, dependent: :destroy #if user delete account all channel are deleted
 	has_many :users, through: :channel_users
 	has_many :messages, dependent: :destroy #if user delete account all messages are deleted

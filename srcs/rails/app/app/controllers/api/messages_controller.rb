@@ -40,7 +40,7 @@ module Api
 		return if @adminPeak
 		user_registered = @channel.users.find(current_user.id) rescue nil
 		unless user_registered
-			if join && (!@channel.private || @channel.password == password)
+			if join && (!@channel.private || @channel.authenticate(password))
 				Channel.channel_user_add(@channel.id, current_user.id)
 			else
 				message = !@channel.private ? "join" : "password"
