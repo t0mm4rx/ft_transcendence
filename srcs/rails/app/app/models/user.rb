@@ -29,8 +29,8 @@ class User < ApplicationRecord
 	after_initialize :set_defaults
 
 	def games
-		# GameRoom.where("player_id = ? OR opponent_id = ?", id, id)
-		game_player + game_opponent
+		GameRoom.where("player_id = ? OR opponent_id = ?", id, id)
+		# game_player + game_opponent
 	end
 
 	def pending_games 

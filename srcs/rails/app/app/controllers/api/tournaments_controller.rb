@@ -15,7 +15,7 @@ class Api::TournamentsController < ApplicationController
 	end
 
 	def games
-		@games = GameRoom.where(tournament_id: params[:id])
+		@games = GameRoom.where(tournament_id: params[:id]).order(updated_at: :desc)
 		render json: @games
 	end
 	

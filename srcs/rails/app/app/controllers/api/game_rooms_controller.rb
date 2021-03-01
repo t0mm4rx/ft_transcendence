@@ -116,7 +116,7 @@ module Api
         end
 
         def ladder_games
-            @games = GameRoom.where(ladder: true).limit(20)
+            @games = GameRoom.where(ladder: true).order(updated_at: :desc).limit(20)
             render json: @games
         end
 

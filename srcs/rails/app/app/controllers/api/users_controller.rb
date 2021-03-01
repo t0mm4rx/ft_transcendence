@@ -70,8 +70,11 @@ module Api
     end
 
     def games
-      games = @user.games.filter { |game| game.status == "ended" }
-      render json: games.reverse.take(15)
+      # games = @user.games.filter { |game| game.status == "ended" }
+    
+      # render json: games.reverse.take(15)
+      games = @user.games.where(status: "ended").order(updated_at: :desc)
+      render json: games.limit(15)
     end
 
     def change_status
