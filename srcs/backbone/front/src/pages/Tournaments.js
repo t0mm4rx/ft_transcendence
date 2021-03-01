@@ -20,7 +20,7 @@ export default Backbone.View.extend({
     else this.renderPermanent();
   },
   renderTournamentList(id) {
-    console.log("ID1 :", id);
+    // console.log("ID1 :", id);
 
     const now = new Date();
     this.$(".tournament-listing#current")
@@ -30,7 +30,7 @@ export default Backbone.View.extend({
     }  id="permanent">PERMANENT</h4></a>`);
     this.$(".tournament-listing#future").html("<h3>Upcoming</h4>");
     this.collection.each((tournament) => {
-      console.log("TOURNAMENT :", tournament);
+      // console.log("TOURNAMENT :", tournament);
 
       const start = new Date(tournament.get("start").replace(/-/g, "/"));
       const reg = new Date(
@@ -56,7 +56,7 @@ export default Backbone.View.extend({
     });
   },
   renderTournament(id) {
-    console.log("ID:", id);
+    // console.log("ID:", id);
     const model = this.collection.get(id);
     model.getUsers();
     this.stopListening();

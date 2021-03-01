@@ -44,10 +44,10 @@ export default Backbone.View.extend({
   ),
   className: "tournament panel",
   initialize() {
-    this.model.getGames();
     // this.listenTo(this.model, "change", this.render);
     this.listenTo(this.model.get("users"), "sync", this.render);
     this.listenTo(this.model.get("games"), "sync", this.renderGames);
+    this.model.getGames();
   },
   events: {
     "click #tournament-badge": "register",
@@ -56,9 +56,9 @@ export default Backbone.View.extend({
     if (
       !this.model.get("users") ||
       !this.model.get("start") ||
-      this.model.get("registration_start")
+      !this.model.get("registration_start")
     )
-      return;
+      return this;
 
     const now = new Date();
     const registrationOpen =
@@ -85,7 +85,7 @@ export default Backbone.View.extend({
     );
     if (this.model.get("winner")) {
       const winner = this.model.get("winner");
-      console.log("WINNER :", winner);
+      // console.log("WINNER :", winner);
 
       this.$("#img2").replaceWith(
         `<img src="${winner.avatar_url}" id="img2" class="avatar"/>`
@@ -120,7 +120,7 @@ export default Backbone.View.extend({
     }
     users.forEach((user) => {
       if (user) {
-        console.log("User", user);
+        // console.log("User", user);
         html += this.userTemplate({ model: user, rank: rank });
         if (rank) rank++;
       }
@@ -129,7 +129,7 @@ export default Backbone.View.extend({
   },
   renderGames() {
     // todo
-    console.log("GAMES:", this.model.get("games"));
+    // console.log("GAMES:", this.model.get("games"));
     let html = "";
     this.model.get("games").each((game) => {
       if (game.get("player") != null && game.get("opponent") != null) {
