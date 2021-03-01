@@ -34,25 +34,22 @@ module Api
 		if @other_user = User.find_by(login: params[:name])
 			@channel.direct = true
 			@channel.name = "DM:#{@other_user.login}:#{current_user.login}"
-		elsif @channel.password.empty?
-			# @channel.private = false
+		elsif params[:password].empty?
 			@channel.public = true
-			# @channel.direct = false
+			@channel.password = "password"
 		else
 			@channel.private = true
 			@channel.public = false
-		# 	@channel.direct = false
 		end
-		puts "CREATE CHANNEL ###########"
-		p @channel
-	if @channel.save
-		Channel.channel_user_creation(@channel.id, current_user.id)
-		if @channel.direct
-			Channel.channel_user_creation(@channel.id, @other_user.id)
-		end
-		render json: @channel, status: :created
-	else
-		render json: @channel.errors, status: :unprocessable_entity
+
+		if @channel.save
+			Channel.channel_user_creation(@channel.id, current_user.id)
+			if @channel.direct
+				Channel.channel_user_creation(@channel.id, @other_user.id)
+			end
+			render json: @channel, status: :created
+		else
+			render json: @channel.errors, status: :unprocessable_entity
 		end
 	end
 

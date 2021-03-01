@@ -55,6 +55,7 @@ module Api
                 render json: game.errors, status: :unprocessable_entity
             end
         end
+        
         # def update
         #     game_room = GameRoom.find(params[:id])
         #     # game_room.update_attribute(:player_id, params[:player_id])

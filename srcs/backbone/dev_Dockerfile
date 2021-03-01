@@ -22,4 +22,5 @@ EXPOSE 8080
 
 ENTRYPOINT ["/tmp/setup.sh"]
 
-CMD ["npm", "run", "serve"]
+#CMD ["npm", "run", "serve"]
+CMD ["npm", "run", "prod"]

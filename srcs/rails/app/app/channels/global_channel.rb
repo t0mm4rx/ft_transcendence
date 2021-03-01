@@ -1,10 +1,6 @@
 class GlobalChannel < ApplicationCable::Channel
   def subscribed
 
-    puts "UUUUUUUUUUUU"
-    puts params
-    puts "UUUUUUUUUUUU"
-
     @user_id = params["user_id"]
     user = User.find(@user_id)
     if user.status === "offline"

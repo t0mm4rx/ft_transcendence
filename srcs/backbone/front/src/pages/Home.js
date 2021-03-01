@@ -16,7 +16,7 @@ export default Backbone.View.extend({
     },
     "click .game-button": function (event) {
       const login = event.currentTarget.id.split("-")[1];
-      window.users.find(a => a.get("login") === login).askGame();
+      window.users.find((a) => a.get("login") === login).askGame();
     },
   },
   render: function () {
