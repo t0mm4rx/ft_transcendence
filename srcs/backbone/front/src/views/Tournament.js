@@ -53,7 +53,12 @@ export default Backbone.View.extend({
     "click #tournament-badge": "register",
   },
   render() {
-    if (!this.model.get("users")) return;
+    if (
+      !this.model.get("users") ||
+      !this.model.get("start") ||
+      this.model.get("registration_start")
+    )
+      return;
 
     const now = new Date();
     const registrationOpen =

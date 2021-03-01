@@ -24,16 +24,16 @@ module Api
     end
 
     def update
-      if current_user.guild_id && @user.guild_id && (current_user.guild_owner || current_user.guild_officer) && current_user.guild_id == @user.guild_id
-          @user.update(user_params_change)
-          @user.save
+      if !@user
+        return render json: { error: "no such user" }, status: :not_found
+      end
+      if params_update_guild_rights && can_update_guild_rights
+          @user.update_attribute(:guild_owner, params[:guild_owner]) if params.has_key?(:guild_owner)
+          @user.update_attribute(:guild_officer, params[:guild_officer]) if params.has_key?(:guild_officer)
           return render json: @user
       end
       if params.has_key?(:banned_until)
         params[:banned_until] = Time.now + params[:banned_until].to_i * 60
-      end
-      if !@user
-        return render json: { error: "no such user" }, status: :not_found
       end
       unless @user === current_user || params.has_key?(:admin)
         if (!current_user.admin || @user.owner) && !current_user.owner
@@ -116,7 +116,7 @@ module Api
     end
 
     def user_params_change
-        params.permit(:username, :avatar_url, :password, :guild_id, :banned_until, :status, :guild_owner, :guild_officer, :admin)
+        params.permit(:username, :avatar_url, :password, :guild_id, :banned_until, :status, :admin)
     end
 
     def limit
@@ -124,6 +124,15 @@ module Api
         params.fetch(:limit, LIMIT_PAGINATION_MAX).to_i,
         LIMIT_PAGINATION_MAX
       ].min
+    end
+
+    def params_update_guild_rights 
+      return params.has_key?(:guild_owner) || params.has_key?(:guild_officer)
+    end
+
+    def can_update_guild_rights 
+      rights_to_user_guild = (current_user.guild_id && current_user.guild_id == @user.guild_id && (current_user.guild_owner || current_user.guild_officer))
+      return current_user.admin || rights_to_user_guild
     end
 
   end
