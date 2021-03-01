@@ -31,11 +31,11 @@ export default Backbone.View.extend({
 				return true;
 			}, () => true);
 			document.querySelector("#make-owner").onclick = () => {
-				console.log(this.lastClickedUser.get('username'));
+				console.log("LOGIN", this.lastClickedUser.get('username'));
 				this.lastClickedUser.save('guild_owner', !this.lastClickedUser.get('guild_owner'));
 			};
 			document.querySelector("#make-officer").onclick = () => {
-				console.log(this.lastClickedUser.get('username'));
+				console.log("LOGIN", this.lastClickedUser.get('username'));
 				this.lastClickedUser.save('guild_officer', !this.lastClickedUser.get('guild_officer'));
 			};
 			// document.querySelector("#make-officer").onclick = () => {

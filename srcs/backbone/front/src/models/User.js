@@ -18,7 +18,7 @@ const User = Backbone.Model.extend({
       url:
         `http://` +
         window.location.hostname +
-        `:3000/api/users/${window.currentUser.get("id")}/`,
+        `:3000/api/users/${this.get("id")}/`,
       type: "PUT",
       data: `${key}=${value}`,
       success: () => {
