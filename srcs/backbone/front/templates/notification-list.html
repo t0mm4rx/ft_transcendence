@@ -8,12 +8,12 @@
     >
       <i class="fas fa-check"></i>
     </div>
-    <div
+    <% if (item.type !== "war_game") {%><div
       class="button-icon notification-delete"
       notification-id="<%= item.type %>-<%= item.id %>-<%= item.name %>-<%= item.req_id %>"
     >
       <i class="fas fa-times"></i>
-    </div>
+    </div><% } %>
   </div>
 </div>
 <% }) %>
