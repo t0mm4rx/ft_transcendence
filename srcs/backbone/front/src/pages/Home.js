@@ -15,7 +15,6 @@ export default Backbone.View.extend({
       });
     },
     "click .game-button": function (event) {
-      console.log("ID : ", event.currentTarget.id);
       const login = event.currentTarget.id.split("-")[1];
       window.users.find(a => a.get("login") === login).askGame();
     },
@@ -41,16 +40,6 @@ export default Backbone.View.extend({
 				</div>`
       );
     }
-
-    // window.liveGames.forEach(game => {
-    // 	games.append(
-    // 		`<div class="game-item">
-    // 			<span><b>${game.attributes.player1}</b> vs. <b>${game.attributes.player2}</b></span>
-    // 			<span>${game.attributes.type}</span>
-    // 			<a class="button-icon button-icon-accent" onclick="window.location.hash='livestream/42/'"><i class="fas fa-tv"></i></a>
-    // 		</div>`
-    // 	);
-    // });
   },
   renderFriendsList: function () {
     if (!window.currentUser.get("friends")) return;

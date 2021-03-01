@@ -102,6 +102,8 @@ export default Backbone.View.extend({
     const friends = this.$("#friends-panel-content");
     friends.html("");
     this.model.get("friends").forEach((friend) => {
+			if (friend.id == window.currentUser.get('id'))
+				friend = window.currentUser.attributes;
       const friendsel = new FriendListElement();
       friends.append(friendsel.render(friend).el);
     });

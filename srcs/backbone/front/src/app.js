@@ -92,4 +92,5 @@ window.notifications = new NotificationCollection();
 // Page layout
 window.layoutView = new PageLayout().render();
 
+
 Backbone.history.start();

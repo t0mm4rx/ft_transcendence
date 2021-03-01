@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_18_202408) do
+ActiveRecord::Schema.define(version: 2021_03_01_161246) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(version: 2021_02_18_202408) do
     t.boolean "private"
     t.string "password"
     t.boolean "direct", default: false
+    t.string "password_digest"
   end
 
   create_table "delayed_jobs", force: :cascade do |t|

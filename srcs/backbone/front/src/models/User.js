@@ -148,7 +148,22 @@ const User = Backbone.Model.extend({
 		type: 'POST',
 		data: `target_id=${this.get("id")}`,
 		success: () => {
-			toasts.notifySuccess(`You invited ${this.get('username')} in your guild.`);
+      toasts.notifySuccess(`You invited ${this.get('username')} in your guild.`);
+      window.globalSocket.sendMessage(
+        {
+          action: "to_broadcast",
+          infos: {
+            message: "guild_invite",
+            content: {
+              from: window.currentUser.get("guild").name,
+              request_to: this.get("id"),
+              desc: "Guild request"
+            },
+          },
+        },
+        false,
+        true
+      );
 		},
 		error: () => {
 			toasts.notifyError("Cannot send guild request.");

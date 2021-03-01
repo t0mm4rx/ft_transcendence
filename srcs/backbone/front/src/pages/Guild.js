@@ -71,7 +71,11 @@ export default Backbone.View.extend({
 		},
 		'click #guild-war': function () {
 			window.location.hash = "guilds/";
-		}
+		},
+		"click .game-button": function (event) {
+			const login = event.currentTarget.id.split("-")[1];
+			window.users.find(a => a.get("login") === login).askGame();
+		},
 	},
 	render: function () {
 		this.guild = window.guilds.models.find(a =>
@@ -96,15 +100,19 @@ export default Backbone.View.extend({
 		console.log("Id: ", this.guild.get("id"));
 		console.log(getGuildMembers(this.guild.get("id")));
 		getGuildMembers(this.guild.get("id")).forEach(friend => {
+			console.log("FRIEND : ", friend);
 			if (!friend)
 				return;
+
+			if (friend.get('id') == window.currentUser.get('id'))
+				friend = window.currentUser;
 			friends.append(
 				`<div class="friend-item">
 					<img src="${friend.get('avatar_url')}" onclick="window.location.hash='user/${friend.get('login')}/'"/>
 					<b class="friend-name" onclick="window.location.hash='user/${friend.get('login')}/'">${friend.get('username')}</b>
 					<span class="friend-status friend-status-${friend.get('status')}">${(friend.get('status').charAt(0).toUpperCase() + friend.get('status').slice(1)) }</span>
 					<span class="button-icon message-button" id="message-${friend.get('login')}"><i class="far fa-comment"></i></span>
-					${(friend.get('status') == "online" )? "<span class=\"button-icon button-icon-accent\"><i class=\"fas fa-gamepad\"></i></span>" : ""}
+					${(friend.get('status') == "online" )? `<span class="button-icon button-icon-accent game-button" id="game-${friend.get('login')}"><i class="fas fa-gamepad"></i></span>` : ""}
 					${!!friend.get('guild_owner') ? "<i class=\"fas fa-crown owner-icon\"></i>" : ""}
 					${!!friend.get('guild_officer') ? "<i class=\"fas fa-star owner-icon\"></i>" : ""}
 					${!!window.currentUser.get('admin') || (window.currentUser.get('guild_owner') && window.currentUser.get('guild_id') === this.guild.id) ? `<span class="button-icon user-settings" login="${friend.get('login')}"><i class="fas fa-cog"></i></span>` : ""}

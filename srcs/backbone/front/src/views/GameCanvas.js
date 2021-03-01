@@ -607,6 +607,9 @@ export default Backbone.View.extend({
 
             if (msg.message)
             {
+                if (self.connection_type == "live" && msg.message.message === "update_ball")
+                    console.log("Message ball\n");
+
                 /**
                  * The sender of the message is the actual user
                  * and the message is "update_y" || "update_ball",
@@ -617,7 +620,7 @@ export default Backbone.View.extend({
                     && msg.message.sender == self.player_info.id
                     && self.connection_type != "live")
                     return;
-
+                
                 // Anyone isn't disconnected.
                 else if (self.state != state_enum["DISCONNECTION"]
                     && (msg.message.message === "update_y"
@@ -643,10 +646,10 @@ export default Backbone.View.extend({
                     }
 
                     // Update ball position.
-                    else if (msg.message.message == "update_ball")
+                    else if (msg.message.message == "update_ball" && self.ball)
                     {
                         let ball_side = (self.ball.x < self.canvas.width / 2) ? self.left : self.right;
-                        if (ball_side.player.id == msg.message.sender)
+                        if (ball_side.player.id == msg.message.sender || self.connection_type == "live")
                             self.ball = msg.message.content;
                         return;
                     }

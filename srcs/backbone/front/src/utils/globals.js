@@ -30,34 +30,43 @@ const connectGlobalSocket = () => {
     // Ignores pings.
     if (msg.type === "ping") return;
 
+    if (msg.type === "confirm_subscription")
+      window.currentUser.set("status", "online");
+
     if (msg.message) {
 
       // New client so refresh current user informations.
-      if (msg.message.message == "new_client") {
+      if (msg.message.message === "new_client") {
         window.currentUser.fetch();
       
       // The message is detinated to the user.
       } else if (msg.message.content.request_to == window.currentUser.get("id")) {
 
         // Another player accept a game request.
-        if (msg.message.message == "game_request_reply") {
+        if (msg.message.message === "game_request_reply") {
           toasts.notifySuccess("Start game !");
           window.location.hash = "game_live/" + msg.message.content.gameid;
           return;
         }
+
         
         window.currentUser.fetch();
         
         // Get a friend request.
-        if (msg.message.message == "friend_request")
+        if (msg.message.message === "friend_request")
           toasts.notifySuccess(
             "Friend request received from " + msg.message.content.from.login
           );
         
         // Get a game refresh.
-        else if (msg.message.message == "game_request")
+        else if (msg.message.message === "game_request")
           toasts.notifySuccess(
             "Game request received from " + msg.message.content.from.login
+          );
+
+        else if (msg.message.message === "guild_invite")
+          toasts.notifySuccess(
+            "Guild invite received from " + msg.message.content.from
           );
         }
       }
