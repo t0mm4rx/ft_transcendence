@@ -150,7 +150,6 @@ export default Backbone.View.extend({
           })
           .catch((err) => {
             console.log(err);
-            toasts.notifyError("Unable to read the image you selected");
           });
       },
       error(err) {

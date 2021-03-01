@@ -12,7 +12,7 @@ class GameRoom < ApplicationRecord
 		status == "ended" || player_score >= 11 || opponent_score >= 11
 	end
 
-	def update_scores(loser, current_user)
+	def update_scores(loser)
 		@loser = loser if loser
 		set_winner_and_loser
 		calculate_new_user_score if self.ladder
@@ -20,7 +20,7 @@ class GameRoom < ApplicationRecord
 			tournament.eliminate(@loser)
 			tournament.calculate_new_game(@winner)
 		end
-		game_room.update_war_scores(current_user)
+		update_war_scores
 	end
 
 	def set_no_show(user)
@@ -53,23 +53,20 @@ class GameRoom < ApplicationRecord
 		player.save && opponent.save
 	end
 
-	def update_war_scores(current_user)
-		if current_user.guild && current_user.guild.present_war_id
-			war = War.find(current_user.guild.present_war_id)
-			guild1 = Guild.find_by(id: war.guild1_id)
-			guild2 = Guild.find_by(id: war.guild2_id)
+	def update_war_scores
+		if (player.guild && opponent.guild && 
+			player.guild.present_war_id && 
+			player.guild.present_war_id === opponent.guild.present_war_id)
+			war = War.find(player.guild.present_war_id)
 			if war.add_count_all == true || self.game_type == 'war' || self.game_type == 'war_time'
-				guild1.isinwtgame = false
-				guild2.isinwtgame = false
+				player.guild.update_attribute(isinwtgame: false)
+				opponent.guild.update_attribute(isinwtgame: false)
 				if @winner.guild_id == war.guild1_id
 					war.guild1_score += 1
 				else
 					war.guild2_score += 1
 				end
 				war.save
-				self.save
-				guild1.save
-				guild2.save
 			end
 		end
 	end
