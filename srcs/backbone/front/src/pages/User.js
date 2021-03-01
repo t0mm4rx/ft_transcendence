@@ -62,8 +62,7 @@ export default Backbone.View.extend({
           if (value === this.model.get("username")) {
             return true;
           }
-          window.currentUser.save("username", value);
-          this.model.set("username", value);
+          this.model.save("username", value);
           return true;
         },
         () => {}
@@ -119,7 +118,8 @@ export default Backbone.View.extend({
     if (!document.querySelector("#avatar-file").files.length) return;
     const file = document.querySelector("#avatar-file").files[0];
     if (!file) return;
-    var login = this.model.get("login");
+    const login = this.model.get("login");
+    const user = this.model;
 
     new Compressor(file, {
       minWidth: 150,
@@ -142,11 +142,10 @@ export default Backbone.View.extend({
         })
           .then((res) => res.json())
           .then((result) => {
-            window.currentUser.save(
+            user.save(
               "avatar_url",
               `http://${window.location.hostname}:8080/${result.filepath}`
             );
-            this.model.trigger("change");
           })
           .catch((err) => {
             console.log(err);
