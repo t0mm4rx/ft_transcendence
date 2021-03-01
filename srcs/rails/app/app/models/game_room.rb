@@ -59,8 +59,8 @@ class GameRoom < ApplicationRecord
 			player.guild.present_war_id === opponent.guild.present_war_id)
 			war = War.find(player.guild.present_war_id)
 			if war.add_count_all == true || self.game_type == 'war' || self.game_type == 'war_time'
-				player.guild.update_attribute(isinwtgame: false)
-				opponent.guild.update_attribute(isinwtgame: false)
+				player.guild.update_attribute(:isinwtgame, false)
+				opponent.guild.update_attribute(:isinwtgame, false)
 				@winner.guild_id == war.guild1_id ? war.guild1_score += 1 : war.guild2_score += 1
 				war.save
 			end
