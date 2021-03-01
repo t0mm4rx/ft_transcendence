@@ -55,12 +55,10 @@ export default Backbone.View.extend({
             this.admins.remove(user);
             e.currentTarget.parentNode.remove();
           },
-          error: (a, state) => {
-            // console.log(a, b);
-
-            if (state.status == 403)
+          error: (model, response) => {
+            if (response.status == 403)
               toasts.notifyError(
-                "you don't have the rights to make this change"
+                "You don't have the rights to make this change"
               );
           },
         }
@@ -74,12 +72,14 @@ export default Backbone.View.extend({
         {
           patch: true,
           success: () => this.admins.add(user),
-          error: (a, state) => {
+          error: (model, response) => {
             // console.log(a, b);
-            if (state.status == 403)
+            if (response.status == 403)
               toasts.notifyError(
                 "you don't have the rights to make this change"
               );
+            else if (response.status == 404)
+              toasts.notifyError("User not found");
           },
         }
       );

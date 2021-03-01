@@ -349,18 +349,19 @@ export default Backbone.View.extend({
             ball_update.velocityY = ball_update.speed * Math.sin(angleRad);
 
             // this.playSound('../../assets/game_sound/wall_hit.ogg');
-            let self = this;
-            // Send ball position to other clients.
-            if (window.currentUser.get('id') == player.player.id)
-                _.throttle(
-                self.ftsocket.sendMessage({
-                    action: "to_broadcast",
-                    infos: {
-                        sender: window.currentUser.get('id'),
-                        message: "update_ball",
-                        content: ball_update
-                    }}, false), 250);
         }
+
+        let self = this;
+        // Send ball position to other clients.
+        if (window.currentUser.get('id') == player.player.id)
+            _.throttle(
+            self.ftsocket.sendMessage({
+                action: "to_broadcast",
+                infos: {
+                    sender: window.currentUser.get('id'),
+                    message: "update_ball",
+                    content: ball_update
+                }}, false), 250);
 
         var to_give = JSON.parse(JSON.stringify(this.ball));
         to_give.previous = null;

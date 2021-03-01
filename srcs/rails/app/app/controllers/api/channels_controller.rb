@@ -69,7 +69,7 @@ module Api
 			if @cu != nil && @cu.owner == true
 				@channel.public = true
 				@channel.private = false
-				@channel.password = nil
+				@channel.password = ""
 				@channel.save
 			else
 				error = "Only channel's owner can remove password"
