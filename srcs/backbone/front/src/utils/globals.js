@@ -70,6 +70,10 @@ const loadCurrentUser = (
     connectGlobalSocket();
   },
   error = (data, state) => {
+	  if (state.status === 401) {
+		Cookies.remove('user');
+		window.location.hash = "/";
+	  }
     console.log(state.responseJSON.error);
   }
 ) => {

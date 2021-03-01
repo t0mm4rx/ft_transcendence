@@ -259,8 +259,7 @@ const User = Backbone.Model.extend({
           true,
           true
         );
-
-        if (notif === true) toasts.notifySuccess("Game Request send.");
+		toasts.notifySuccess("Game Request send.");
       },
       error: (err) => {
         toasts.notifyError("Cannot send a game request.");

@@ -109,14 +109,8 @@ module Api
             game_room = GameRoom.find(params[:id])
             game_room.update_attribute(:player_score, params[:player_score]) if params.has_key?(:player_score)
             game_room.update_attribute(:opponent_score, params[:opponent_score]) if params.has_key?(:opponent_score)
-            if (params[:loser_id].to_i == game_room.player_id)
-                loser = game_room.player
-            elsif (params[:loser_id].to_i == game_room.opponent_id)
-                loser = game_room.opponent
-            end
-            if (loser || game_room.game_over? )&& !game_room.winner_id
-                game_room.update_scores(loser)
-                game_room.update_war_scores(current_user)
+            if game_room.game_over? && !game_room.winner_id
+                game_room.update_scores
             end
             render json: game_room
         end
