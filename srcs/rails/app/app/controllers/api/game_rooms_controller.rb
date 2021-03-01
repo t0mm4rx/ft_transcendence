@@ -116,7 +116,7 @@ module Api
             # end
             # if (loser || game_room.game_over? )&& !game_room.winner_id
             if game_room.game_over? && !game_room.winner_id
-                game_room.update_scores(loser)
+                game_room.update_scores
             end
             render json: game_room
         end

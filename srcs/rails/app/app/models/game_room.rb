@@ -61,11 +61,7 @@ class GameRoom < ApplicationRecord
 			if war.add_count_all == true || self.game_type == 'war' || self.game_type == 'war_time'
 				player.guild.update_attribute(isinwtgame: false)
 				opponent.guild.update_attribute(isinwtgame: false)
-				if @winner.guild_id == war.guild1_id
-					war.guild1_score += 1
-				else
-					war.guild2_score += 1
-				end
+				@winner.guild_id == war.guild1_id ? war.guild1_score += 1 : war.guild2_score += 1
 				war.save
 			end
 		end
