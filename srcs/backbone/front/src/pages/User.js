@@ -157,41 +157,4 @@ export default Backbone.View.extend({
       },
     });
   },
-  // updateProfilePicture() {
-  //   if (!document.querySelector("#avatar-file").files.length) return;
-  //   const file = document.querySelector("#avatar-file").files[0];
-  //   if (!file) return;
-
-  //   const reader = new FileReader();
-  //   const login = this.model.get("login");
-  //   reader.readAsBinaryString(file);
-  //   reader.onload = function (event) {
-  //     event.preventDefault();
-  //     event.stopPropagation();
-
-  //     fetch("/upload", {
-  //       method: "post",
-  //       headers: { "Content-Type": file.type, "X-Login": login },
-  //       body: file,
-  //     })
-  //       .then((response) => response.json())
-  //       .then((result) => {
-  //         // console.log("Success:", result);
-  //         window.currentUser.save(
-  //           "avatar_url",
-  //           `http://${window.location.hostname}:8080/assets/user_images/${result.filename}`
-  //         );
-  //         this.model.trigger("change");
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error:", error);
-  //         toasts.notifyError("Unable to read the image you selected");
-  //       });
-
-  //     return false;
-  //   };
-  //   reader.onerror = function (error) {
-  //     toasts.notifyError("Unable to read the image you selected");
-  //   };
-  // },
 });
