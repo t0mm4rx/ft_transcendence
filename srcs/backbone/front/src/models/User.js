@@ -23,11 +23,13 @@ const User = Backbone.Model.extend({
       data: `${key}=${value}`,
       success: () => {
         this.set(key, value);
+        if (this.id === window.currentUser.id)
+          window.currentUser.set(key, value);
       },
       error: (error) => {
-		  toasts.notifyError("Cannot update property.");
-		  console.log("ERRRORORROOROR", error);
-	  },
+        toasts.notifyError("Cannot update property.");
+        console.log("ERRRORORROOROR", error);
+      },
     });
   },
   askFriend: function () {
@@ -143,44 +145,46 @@ const User = Backbone.Model.extend({
     });
   },
   askGuild: function () {
-	$.ajax({
-		url: `http://${window.location.hostname}:3000/api/guilds/send_request`,
-		type: 'POST',
-		data: `target_id=${this.get("id")}`,
-		success: () => {
-			toasts.notifySuccess(`You invited ${this.get('username')} in your guild.`);
-		},
-		error: () => {
-			toasts.notifyError("Cannot send guild request.");
-		}
-	});
+    $.ajax({
+      url: `http://${window.location.hostname}:3000/api/guilds/send_request`,
+      type: "POST",
+      data: `target_id=${this.get("id")}`,
+      success: () => {
+        toasts.notifySuccess(
+          `You invited ${this.get("username")} in your guild.`
+        );
+      },
+      error: () => {
+        toasts.notifyError("Cannot send guild request.");
+      },
+    });
   },
   acceptGuildInvite: function () {
-	$.ajax({
-		url: `http://${window.location.hostname}:3000/api/guilds/accept_invitation`,
-		type: 'POST',
-		success: () => {
-			toasts.notifySuccess(`You joined the guild!`);
-			window.currentUser.fetch();
-			window.guilds.fetch();
-		},
-		error: () => {
-			toasts.notifyError("Unable to join the guild.");
-		}
-	});
+    $.ajax({
+      url: `http://${window.location.hostname}:3000/api/guilds/accept_invitation`,
+      type: "POST",
+      success: () => {
+        toasts.notifySuccess(`You joined the guild!`);
+        window.currentUser.fetch();
+        window.guilds.fetch();
+      },
+      error: () => {
+        toasts.notifyError("Unable to join the guild.");
+      },
+    });
   },
   declineGuildInvite: function () {
-	$.ajax({
-		url: `http://${window.location.hostname}:3000/api/guilds/ignore_invitation`,
-		type: 'POST',
-		success: () => {
-			toasts.notifySuccess(`You declined the guild invitation.`);
-			window.currentUser.fetch();
-		},
-		error: () => {
-			toasts.notifyError("Unable to decline the invitation.");
-		}
-	});
+    $.ajax({
+      url: `http://${window.location.hostname}:3000/api/guilds/ignore_invitation`,
+      type: "POST",
+      success: () => {
+        toasts.notifySuccess(`You declined the guild invitation.`);
+        window.currentUser.fetch();
+      },
+      error: () => {
+        toasts.notifyError("Unable to decline the invitation.");
+      },
+    });
   },
   setTFA: function () {
     $.ajax({
@@ -259,7 +263,7 @@ const User = Backbone.Model.extend({
           true,
           true
         );
-		toasts.notifySuccess("Game Request send.");
+        toasts.notifySuccess("Game Request send.");
       },
       error: (err) => {
         toasts.notifyError("Cannot send a game request.");
@@ -390,12 +394,14 @@ const User = Backbone.Model.extend({
       },
     });
   },
-  changeStatus(statu)
-  {
+  changeStatus(statu) {
     $.ajax({
-      url: `http://` + window.location.hostname + `:3000/api/users/${this.id}/change_status`,
+      url:
+        `http://` +
+        window.location.hostname +
+        `:3000/api/users/${this.id}/change_status`,
       type: "POST",
-      data: { status: statu},
+      data: { status: statu },
       success: () => {
         this.set("status", statu);
         window.globalSocket.sendMessage(
@@ -403,8 +409,8 @@ const User = Backbone.Model.extend({
             action: "to_broadcast",
             infos: {
               message: "new_client",
-              sender: window.currentUser.get('id'),
-              content: {desc: "Changement status", status: statu},
+              sender: window.currentUser.get("id"),
+              content: { desc: "Changement status", status: statu },
             },
           },
           false,
@@ -412,7 +418,7 @@ const User = Backbone.Model.extend({
         );
       },
     });
-  }
+  },
 });
 
 const Users = Backbone.Collection.extend({
