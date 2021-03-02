@@ -44,10 +44,9 @@ export default Backbone.View.extend({
   ),
   className: "tournament panel",
   initialize() {
-    // this.listenTo(this.model, "change", this.render);
+    this.model.getGames();
     this.listenTo(this.model.get("users"), "sync", this.render);
     this.listenTo(this.model.get("games"), "sync", this.renderGames);
-    this.model.getGames();
   },
   events: {
     "click #tournament-badge": "register",
