@@ -37,19 +37,19 @@ export default Backbone.View.extend({
       } else if (type === "guild_invite") {
         window.currentUser.declineGuildInvite();
       } else if (type === "game") {
-		$.ajax({
-			url: `http://${window.location.hostname}:3000/api/game/deny`,
-      type: 'PUT',
-      data: `opponentid=${window.currentUser.id}&userid=${id}`,
-			success: () => {
-				toasts.notifySuccess("Denied game request.");
-				window.currentUser.fetch();
-			},
-			error: () => {
-				toasts.notifyError("Failed to deny game request.");
-			}
-		});
-	  } else {
+        $.ajax({
+          url: `http://${window.location.hostname}:3000/api/game/deny`,
+          type: "PUT",
+          data: `opponentid=${window.currentUser.id}&userid=${id}`,
+          success: () => {
+            toasts.notifySuccess("Denied game request.");
+            window.currentUser.fetch();
+          },
+          error: () => {
+            toasts.notifyError("Failed to deny game request.");
+          },
+        });
+      } else {
         const game = new Game({ id: id });
         game.destroy({
           success: (data) => {
@@ -125,7 +125,7 @@ export default Backbone.View.extend({
       return;
     this.notifs = [];
     window.currentUser.get("pending_requests").forEach((req) => {
-      const user = window.users.models.find(a => a.get('id') === req.user_id);
+      const user = window.users.models.find((a) => a.get("id") === req.user_id);
       if (!!user) {
         this.notifs.push({
           title: `${user.get("username")} sent you a friend request`,
@@ -136,7 +136,7 @@ export default Backbone.View.extend({
       }
     });
     window.currentUser.get("game_pending_requests").forEach((req) => {
-	  const user = window.users.find(a => a.get('id') === req.user_id);
+      const user = window.users.find((a) => a.get("id") === req.user_id);
       if (!!user) {
         this.notifs.push({
           title: `${user.get("username")} sent you a game request`,
@@ -148,23 +148,35 @@ export default Backbone.View.extend({
       }
     });
     window.currentUser.get("pending_games").forEach((req) => {
-      let type = req.ladder ? "ladder" : "";
-      if (req.game_type == "war") type = "war_game";
-      else if (req.tournament_id) type = "tournament";
-      const user = window.users.find(req.user_id);
-      if (!!user) {
-        let title = `${user.get("username")} sent you a ${type} game request`;
-        if (type == "tournament") {
-          title = `You have an upcoming tournament game. Declining or no-show leads to elimination.`;
-        }
-        this.notifs.push({
-          title: title,
-          type: type,
-          id: req.id,
-          name: user.get("username"),
-        });
+      let title = `${req.from} sent you a ${req.game_type} game request`;
+      if (req.game_type == "tournament") {
+        title = `You have an upcoming tournament game. Declining or no-show leads to elimination.`;
       }
+      this.notifs.push({
+        title: title,
+        type: req.game_type,
+        id: req.id,
+        name: req.from,
+      });
     });
+    // window.currentUser.get("pending_games").forEach((req) => {
+    //   let type = req.ladder ? "ladder" : "";
+    //   if (req.game_type == "war") type = "war_game";
+    //   else if (req.tournament_id) type = "tournament";
+    //   const user = window.users.find(req.user_id);
+    //   if (!!user) {
+    //     let title = `${user.get("username")} sent you a ${type} game request`;
+    //     if (type == "tournament") {
+    //       title = `You have an upcoming tournament game. Declining or no-show leads to elimination.`;
+    //     }
+    //     this.notifs.push({
+    //       title: title,
+    //       type: type,
+    //       id: req.id,
+    //       name: user.get("username"),
+    //     });
+    //   }
+    // });
     if (window.currentUser.get("guild")) {
       if (window.currentUser.get("guild").war_invites) {
         const guild_id = window.currentUser.get("guild").war_invites;

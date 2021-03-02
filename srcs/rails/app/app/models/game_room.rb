@@ -12,7 +12,7 @@ class GameRoom < ApplicationRecord
 		status == "ended" || player_score >= 11 || opponent_score >= 11
 	end
 
-	def update_scores(loser)
+	def update_scores(loser = nil)
 		@loser = loser if loser
 		set_winner_and_loser
 		calculate_new_user_score if self.ladder
