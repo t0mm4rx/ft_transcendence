@@ -85,7 +85,6 @@ export default Backbone.View.extend({
     );
     if (this.model.get("winner")) {
       const winner = this.model.get("winner");
-      // console.log("WINNER :", winner);
 
       this.$("#img2").replaceWith(
         `<img src="${winner.avatar_url}" id="img2" class="avatar"/>`
@@ -103,7 +102,6 @@ export default Backbone.View.extend({
   },
   renderPermanent() {
     this.$el.attr("id", "permanent");
-    // console.log($(".tournament.panel"));
 
     this.$el.html(this.permanentTemplate);
     this.renderUsers(
@@ -120,7 +118,6 @@ export default Backbone.View.extend({
     }
     users.forEach((user) => {
       if (user) {
-        // console.log("User", user);
         html += this.userTemplate({ model: user, rank: rank });
         if (rank) rank++;
       }
@@ -128,8 +125,6 @@ export default Backbone.View.extend({
     this.$("#ranking").html(html);
   },
   renderGames() {
-    // todo
-    // console.log("GAMES:", this.model.get("games"));
     let html = "";
     this.model.get("games").each((game) => {
       if (game.get("player") != null && game.get("opponent") != null) {

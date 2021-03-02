@@ -15,7 +15,6 @@ export default Backbone.View.extend({
     this.listenTo(this.collection, "block", this.onBlock);
     $(document).on("chat", (_, { chat }) => {
       $("#chat-panel").addClass("chat-panel-open");
-      console.log("ADD CHANNEL ", chat);
 
       window.chat.fetch({
         success: () =>

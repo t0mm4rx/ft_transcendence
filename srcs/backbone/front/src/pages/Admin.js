@@ -73,7 +73,6 @@ export default Backbone.View.extend({
           patch: true,
           success: () => this.admins.add(user),
           error: (model, response) => {
-            // console.log(a, b);
             if (response.status == 403)
               toasts.notifyError(
                 "you don't have the rights to make this change"
@@ -131,7 +130,6 @@ export default Backbone.View.extend({
   editGuild(e) {
     const id = this.getId(e);
     const guild = this.guilds.get(id);
-    console.log("G USERS", guild.get("users"));
     const editGuild = new EditGuild({ model: guild });
     // editGuild.render();
   },
@@ -174,9 +172,7 @@ export default Backbone.View.extend({
   banUser() {
     const login = $("#ban-login-input").val();
     const time = $("#ban-time-input").val();
-    console.log("BAN", login, time);
     const user = window.users.findWhere({ login: login });
-    console.log("USER ", user);
     if (!user) toasts.notifyError("No such user.");
     else user.banUntil(time);
   },
@@ -187,7 +183,6 @@ export default Backbone.View.extend({
     const title = $("#tournament-title-input").val();
 
     const timeZone = -(new Date().getTimezoneOffset() / 60);
-    console.log("OFFSET", timeZone);
 
     if (name == "" || regStart == "" || start == "") {
       toasts.notifyError("Inputs can't be left blank");

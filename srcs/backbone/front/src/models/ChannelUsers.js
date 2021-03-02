@@ -7,14 +7,12 @@ const ChannelUser = Backbone.Model.extend({
   rollback(prev) {
     if (!prev) {
       const changed = this.changedAttributes();
-      console.log("ROLLBACK:", this, changed);
       if (!changed) return;
 
       const keys = _.keys(changed);
       prev = _.pick(this.previousAttributes(), keys);
     }
     this.set(prev, { silent: true }); // "silent" is optional; prevents change event
-    console.log("AFTER ROLLBACK:", this);
   },
 });
 
@@ -27,9 +25,6 @@ const ChannelUsers = Backbone.Collection.extend({
     this.channel_id = props.channel_id;
   },
   addAs(type, username, date) {
-    console.log("ADD", username, "TO", type, "WITH", date);
-    console.log(this.models);
-
     const user = this.findWhere({ username: username });
 
     if (user) {
@@ -39,7 +34,6 @@ const ChannelUsers = Backbone.Collection.extend({
         const dateType = type == "banned" ? "ban_date" : "mute_date";
         params[dateType] = date;
       }
-      console.log(user, "SET", type, "TO TRUE");
       user.set(params);
     }
     return user;
@@ -56,13 +50,10 @@ const ChannelUsers = Backbone.Collection.extend({
     return user;
   },
   saveChanges() {
-    console.log("SAVE CHANGES");
 
     this.each((channelUser) => {
-      console.log("1", channelUser);
 
       if (channelUser.hasChanged()) {
-        console.log("2", channelUser, channelUser.changedAttributes());
 
         const changed = channelUser.changedAttributes();
         const keys = _.keys(changed);
@@ -70,10 +61,9 @@ const ChannelUsers = Backbone.Collection.extend({
 
         channelUser.save(channelUser.changedAttributes(), {
           patch: true,
-          success: () => console.log("Successfully saved user"),
+          success: () => {},
           error: (data, state) => {
-            console.log("CHANGED ", changed, prev);
-
+            console.log("Save Changes channel user : ", changed, prev);
             channelUser.rollback(prev);
             toasts.notifyError(state.responseJSON.error);
           },

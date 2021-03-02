@@ -29,7 +29,6 @@ export default Backbone.View.extend({
     const games = $("#live-game-list");
     games.html("");
     const to_stream = await new Livestream().gamestostream();
-    console.log("To stream : ", to_stream);
 
     if (to_stream !== null) {
       to_stream.forEach((game) => {

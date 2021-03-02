@@ -38,7 +38,6 @@ if (token) {
 }
 // When the token changes in the cookies, we set ajax to use it for requests
 $(document).on("token_changed", function () {
-  console.log("User token changed, we refresh the Ajax headers.");
   const token = Cookies.get("user");
   $.ajaxSetup({
     headers: { Authorization: `Bearer ${token}` },

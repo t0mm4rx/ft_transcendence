@@ -45,7 +45,7 @@ const GameLive = Backbone.Model.extend({
             },
             error: (err) => {
               toasts.notifyError("Set active problem.");
-              console.log(err);
+              console.log("Set active game error : ", err);
             },
         });
     },
@@ -60,7 +60,7 @@ const GameLive = Backbone.Model.extend({
             },
             error: (err) => {
               toasts.notifyError("Set ended problem.");
-              console.log(err);
+              console.log("Set ended game error: ", err);
             },
         });
     }

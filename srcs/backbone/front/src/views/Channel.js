@@ -53,7 +53,6 @@ export default Backbone.View.extend({
     "click #edit-channel": "editChannel",
     "click #block-user": function ({ currentTarget }) {
       const login = $(currentTarget.parentNode).find("#chat-title").html();
-      console.log(login);
       const user = new User({ id: login });
       user.fetch({
         success: () => {
@@ -72,7 +71,6 @@ export default Backbone.View.extend({
       this.getUserProfile();
     },
     "click #start-game": function () {
-      // console.log("Model : ", this.model);
       if (this.model.get("direct") == true) {
         const channel_users = this.model.get("channel_users");
         var user;
@@ -86,7 +84,6 @@ export default Backbone.View.extend({
   render(adminPeak) {
     this.adminPeak = adminPeak;
     this.messagesLength = this.collection.length;
-    // console.log("RENDER CHANNEL");
     this.renderHeader();
     let html = `<div id="chat-messages"></div>`;
     if (!adminPeak)
@@ -109,13 +106,10 @@ export default Backbone.View.extend({
     );
     let prefix = "";
     if (!!user) {
-      console.log("User!", user);
       if (!!user.get("guild")) {
         prefix = `[${user.get("guild").anagram}] `;
-        console.log("PREFIX", prefix);
       }
     }
-    console.log("prefix", prefix);
     this.$el.html(this.template({ model: this.model, prefix: prefix }));
     if (this.adminPeak) {
       this.$("#leave-channel").hide();
@@ -136,7 +130,6 @@ export default Backbone.View.extend({
     if (this.collection.length == this.messagesLength) return;
     const newMessages = this.collection.length - this.messagesLength;
     this.messagesLength = this.collection.length;
-    // console.log("ON MORE MESSAGES", newMessages, messages, this.collection);
     const html = this.messagesToHTML(messages.models.slice(0, newMessages));
     this.$("#chat-messages").prepend(html);
     document.querySelector("#chat-messages").scrollTop = $(
@@ -144,7 +137,6 @@ export default Backbone.View.extend({
     ).offset().top;
   },
   onNewMessage(message) {
-    // console.log("NEW MESSAGE", message);
     const username = message.username;
     this.$("#chat-messages").append(
       this.messageTemplate({
@@ -160,7 +152,6 @@ export default Backbone.View.extend({
     ).scrollHeight;
   },
   messagesToHTML(messages) {
-    console.log("MSG -> HTML", messages.length);
     if (messages.length > 0) this.firstUser = messages[0].get("username");
     let html = "";
     messages.forEach((message) => {
@@ -183,7 +174,6 @@ export default Backbone.View.extend({
     });
     this.channelUsers.fetch({
       success: () => {
-        console.log("Successfully fetched channel users");
         this.editView.render(this.model.get("owner"));
       },
       error: () => toasts.notifyError("Failed to get channel data."),
@@ -226,6 +216,7 @@ export default Backbone.View.extend({
   },
   onScroll() {
     if ($("#chat-messages").scrollTop() == 0) {
+      //DOUBT
       console.log(
         "ON SCROLL ",
         $("#chat-messages").scrollTop(),
@@ -241,7 +232,6 @@ export default Backbone.View.extend({
   },
   getUserProfile() {
     const login = this.model.get("name");
-    console.log(login);
     if (window.users.find((a) => a.get("login") === login)) {
       window.location.hash = `user/${login}/`;
     }

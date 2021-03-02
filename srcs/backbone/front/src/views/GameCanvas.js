@@ -317,7 +317,6 @@ export default Backbone.View.extend({
         }
 	
         let player = (ball_update.x < this.canvas.width / 2) ? this.left : this.right;
-        // console.log("Player : ", player);
         let colidY = this.collision(ball_update, player);
         if (colidY !== -1)
         {
@@ -605,8 +604,6 @@ export default Backbone.View.extend({
 
             if (msg.message)
             {
-                if (self.connection_type == "live" && msg.message.message === "update_ball")
-                    console.log("Message ball\n");
 
                 /**
                  * The sender of the message is the actual user
@@ -855,8 +852,6 @@ export default Backbone.View.extend({
             right_player = this.player_info
         }
 
-        // console.log("CONNECTION TYPE : ", self.connection_type);
-
         if (this.connection_type == "normal")
         {
             // Init left player.
@@ -909,7 +904,6 @@ export default Backbone.View.extend({
         }
         else if (this.connection_type != "normal")
         {
-            // console.log("PUTAIN");
             this.ftsocket.sendMessage({ 
                 action: "to_broadcast", 
                 infos: {

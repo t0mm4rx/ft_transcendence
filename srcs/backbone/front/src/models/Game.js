@@ -130,7 +130,7 @@ const Game = Backbone.Model.extend({
           window.location.hash = "game_live/" + data.id;
         },
         error: (data) => {
-          console.log("ERROR", data);
+          console.log("Game open error :", data);
           toasts.notifyError(data.responseJSON.error);
         },
       }

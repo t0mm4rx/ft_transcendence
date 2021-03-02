@@ -6,7 +6,6 @@ import toasts from "../utils/toasts";
 
 const User = Backbone.Model.extend({
   urlRoot: `http://${window.location.hostname}:3000/api/users`,
-  // url: () => `http://${window.location.hostname}:3000/api/users${this.id}`,
 });
 
 const Users = Backbone.Collection.extend({
@@ -52,27 +51,16 @@ export default Backbone.View.extend({
   initialize() {
     this.users = new Users({ id: this.model.id });
     this.users.fetch({ success: () => this.render() });
-    // this.listenTo(this.users, "sync", this.render);
   },
   events: {
-    // "keyup input.username": "keyPressEventHandler",
-    // "focus input.username": "autocomplete",
-    // "blur input.username": "closeAutocomplete",
-    // "click .autocomplete-item": function (e) {
-    //   const id = `input.username#${e.currentTarget.parentNode.id}`;
-    //   $(id).val(e.currentTarget.innerText);
-    //   $(id).blur();
-    // },
     "click .add": "addToCategory",
     "click .delete": "removeFromCategory",
   },
   render() {
     let owners = "";
     let officers = "";
-    console.log("G USERS", this.users);
 
     this.users.each((user) => {
-      console.log("##", user);
 
       if (user.get("guild_owner")) {
         owners += this.userTemplate({
@@ -122,72 +110,19 @@ export default Backbone.View.extend({
     );
   },
   removeFromCategory(e) {
-    console.log("REMOVE", e);
     const user = e.currentTarget.parentNode;
     const category = e.currentTarget.id;
-    console.log("CAT", category);
     this.users.get(user.id).set(category, false);
     user.remove(); // from DOM
   },
   saveChanges() {
     this.users.each((user) => {
       if (user.hasChanged()) {
-        // const tmp = new User({ id: user.id });
         user.save(user.changed, {
-          success: () => console.log("Saved user", user),
+          success: () => {},
           error: () => console.log("Error on save", user),
         });
       }
     });
   },
-
-  // keyPressEventHandler(event) {
-  //   if (event.target.className == "username-input") {
-  //     if (event.keyCode === 27) {
-  //       event.target.blur();
-  //     } else {
-  //       this.autocomplete(event);
-  //     }
-  //   }
-  // },
-  // autocomplete(e) {
-  //   // console.log(e.currentTarget);
-
-  //   const query = $(e.currentTarget).val();
-  //   console.log("QUERY:", query);
-
-  //   let result = false;
-  //   console.log(e);
-
-  //   const id = `.autocomplete#${e.target.id}`;
-  //   $(id).html("");
-  //   // * only suggest users with no role yet
-  //   const condition = {
-  //     // owner: false,
-  //     admin: false,
-  //     banned: false,
-  //     muted: false,
-  //   };
-
-  //   this.collection.where(condition).forEach((user) => {
-  //     if (query.length === 0 || user.get("username").indexOf(query) !== -1) {
-  //       $(id).append(
-  //         `<span class="autocomplete-item">${user.get("username")}</span>`
-  //       );
-  //       result = true;
-  //     }
-  //   });
-  //   if (!result) {
-  //     $(id).append(`<div id="autocomplete-no-result">No result found</div>`);
-  //   }
-  //   $(id).show();
-  //   $("#input-container .fa-search").addClass("fa-times");
-  // },
-  // closeAutocomplete(e) {
-  //   const id = `.autocomplete#${e.target.id}`;
-  //   setTimeout(() => {
-  //     $(id).hide();
-  //     $("#input-container .fa-times").addClass("fa-search");
-  //   }, 100);
-  // },
 });

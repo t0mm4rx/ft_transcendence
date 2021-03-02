@@ -31,22 +31,15 @@ export default Backbone.View.extend({
 				return true;
 			}, () => true);
 			document.querySelector("#make-owner").onclick = () => {
-				console.log("LOGIN", this.lastClickedUser.get('username'));
 				this.lastClickedUser.save('guild_owner', !this.lastClickedUser.get('guild_owner'));
 			};
 			document.querySelector("#make-officer").onclick = () => {
-				console.log("LOGIN", this.lastClickedUser.get('username'));
 				this.lastClickedUser.save('guild_officer', !this.lastClickedUser.get('guild_officer'));
 			};
-			// document.querySelector("#make-officer").onclick = () => {
-			// 	this.lastClickedUser.save('guild_officer', !this.guild_officer);
-			// };
 			document.querySelector("#remove").onclick = () => {
-				console.log("EVVEENT");
 				const user = window.users.find(a => a.get('login') === login);
 				if (!user)
 					return;
-				console.log(`target_id=${user.get('id')}`);
 				$.ajax({
 					url: `http://${window.location.hostname}:3000/api/guilds/delete_member?target_id=${user.get('id')}`,
 					type: 'POST',
@@ -56,7 +49,6 @@ export default Backbone.View.extend({
 						window.guilds.fetch();
 					},
 					error: (err) => {
-						console.log(err);
 						toasts.notifyError("Cannot remove user from the guild.");
 					}
 				});
@@ -84,9 +76,6 @@ export default Backbone.View.extend({
 				return (a); 
 		});
 
-		console.log("Anagram : ", this.anagram);
-		console.log("Guilds : ", window.guilds);
-		console.log("Guild : ", this.guild);
 		this.$el.html(_.template(template)({guild: this.guild}));
 		this.renderUsers();
 		this.renderHistory();
@@ -97,10 +86,7 @@ export default Backbone.View.extend({
 		friends.html("");
 		if (!this.guild)
 			return;
-		console.log("Id: ", this.guild.get("id"));
-		console.log(getGuildMembers(this.guild.get("id")));
 		getGuildMembers(this.guild.get("id")).forEach(friend => {
-			console.log("FRIEND : ", friend);
 			if (!friend)
 				return;
 
@@ -121,7 +107,6 @@ export default Backbone.View.extend({
 		});
 	},
 	renderHistory: function () {
-		console.log("RENDER HISTORY");
 		const guild = window.guilds.find(a => !!a && a.get('anagram') === this.anagram);
 		if (!guild)
 			return;
@@ -144,9 +129,7 @@ export default Backbone.View.extend({
 					);
 				})
 			},
-			error: () => {
-				console.log("Cannot get guild history");
-			}
+			error: () => {}
 		});
 	}
 });

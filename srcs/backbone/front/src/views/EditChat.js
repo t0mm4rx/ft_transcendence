@@ -61,7 +61,6 @@ export default Backbone.View.extend({
         return true;
       },
       () => {
-        console.log("CANCEL");
         this.collection.rollbackChanges();
         this.undelegateEvents();
         this.$el.removeData().unbind();
@@ -116,15 +115,12 @@ export default Backbone.View.extend({
       $(`.user-container#${category}`).append(
         this.userTemplate({ model: user, category: category })
       );
-      console.log("EDITED USER", user);
     }
   },
   removeFromCategory(e) {
-    console.log("REMOVE", e);
     const user = e.currentTarget.parentNode;
     // const username = e.currentTarget.previousElementSibling.innerHTML;
     const category = e.currentTarget.id;
-    console.log("CAT", category);
 
     // this.collection.removeAs(category, username);
     this.collection.removeAs(category, user.id);
@@ -141,13 +137,9 @@ export default Backbone.View.extend({
     }
   },
   autocomplete(e) {
-    // console.log(e.currentTarget);
 
     const query = $(e.currentTarget).val();
-    console.log("QUERY:", query);
-
     let result = false;
-    console.log(e);
 
     const id = `.autocomplete#${e.target.id}`;
     $(id).html("");

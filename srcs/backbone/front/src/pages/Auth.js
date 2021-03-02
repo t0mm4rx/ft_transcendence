@@ -31,7 +31,6 @@ export default Backbone.View.extend({
 		},
 		'keyup #auth-2fa-inputs > input': function (event) {
 			if ("0123456789".indexOf(event.originalEvent.key) === -1) {
-				console.log("Block");
 				event.stopPropagation();
 			} else {
 				if (event.currentTarget.value.length > 1)
@@ -142,9 +141,7 @@ export default Backbone.View.extend({
 		window.addEventListener('message', event => {
 			w.close();
 			const params = new URLSearchParams("?" + event.data.params);
-			params.forEach(param => {
-				console.log(name, param);
-			})
+
 			if (!params.get("token") || !params.get("creation")) {
 				toasts.notifyError("Cannot get the 42 API token.");
 				return;
@@ -231,7 +228,6 @@ export default Backbone.View.extend({
 	signup: function () {
 		const displayName = $("#display-name-input").val();
 		const tfa = $("#2fa-input").is(':checked');
-		console.log("Signup, 2fa:", tfa);
 		if (displayName.length <= 0) {
 			toasts.notifyError("The display name can't be empty.");
 		} else {

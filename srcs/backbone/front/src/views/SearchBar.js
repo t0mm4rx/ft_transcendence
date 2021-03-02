@@ -9,7 +9,6 @@ export default Backbone.View.extend({
     `<a href="<%= link %>" class="search-result-object"><%= name %></a>`
   ),
   initialize() {
-    console.log("Init");
     $("#search-bar").append(`<i class="fas fa-search"></i>
     <input
       type="text"
@@ -30,8 +29,6 @@ export default Backbone.View.extend({
     },
   },
   showInput() {
-    console.log("SHOW INPUT");
-
     this.$(".fa-search").addClass("hidden");
     this.$("#search-input").removeClass("hidden");
   },
@@ -43,7 +40,6 @@ export default Backbone.View.extend({
     if (e.keyCode == 13) $("#search-input").val("");
   },
   showResults() {
-    console.log("SHOW RESULTS", this.search, this.search.get("users"));
     if (
       this.search.get("users").length === 0 &&
       this.search.get("guilds").length === 0 &&

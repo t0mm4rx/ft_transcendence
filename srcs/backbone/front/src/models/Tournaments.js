@@ -43,7 +43,6 @@ const Tournament = Backbone.Model.extend({
     games.fetch();
   },
   register() {
-    console.log("REGISTER");
     $.ajax({
       url: this.url() + "/register",
       type: "POST",
@@ -59,7 +58,6 @@ const Tournament = Backbone.Model.extend({
     });
   },
   unregister() {
-    console.log("UNREGISTER");
 
     $.ajax({
       url: this.url() + "/unregister",
@@ -70,11 +68,8 @@ const Tournament = Backbone.Model.extend({
         this.get("users").fetch();
       },
       error: (state) => {
-        // console.log(this.model);
-        console.log(state);
-
+        console.log("Unregister tournament error: ", state);
         toasts.notifyError(state);
-        // toasts.notifyError(state.responseJSON.error);
       },
     });
   },

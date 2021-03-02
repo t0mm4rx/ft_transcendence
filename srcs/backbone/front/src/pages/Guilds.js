@@ -38,7 +38,6 @@ export default Backbone.View.extend({
 		"click #wt_game_invite": function ()
 		{
 			var guild = new Guild(window.currentUser.get('guild'));
-			console.log(guild);
 			guild.gameWarInvite();
 		}
 	},
@@ -58,7 +57,6 @@ export default Backbone.View.extend({
 		if (isInWar) {
 			war = window.wars.models.find(a => a.get('id') === window.currentUser.get('guild').present_war_id);
 			if (war) {
-				console.log(war);
 				guild1 = window.guilds.find(a => a.get('id') === war.get('guild1_id'));
 				guild2 = window.guilds.find(a => a.get('id') === war.get('guild2_id'));
 			}
@@ -174,7 +172,6 @@ export default Backbone.View.extend({
 			toasts.notifyError("Dates cannot be empty.");
 			return;
 		}
-		console.log(guilds.models.find(a => a.get('anagram') === opponent));
 		guilds.models.find(a => a.get('anagram') === opponent).declareWar({
 			'start_date': start,
 			'end_date': end,

@@ -91,7 +91,6 @@ export default Backbone.View.extend({
     loadUsers();
   },
   render: function () {
-    console.log(this.model);
     this.$el.html(_.template(template)({ data: this.model.toJSON() }));
     this.renderFriendsList();
     this.games.fetch();
@@ -150,11 +149,11 @@ export default Backbone.View.extend({
             );
           })
           .catch((err) => {
-            console.log(err);
+            console.log("Fetch upload file error: ", err);
           });
       },
       error(err) {
-        console.log(err.message);
+        console.log("Update profile picture error: ", err.message);
       },
     });
   },

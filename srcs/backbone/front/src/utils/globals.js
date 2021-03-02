@@ -83,7 +83,6 @@ const loadCurrentUser = (
 		Cookies.remove('user');
 		window.location.hash = "/";
 	  }
-    console.log(state.responseJSON.error);
   }
 ) => {
   if (window.currentUser.status !== 200 && !!Cookies.get("user"))

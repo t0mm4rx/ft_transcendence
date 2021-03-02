@@ -28,7 +28,7 @@ const User = Backbone.Model.extend({
       },
       error: (error) => {
         toasts.notifyError("Cannot update property.");
-        console.log("ERRRORORROOROR", error);
+        console.log("Save user error : ", error);
       },
     });
   },
@@ -61,7 +61,7 @@ const User = Backbone.Model.extend({
       },
       error: (err) => {
         toasts.notifyError("Cannot send a friend request.");
-        console.log(err);
+        console.log("Ask frien user error: ", err);
       },
     });
   },
@@ -101,7 +101,7 @@ const User = Backbone.Model.extend({
         window.currentUser.fetch();
       },
       error: (err) => {
-        console.log(err);
+        console.log("Unfriend user error: ", err);
       },
     });
   },
@@ -139,7 +139,7 @@ const User = Backbone.Model.extend({
         window.currentUser.fetch();
       },
       error: (err) => {
-        console.log(err);
+        console.log("Accept friend error: ", err);
         toasts.notifyError("An error occured.");
       },
     });
@@ -207,7 +207,6 @@ const User = Backbone.Model.extend({
     window.currentUser.fetch();
   },
   block() {
-    console.log(this);
     $.ajax({
       url: "http://" + window.location.hostname + ":3000/api/blocked",
       type: "POST",
@@ -222,7 +221,6 @@ const User = Backbone.Model.extend({
     });
   },
   unblock() {
-    console.log(this);
     $.ajax({
       url:
         `http://` + window.location.hostname + `:3000/api/blocked/${this.id}`,
@@ -280,13 +278,11 @@ const User = Backbone.Model.extend({
       },
       error: (err) => {
         toasts.notifyError("Cannot send a game request.");
-        console.log(err);
+        console.log("Ask game user error: ", err);
       },
     });
   },
   acceptGame(game_request_id) {
-    console.log("This.id = ", this.id);
-    console.log("this.get('id')", this.get("id"));
     $.ajax({
       url:
         `http://` +
@@ -347,25 +343,22 @@ const User = Backbone.Model.extend({
         window.currentUser.fetch();
       },
       error: (err) => {
-        console.log(err);
+        console.log("Accept game error: ", err);
         toasts.notifyError("An error occured.");
       },
     });
   },
   findLadderGame() {
-    console.log("FIND LADDER");
-
     $.ajax({
       url: `http://${window.location.hostname}:3000/api/ladder_games`,
       type: "POST",
       success: (data) => {
-        console.log(data);
         toasts.notifySuccess(
           `Ladder game request sent to ${data.opponent.login}`
         );
       },
       error: (data) => {
-        console.log("ERROR", data);
+        console.log("Find lagger game error: ", data);
         toasts.notifyError(data.responseJSON.error);
       },
     });

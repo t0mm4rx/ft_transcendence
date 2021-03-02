@@ -53,11 +53,9 @@ export default Backbone.View.extend({
         const game = new Game({ id: id });
         game.destroy({
           success: (data) => {
-            console.log("DENIED GAME");
             toasts.notifySuccess("Game declined");
           },
           error: (model, response) => {
-            console.log("ERROR", response);
             toasts.notifyError(response.responseJSON.error);
           },
         });
@@ -69,11 +67,8 @@ export default Backbone.View.extend({
       const elId = el.currentTarget.getAttribute("notification-id");
       // const index = el.currentTarget.getAttribute("index");
       const type = elId.split("-")[0];
-      console.log("NOTIF TYPE = ", type);
       const id = parseInt(elId.split("-")[1]);
-      console.log("NOTIF USER ID = ", id);
       const username = elId.split("-")[2];
-      console.log("NOTIF USER NAME = ", username);
       if (type === "friend") {
         const target = new User({ id: id, username: username });
         target.acceptFriend();
@@ -86,7 +81,6 @@ export default Backbone.View.extend({
           window.currentUser.get("guild").war_invite_id
         );
         if (!war) return;
-        console.log("War = ", war);
         showModal(
           "War declaration",
           `<div id="war-notification"><p>Prize: ${war.get("prize")}</p>
@@ -127,15 +121,11 @@ export default Backbone.View.extend({
     this.renderList();
   },
   renderList: async function () {
-	console.log("HEEEEEERE");
     if (!window.currentUser || !window.currentUser.get("pending_requests"))
       return;
     this.notifs = [];
-	console.log("Requests", window.currentUser.get("pending_requests"));
     window.currentUser.get("pending_requests").forEach((req) => {
-	console.log("REQ", req);
       const user = window.users.models.find(a => a.get('id') === req.user_id);
-	  console.log("MOTIF", user);
       if (!!user) {
         this.notifs.push({
           title: `${user.get("username")} sent you a friend request`,
@@ -194,12 +184,6 @@ export default Backbone.View.extend({
         if (prop) {
           await prop.fetch({
             success: () => {
-              console.log(
-                "Prop : ",
-                `${prop.get("username")} from the ${
-                  prop.get("guild").name
-                } guild ask for a game.`
-              );
               self.notifs.push({
                 title: `${prop.get("username")} from the ${
                   prop.get("guild").name

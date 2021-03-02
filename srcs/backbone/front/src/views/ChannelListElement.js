@@ -22,7 +22,6 @@ export default Backbone.View.extend({
   },
   renderMessages(e, adminPeak) {
     this.adminPeak = !!adminPeak;
-    console.log("RENDER MESS", adminPeak);
 
     $(`.channel-current`).removeClass("channel-current");
     this.$el.addClass("channel-current");

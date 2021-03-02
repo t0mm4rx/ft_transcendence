@@ -23,7 +23,6 @@ const Channel = Backbone.Collection.extend({
     this.fetch({
       data: auth,
       success: () => {
-        console.log("FETCHED MESSAGES FOR ", this.channel_id);
         this.socket(this.channel_id);
         this.fetchBlockedUsers();
         this.trigger("open");
@@ -44,11 +43,10 @@ const Channel = Backbone.Collection.extend({
       data: { offset: this.length, adminPeak: !!adminPeak },
       remove: false,
       success: (data) => {
-        console.log("Successfully fetched more messages");
         this.trigger("load", data);
       },
       error: (data, state) => {
-        console.log(state.responseJSON);
+        console.log("Error load message: ", state.responseJSON);
       },
     });
   },
@@ -101,7 +99,6 @@ const Channel = Backbone.Collection.extend({
       url: `http://` + window.location.hostname + `:3000/api/blocked/`,
       type: "GET",
       success: (data) => {
-        console.log("BLOCKED USERS: ", data);
         this.blockedUsers = data;
       },
       error: (state) => toasts.notifyError(state.responseJSON.error),
