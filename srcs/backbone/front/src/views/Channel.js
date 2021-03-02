@@ -216,12 +216,6 @@ export default Backbone.View.extend({
   },
   onScroll() {
     if ($("#chat-messages").scrollTop() == 0) {
-      //DOUBT
-      console.log(
-        "ON SCROLL ",
-        $("#chat-messages").scrollTop(),
-        document.querySelector("#chat-messages").scrollHeight
-      );
       this.collection.loadMessages(this.adminPeak);
     }
   },
