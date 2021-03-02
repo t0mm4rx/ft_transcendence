@@ -189,23 +189,14 @@ export default Backbone.View.extend({
           });
       }
       if (window.currentUser.get("guild").wt_game_invite) {
-        var prop = window.users.where({
-          id: window.currentUser.get("guild").wt_game_invite,
-        })[0];
-        var self = this;
-        if (prop) {
-          await prop.fetch({
-            success: () => {
-              self.notifs.push({
-                title: `${prop.get("username")} from the ${
-                  prop.get("guild").name
-                } guild ask for a game.`,
-                type: "war_game",
-                id: 0,
-              });
-            },
-          });
-        }
+		const user = window.users.find(a => a.get('id') === window.currentUser.get("guild").wt_game_invite);
+		if (!user)
+			return;
+		this.notifs.push({
+			title: `${user.get('username')} invites you for a game in the current war.`,
+			type: 'war_game',
+			id: 0
+		});
       }
     }
     if (window.currentUser.get("guild_invites") !== 0) {
