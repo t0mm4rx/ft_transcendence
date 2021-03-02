@@ -7,10 +7,6 @@ export default Backbone.View.extend({
   initialize() {},
   events: {},
   render(user_id) {
-    let game_type = "direct";
-    if (this.model.get("ladder")) game_type = "ladder";
-    else if (this.model.get("game_type") == "war") game_type = "war";
-    else if (this.model.get("tournament")) game_type = "tournament";
     const winner =
       this.model.get("winner_id") === this.model.get("player").id
         ? "player"
@@ -24,7 +20,9 @@ export default Backbone.View.extend({
     )}</span> - <span>${this.model.get(loser + "_score")}</span> ${
       this.model.get(loser).username
     }
-    <span class="history-item-info"> - ${game_type} game</span></span>
+    <span class="history-item-info"> - ${this.model.escape(
+      "game_type"
+    )} game</span></span>
     <span class="history-item-${result}">${result}</span>`;
 
     this.$el.html(html);
