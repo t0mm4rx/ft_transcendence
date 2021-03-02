@@ -51,7 +51,7 @@ module.exports = {
     },
     publicPath: "/server/",
     contentBase: path.resolve(__dirname, "./"),
-    watchContentBase: true,
+    watchContentBase: false,
     compress: true,
     port: 8080,
   },
