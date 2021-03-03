@@ -5,17 +5,15 @@ import { showModal } from "../utils/modal";
 import toasts from "../utils/toasts";
 
 export default Backbone.View.extend({
+  userTemplate: _.template(
+    `<div class="chat-edit user-profile" id="<%= model.escape("user_id") %>">
+      <img class="avatar" id="chat-avatar" src="<%= model.escape("avatar") %>" />
+      <span id="chat-username"><%= model.escape("username") %></span>
+      <div class="button-icon delete" id="<%= category %>"><i class="fas fa-times-circle"></i></div>
+    </div>`
+  ),
   initialize() {
-    this.userTemplate = _.template(
-      `<div class="chat-edit user-profile" id="<%= model.escape("user_id") %>">
-        <img class="avatar" id="chat-avatar" src="<%= model.escape("avatar") %>" />
-        <span id="chat-username"><%= model.escape("username") %></span>
-        <div class="button-icon delete" id="<%= category %>"><i class="fas fa-times-circle"></i></div>
-      </div>`
-    );
     this.template = _.template($("#tpl-edit-channel-form").html());
-    // this.listenTo(this.model, "destroy", () => this.remove());
-    // this.listenTo(this.collection, "change", this.renderUser);
   },
   el: "body",
   events: {
@@ -36,7 +34,6 @@ export default Backbone.View.extend({
       "Edit channel",
       this.template(templateData),
       () => {
-        this.collection.saveChanges();
         if (!admin && owner) {
           const password = $("#new-channel-password").val();
           const no_pass = $("#no-password:checked").length > 0;
@@ -56,17 +53,20 @@ export default Backbone.View.extend({
           if (this.model.get("private") === false) success_message = "added";
           window.chat.editChannel(data, this.model.id, success_message);
         }
-        this.undelegateEvents();
-        this.$el.removeData().unbind();
+        this.onFinished();
         return true;
       },
       () => {
-        this.collection.rollbackChanges();
-        this.undelegateEvents();
-        this.$el.removeData().unbind();
-      }
+        this.onFinished();
+      },
+      true
     );
     $(".autocomplete").hide();
+  },
+  onFinished() {
+    this.undelegateEvents();
+    this.unbind();
+    this.stopListening();
   },
   renderChannelUsers(owner, admin) {
     let htmlOwners = "";
@@ -107,24 +107,24 @@ export default Backbone.View.extend({
         return;
       }
     }
-    const user = this.collection.addAs(category, username, date);
-    $(`input.username#${category}`).val("");
-    if (!user) {
-      toasts.notifyError(`Failed to add ${username} as ${category}`);
-    } else {
+    const user = this.collection.addAs(category, username, date, () => {
       $(`.user-container#${category}`).append(
         this.userTemplate({ model: user, category: category })
       );
+    });
+    $(`input.username#${category}`).val("");
+    if (!user) {
+      toasts.notifyError(`Failed to add ${username} as ${category}`);
     }
   },
   removeFromCategory(e) {
     const user = e.currentTarget.parentNode;
-    // const username = e.currentTarget.previousElementSibling.innerHTML;
+    const id = e.currentTarget.parentNode.id;
     const category = e.currentTarget.id;
 
-    // this.collection.removeAs(category, username);
-    this.collection.removeAs(category, user.id);
-    user.remove(); // from DOM
+    this.collection.removeAs(category, id, () => {
+      user.remove(); // from DOM
+    });
   },
 
   keyPressEventHandler(event) {
@@ -137,7 +137,6 @@ export default Backbone.View.extend({
     }
   },
   autocomplete(e) {
-
     const query = $(e.currentTarget).val();
     let result = false;
 

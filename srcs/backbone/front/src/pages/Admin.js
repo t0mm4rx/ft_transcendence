@@ -51,6 +51,7 @@ export default Backbone.View.extend({
       user.save(
         { admin: false },
         {
+          patch: true,
           success: () => {
             this.admins.remove(user);
             e.currentTarget.parentNode.remove();
@@ -144,6 +145,7 @@ export default Backbone.View.extend({
       collection: channelUsers,
     });
     channelUsers.fetch({
+      reset: true,
       success: () => {
         editView.render(true, true);
       },

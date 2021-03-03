@@ -3,78 +3,53 @@ import $ from "jquery";
 import toasts from "../utils/toasts";
 import _ from "underscore";
 
-const ChannelUser = Backbone.Model.extend({
-  rollback(prev) {
-    if (!prev) {
-      const changed = this.changedAttributes();
-      if (!changed) return;
-
-      const keys = _.keys(changed);
-      prev = _.pick(this.previousAttributes(), keys);
-    }
-    this.set(prev, { silent: true }); // "silent" is optional; prevents change event
-  },
-});
-
 const ChannelUsers = Backbone.Collection.extend({
-  model: ChannelUser,
-  url() {
-    return `http://` + window.location.hostname + `:3000/api/channels/${this.channel_id}/channel_users/`;
-  },
   initialize(props) {
     this.channel_id = props.channel_id;
+    this.url = `http://${window.location.hostname}:3000/api/channels/${this.channel_id}/channel_users/`;
   },
-  addAs(type, username, date) {
+  addAs(type, username, date, onSuccess) {
     const user = this.findWhere({ username: username });
+    if (!user) return null;
+    console.log("ADD AS ", user, type);
 
-    if (user) {
-      const params = {};
-      params[type] = true;
-      if (type == "banned" || type == "muted") {
-        const dateType = type == "banned" ? "ban_date" : "mute_date";
-        params[dateType] = date;
-      }
-      user.set(params);
+    const params = {
+      [type]: true,
+    };
+    if (type == "banned" || type == "muted") {
+      const dateType = type == "banned" ? "ban_date" : "mute_date";
+      params[dateType] = date;
     }
+    user.save(params, {
+      patch: true,
+      success: onSuccess,
+      error: (data, response) => {
+        console.log("Failed", response);
+        toasts.notifyError(response.responseJSON.user_id);
+      },
+    });
+
     return user;
   },
-  removeAs(type, userId) {
+  removeAs(type, userId, onSuccess) {
     const user = this.findWhere({ user_id: parseInt(userId) });
-    const params = {};
-    params[type] = false;
+    if (!user) return null;
+    const params = {
+      [type]: false,
+    };
     if (type == "banned" || type == "muted") {
       const dateType = type == "banned" ? "ban_date" : "mute_date";
       params[dateType] = null;
     }
-    user.set(params);
+    user.save(params, {
+      patch: true,
+      success: onSuccess,
+      error: (data, response) => {
+        console.log("Failed", response);
+        toasts.notifyError(response.responseJSON.user_id);
+      },
+    });
     return user;
-  },
-  saveChanges() {
-
-    this.each((channelUser) => {
-
-      if (channelUser.hasChanged()) {
-
-        const changed = channelUser.changedAttributes();
-        const keys = _.keys(changed);
-        const prev = _.pick(channelUser.previousAttributes(), keys);
-
-        channelUser.save(channelUser.changedAttributes(), {
-          patch: true,
-          success: () => {},
-          error: (data, state) => {
-            console.log("Save Changes channel user : ", changed, prev);
-            channelUser.rollback(prev);
-            toasts.notifyError(state.responseJSON.error);
-          },
-        });
-      }
-    });
-  },
-  rollbackChanges() {
-    this.each((channelUser) => {
-      channelUser.rollback();
-    });
   },
 });
 

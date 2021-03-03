@@ -4,9 +4,9 @@ import $ from "jquery";
 import _ from "underscore";
 import { showModal } from "../utils/modal";
 import toasts from "../utils/toasts";
-import { ChannelUsers } from "../models/ChannelUsers";
 import EditChat from "./EditChat";
 import { User } from "../models/User";
+import { ChannelUsers } from "../models/ChannelUsers";
 
 export default Backbone.View.extend({
   className: "chat-chat",
@@ -41,12 +41,11 @@ export default Backbone.View.extend({
     this.listenTo(this.collection, "join", this.joinChannel);
     this.listenTo(this.collection, "newMessage", this.onNewMessage);
     this.listenTo(this.collection, "load", this.onLoadMessages);
+    this.lastUser = null;
 
     this.channelUsers = new ChannelUsers({
       channel_id: this.model.id,
     });
-
-    this.lastUser = null;
   },
   events: {
     "click #leave-channel": "leaveChannel",
@@ -173,6 +172,7 @@ export default Backbone.View.extend({
       collection: this.channelUsers,
     });
     this.channelUsers.fetch({
+      reset: true,
       success: () => {
         this.editView.render(this.model.get("owner"));
       },
