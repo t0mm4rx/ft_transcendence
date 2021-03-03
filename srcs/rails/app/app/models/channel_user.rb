@@ -28,10 +28,11 @@ class ChannelUser < ApplicationRecord
   end
 
   def no_collision
-    if (admin || owner) && (banned || muted)
-      errors.add(:admin, "Can't be admin or owner and banned or muted")
+    if (admin || owner) && (self.banned|| self.muted)
+      errors.add(:user_id, "Can't be both admin/owner and banned/muted")
+    elsif (user.admin || user.owner) && (self.banned|| self.muted)
+      errors.add(:user_id, "Can't ban or mute site admins")
     end
   end
-  
 
 end

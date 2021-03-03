@@ -55,19 +55,6 @@ module Api
                 render json: game.errors, status: :unprocessable_entity
             end
         end
-        
-        # def update
-        #     game_room = GameRoom.find(params[:id])
-        #     # game_room.update_attribute(:player_id, params[:player_id])
-        #     # game_room.update_attribute(:opponent_id, params[:opponent_id])
-        #     # game_room.update_attribute(:status, params[:status])
-        #     game_room.update(game_room_params_update)
-        #     if game_room.save
-        #         render json: game_room
-        #     else
-        #         render json: {}, status: :unprocessable_entity
-        #     end
-        # end
 
         def destroy
             game = GameRoom.find(params[:id])
@@ -130,17 +117,9 @@ module Api
 
         # Set GameRoom param
         def game_room_params
-
-            # require() : mark required parameter
-            # permit() : set the autorized parameter
-          #  params.require(:game_room).permit(:player, :opponent, :status, :number_player)
             params.permit(:player_id, :opponent_id, :status, :number_player, :game_type)
         end
         def game_room_params_update
-
-            # require() : mark required parameter
-            # permit() : set the autorized parameter
-          #  params.require(:game_room).permit(:player, :opponent, :status, :number_player)
             params.permit(:opponent_id, :status, :number_player, :accepted)
         end
     end

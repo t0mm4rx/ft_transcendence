@@ -5,10 +5,7 @@ module Api
 
     def index
       user = User.find(params[:user_id])
-      friends = user.friends
-      # .limit(limit).offset(params[:offset])
-
-      render json: friends, each_serializer: FriendSerializer
+      render json: user.friends, each_serializer: FriendSerializer
     end
 
     def create

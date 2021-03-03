@@ -20,7 +20,7 @@ module Api
 		end
 		@message = @channel.messages.create(message_params)
 		MessageChannel.broadcast_to @channel, ActiveModel::SerializableResource.new(@message).serializable_hash
-		# MessageChannel.broadcast_to @channel, id: @message.id, username: current_user['username'], body: params['body'], date: @message.date, avatar: current_user.avatar_url
+
 		if @message.save
 			render json: @message, status: :created
 		else

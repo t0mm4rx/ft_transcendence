@@ -85,14 +85,6 @@ class User < ApplicationRecord
 		end
 	end
 
-	# def guild
-	# 	friendships_.filter_map do |friendship|
-	# 		if friendship.accepted
-	# 			friendship.user_id == id ? friendship.friend : friendship.user
-	# 		end
-	# 	end
-	# end
-
 	def banned
 		return false if !banned_until
 		banned_until > DateTime.now

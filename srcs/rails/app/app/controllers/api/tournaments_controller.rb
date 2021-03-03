@@ -4,7 +4,6 @@ class Api::TournamentsController < ApplicationController
 	before_action :check_registration_time, only: [:register, :unregister]
 
 	def index
-		# Tournament.all.each {|t| t.destroy if t.users.length < 2}
 		@tournaments = Tournament.all
 		render json: @tournaments
 	end
@@ -38,17 +37,6 @@ class Api::TournamentsController < ApplicationController
 	end
 
 	def show
-		# @tournament.match_opponents
-		# render json: @tournament.tournament_users
-		# @tournament.games[0].destroy
-		# game = GameRoom.new(player_id: 2, tournament_id: @tournament.id)
-		# game.save
-		# @tournament.calculate_new_game(User.find(1))
-		# render json: game
-		# @tournament.calculate_new_game(User.find(2))
-		# @tournament.game_rooms.find_by(status: "ended").update_scores
-		# @tournament.eliminate(User.find(2))
-		# @tournament.calculate_new_game(User.find(1))
 		render json: @tournament.tournament_users.order(eliminated: :asc)
 	end
 	

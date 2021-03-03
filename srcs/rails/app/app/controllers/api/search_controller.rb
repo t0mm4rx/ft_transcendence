@@ -13,7 +13,6 @@ module Api
 		def set_prefix
 			@prefix = params[:input]
 			if @prefix.length > 10 || @prefix.match(/\A[a-zA-Z0-9 ]*\z/).nil?
-				puts "bad input!"
 				@prefix = ""
 			end
 		end
