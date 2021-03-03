@@ -3,18 +3,10 @@ module Api
 	before_action :set_channel, only: [:show, :update, :destroy]
 	# GET /channels
 	def index
-		# @channels = Channel.all.order(:direct);
 		@public = Channel.where(public: true, direct: false);
 		@private = Channel.where(public: false, direct: false);
 		@dms = current_user.channels.where(direct: true);
 		@channels =  @public +  @private + @dms
-		# @channels = {
-		# 	@channels = ActiveModelSerializers::SerializableResource.new(@public,
-		# 		{serializer: ChannelSerializer}).as_json;
-		# 	private: render json: @private, current_user: current_user.login,
-		# 	dms: render json: @dms, current_user: current_user.login
-		# }
-
 		render json: @channels
 	end
 
@@ -36,11 +28,12 @@ module Api
 			@channel.name = "DM:#{@other_user.login}:#{current_user.login}"
 		elsif params[:password].empty?
 			@channel.public = true
-			@channel.password = "password"
 		else
 			@channel.private = true
 			@channel.public = false
 		end
+		# must add a placeholder password if none given
+		@channel.password = "password" if params[:password].empty?
 
 		if @channel.save
 			Channel.channel_user_creation(@channel.id, current_user.id)
