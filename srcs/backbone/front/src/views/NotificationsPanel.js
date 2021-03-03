@@ -76,10 +76,7 @@ export default Backbone.View.extend({
         const target = new User({ id: id, username: username });
         target.acceptGame();
       } else if (type === "war") {
-        const war = window.wars.where(
-          "id",
-          window.currentUser.get("guild").war_invite_id
-        );
+		const war = window.wars.find(a => a.get('id') === window.currentUser.get("guild").war_invite_id);
         if (!war) return;
         showModal(
           "War declaration",
@@ -91,7 +88,7 @@ export default Backbone.View.extend({
           "en-FR"
         )} to ${new Date(war.get("wt_end")).toLocaleString("en-FR")}</p>
         <p>Max unanswered games: ${war.get("wt_max_unanswers")}</p>
-		<p>All games count for the war: ${war.get("add_count_all") ? "yes" : "no"}</p>
+		<p>All games count for the war: ${!!war.get("add_count_all") ? "yes" : "no"}</p>
 	<p>You'll have ${war.get(
     "wt_time_to_answer"
   )} days to answer game requests.</p></div>`,
